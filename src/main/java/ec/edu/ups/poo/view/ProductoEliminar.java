@@ -1,7 +1,10 @@
 package ec.edu.ups.poo.view;
 
+import ec.edu.ups.poo.modelo.Producto;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.util.List;
 
 public class ProductoEliminar extends JFrame {
     private JPanel panelEliminarProducto;
@@ -20,66 +23,62 @@ public class ProductoEliminar extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
 
-        // Configurar modelo de la tabla
+        // Inicializar el modelo de la tabla
         modelo = new DefaultTableModel();
-        Object[] columnas = {"ID", "NOMBRE", "PRECIO"};
+        Object[] columnas = {"CÓDIGO", "NOMBRE", "PRECIO"};
         modelo.setColumnIdentifiers(columnas);
         tblEliminarProducto.setModel(modelo);
+
+        // Configurar selección de fila para mostrar información
+        tblEliminarProducto.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                int filaSeleccionada = tblEliminarProducto.getSelectedRow();
+                if (filaSeleccionada >= 0) {
+                    String nombre = (String) tblEliminarProducto.getValueAt(filaSeleccionada, 1);
+                    txtNombre.setText(nombre);
+                }
+            }
+        });
     }
 
     public JPanel getPanelEliminarProducto() {
         return panelEliminarProducto;
     }
 
-    public void setPanelEliminarProducto(JPanel panelEliminarProducto) {
-        this.panelEliminarProducto = panelEliminarProducto;
-    }
-
     public JLabel getLblNombre() {
         return lblNombre;
-    }
-
-    public void setLblNombre(JLabel lblNombre) {
-        this.lblNombre = lblNombre;
     }
 
     public JTextField getTxtNombre() {
         return txtNombre;
     }
 
-    public void setTxtNombre(JTextField txtNombre) {
-        this.txtNombre = txtNombre;
-    }
-
-    public JButton getLISTARButton() {
+    public JButton getBtnListar() {
         return LISTARButton;
     }
 
-    public void setLISTARButton(JButton LISTARButton) {
-        this.LISTARButton = LISTARButton;
-    }
-
-    public JButton getELIMINARButton() {
+    public JButton getBtnEliminar() {
         return ELIMINARButton;
-    }
-
-    public void setELIMINARButton(JButton ELIMINARButton) {
-        this.ELIMINARButton = ELIMINARButton;
     }
 
     public JTable getTblEliminarProducto() {
         return tblEliminarProducto;
     }
 
-    public void setTblEliminarProducto(JTable tblEliminarProducto) {
-        this.tblEliminarProducto = tblEliminarProducto;
+    public void cargarDatos(List<Producto> productos) {
+        modelo.setNumRows(0);
+        for (Producto producto : productos) {
+            Object[] filaProducto = {producto.getCodigo(), producto.getNombre(), producto.getPrecio()};
+            modelo.addRow(filaProducto);
+        }
     }
 
-    public DefaultTableModel getModelo() {
-        return modelo;
+    public void limpiarCampos() {
+        txtNombre.setText("");
+        tblEliminarProducto.clearSelection();
     }
 
-    public void setModelo(DefaultTableModel modelo) {
-        this.modelo = modelo;
+    public void mostrarMensaje(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje);
     }
 }

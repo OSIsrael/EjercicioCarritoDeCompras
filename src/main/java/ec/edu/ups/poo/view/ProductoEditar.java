@@ -8,7 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-public class ProductoEditar extends JFrame {
+public class ProductoEditar extends JInternalFrame {
     private JPanel panelEditarProducto;
     private JLabel lblNombre;
     private JTextField txtNombre;
@@ -20,10 +20,13 @@ public class ProductoEditar extends JFrame {
     public ProductoEditar() {
         setContentPane(panelEditarProducto);
         setTitle("EDITAR PRODUCTOS");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(600, 500);
-        setLocationRelativeTo(null);
-        setVisible(true);
+        setClosable(true);
+        setIconifiable(true);
+        setResizable(true);
+        setMaximizable(true);
+        //setVisible(true);
 
         modelo = new DefaultTableModel();
         Object[] columnas = {"CÓDIGO", "NOMBRE", "PRECIO"};

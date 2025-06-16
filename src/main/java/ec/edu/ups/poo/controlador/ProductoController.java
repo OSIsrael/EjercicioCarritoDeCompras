@@ -13,24 +13,17 @@ import java.util.List;
 
 public class ProductoController {
 
-    private final ProductoAnadirView productoAnadirView;
-    private final ProductoListaView productoListaView;
-    private final ProductoEditar productoEditarView;
-    private final ProductoEliminar productoEliminarView;
-    private final ProductoDAO productoDAO;
+    private  ProductoAnadirView productoAnadirView;
+    private  ProductoListaView productoListaView;
+    private  ProductoEditar productoEditarView;
+    private  ProductoEliminar productoEliminarView;
+    private  ProductoDAO productoDAO;
 
-    public ProductoController(ProductoDAO productoDAO, ProductoAnadirView productoView,
-                              ProductoListaView productoListaView, ProductoEditar productoEditarView,
-                              ProductoEliminar productoEliminarView) {
-        this.productoDAO = productoDAO;
-        this.productoAnadirView = productoView;
-        this.productoListaView = productoListaView;
-        this.productoEditarView = productoEditarView;
-        this.productoEliminarView = productoEliminarView;
-        configurarEventos();
+    public ProductoController(ProductoDAO productoDAO) {
+
     }
 
-    private void configurarEventos() {
+    private void configurarAnadirEventos() {
 
         productoAnadirView.getBtnGuardar().addActionListener(new ActionListener() {
             @Override
@@ -38,7 +31,8 @@ public class ProductoController {
                 guardarProducto();
             }
         });
-
+    }
+    private void configurarLitsaEventos() {
 
         productoListaView.getBtnBuscar().addActionListener(new ActionListener() {
             @Override
@@ -53,7 +47,8 @@ public class ProductoController {
                 listarProductos();
             }
         });
-
+    }
+    private void configurarEditarEventos() {
 
         productoEditarView.getBtnListar1().addActionListener(new ActionListener() {
             @Override
@@ -68,8 +63,9 @@ public class ProductoController {
                 editarProducto();
             }
         });
+    }
 
-
+    private void configurarEliminarEventos() {
         productoEliminarView.getBtnListar().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -154,5 +150,43 @@ public class ProductoController {
         } else {
             productoEliminarView.mostrarMensaje("Seleccione un producto de la tabla");
         }
+    }
+
+    public ProductoAnadirView getProductoAnadirView() {
+        return productoAnadirView;
+
+    }
+
+    public void setProductoAnadirView(ProductoAnadirView productoAnadirView) {
+        this.productoAnadirView = productoAnadirView;
+        configurarAnadirEventos();
+    }
+
+    public ProductoListaView getProductoListaView() {
+        return productoListaView;
+    }
+
+    public void setProductoListaView(ProductoListaView productoListaView) {
+        this.productoListaView = productoListaView;
+        configurarLitsaEventos();
+
+    }
+
+    public ProductoEditar getProductoEditarView() {
+        return productoEditarView;
+    }
+
+    public void setProductoEditarView(ProductoEditar productoEditarView) {
+        this.productoEditarView = productoEditarView;
+        configurarEditarEventos();
+    }
+
+    public ProductoEliminar getProductoEliminarView() {
+        return productoEliminarView;
+    }
+
+    public void setProductoEliminarView(ProductoEliminar productoEliminarView) {
+        this.productoEliminarView = productoEliminarView;
+        configurarEliminarEventos();
     }
 }

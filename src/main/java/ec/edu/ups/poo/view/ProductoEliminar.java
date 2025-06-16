@@ -6,7 +6,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
 
-public class ProductoEliminar extends JFrame {
+public class ProductoEliminar extends JInternalFrame {
     private JPanel panelEliminarProducto;
     private JLabel lblNombre;
     private JTextField txtNombre;
@@ -18,10 +18,13 @@ public class ProductoEliminar extends JFrame {
     public ProductoEliminar() {
         setContentPane(panelEliminarProducto);
         setTitle("ELIMINAR PRODUCTOS");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(600, 500);
-        setLocationRelativeTo(null);
-        setVisible(true);
+        setResizable(true);
+        setClosable(true);
+        setIconifiable(true);
+        setMaximizable(true);
+        //setVisible(true);
 
         // Inicializar el modelo de la tabla
         modelo = new DefaultTableModel();

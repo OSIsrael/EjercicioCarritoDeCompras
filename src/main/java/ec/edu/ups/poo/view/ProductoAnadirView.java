@@ -6,7 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-public class ProductoAnadirView extends JFrame {
+public class ProductoAnadirView extends JInternalFrame {
     private JPanel panelPrincipal;
     private JButton btnGuardar;
     private JTextField txtCodigo;
@@ -21,13 +21,14 @@ public class ProductoAnadirView extends JFrame {
     public ProductoAnadirView() {
         setContentPane(panelPrincipal);
         setTitle("Datos del Producto");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(500, 500);
         //setResizable(false);
-        setLocationRelativeTo(null);
-        setVisible(true);
+        //setVisible(true);
         //pack();
-
+        setClosable(true);
+        setIconifiable(true);
+        setResizable(true);
         btnEliminar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

@@ -6,7 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-public class ProductoView extends JFrame {
+public class ProductoAnadirView extends JFrame {
     private JPanel panelPrincipal;
     private JButton btnGuardar;
     private JTextField txtCodigo;
@@ -18,7 +18,7 @@ public class ProductoView extends JFrame {
     private JLabel lblAgregar;
     private JButton btnEliminar;
 
-    public ProductoView() {
+    public ProductoAnadirView() {
         setContentPane(panelPrincipal);
         setTitle("Datos del Producto");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -47,7 +47,7 @@ public class ProductoView extends JFrame {
         }
     }
     public static void main(String[] args) {
-        new ProductoView();
+        new ProductoAnadirView();
     }
 
     public JPanel getPanelPrincipal() {

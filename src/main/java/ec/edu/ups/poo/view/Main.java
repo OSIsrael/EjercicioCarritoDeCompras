@@ -9,10 +9,16 @@ public class Main {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
 
-                ProductoAnadirView productoView = new ProductoAnadirView();
-                ProductoDAO productoDAO = new ProductoDAOMemoria();
+                ProductoAnadirView productoAnadirView = new ProductoAnadirView();
                 ProductoListaView productoListaView = new ProductoListaView();
-                new ProductoController(productoDAO, productoView,productoListaView);
+                ProductoEditar productoEditarView = new ProductoEditar();
+                ProductoEliminar productoEliminarView = new ProductoEliminar();
+
+                ProductoDAO productoDAO = new ProductoDAOMemoria();
+
+
+                new ProductoController(productoDAO, productoAnadirView, productoListaView,
+                        productoEditarView, productoEliminarView);
             }
         });
     }

@@ -11,13 +11,23 @@ public class Main {
     public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                PrincipalView principalView = new PrincipalView();
+
+                //instancias (singleton)
                 ProductoDAO productoDAO = new ProductoDAOMemoria();
-                ProductoController productoController = new ProductoController(productoDAO);
+
+                //instancias de vistas
+                PrincipalView principalView = new PrincipalView();
                 ProductoAnadirView productoAnadirView = new ProductoAnadirView();
                 ProductoListaView productoListaView = new ProductoListaView();
                 ProductoEliminar productoEliminar = new ProductoEliminar();
                 ProductoEditar productoEditar = new ProductoEditar();
+                CarritoAnadirView carritoAnadirView = new CarritoAnadirView();
+
+                //intancia controller
+                ProductoController productoController = new ProductoController(productoDAO,productoAnadirView,productoListaView,productoEditar,productoEliminar,carritoAnadirView);
+
+
+
                 principalView.getMenuItemCrearProducto().addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -52,6 +62,16 @@ public class Main {
                         if (!productoEditar.isVisible()) {
                             principalView.getjDesktopPane().add(productoEditar);
                             productoEditar.setVisible(true);
+                        }
+                    }
+                });
+                principalView.getMenuItemCarrito().addActionListener(new ActionListener() {
+
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        if (!carritoAnadirView.isVisible()) {
+                            principalView.getjDesktopPane().add(carritoAnadirView);
+                            carritoAnadirView.setVisible(true);
                         }
                     }
                 });

@@ -47,9 +47,7 @@ public class ProductoAnadirView extends JInternalFrame {
             System.out.println(producto);
         }
     }
-    public static void main(String[] args) {
-        new ProductoAnadirView();
-    }
+
 
     public JPanel getPanelPrincipal() {
         return panelPrincipal;

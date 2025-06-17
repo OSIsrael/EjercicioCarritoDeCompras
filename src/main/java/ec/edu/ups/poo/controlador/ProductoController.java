@@ -2,10 +2,7 @@ package ec.edu.ups.poo.controlador;
 
 import ec.edu.ups.poo.dao.ProductoDAO;
 import ec.edu.ups.poo.modelo.Producto;
-import ec.edu.ups.poo.view.ProductoAnadirView;
-import ec.edu.ups.poo.view.ProductoListaView;
-import ec.edu.ups.poo.view.ProductoEditar;
-import ec.edu.ups.poo.view.ProductoEliminar;
+import ec.edu.ups.poo.view.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,10 +14,21 @@ public class ProductoController {
     private  ProductoListaView productoListaView;
     private  ProductoEditar productoEditarView;
     private  ProductoEliminar productoEliminarView;
+    private CarritoAnadirView carritoAnadirView;
     private  ProductoDAO productoDAO;
 
-    public ProductoController(ProductoDAO productoDAO) {
-
+    public ProductoController(ProductoDAO productoDAO,ProductoAnadirView productoAnadirView,ProductoListaView productoListaView,ProductoEditar productoEditarView,ProductoEliminar productoEliminarView,CarritoAnadirView carritoAnadirView) {
+        this.productoListaView=productoListaView;
+        this.productoEditarView=productoEditarView;
+        this.productoAnadirView=productoAnadirView;
+        this.productoDAO=productoDAO;
+        this.productoEliminarView=productoEliminarView;
+        this.carritoAnadirView=carritoAnadirView;
+        configurarLitsaEventos();
+        configurarAnadirEventos();
+        configurarEditarEventos();
+        configurarEliminarEventos();
+        configurarCarritoEventos();
     }
 
     private void configurarAnadirEventos() {
@@ -79,6 +87,32 @@ public class ProductoController {
                 eliminarProducto();
             }
         });
+    }
+    private void configurarCarritoEventos(){
+        carritoAnadirView.getBtnBuscar().addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                buscarProductoCarrito();
+            }
+        });
+    }
+    private void buscarProductoCarrito(){
+        int codigo= Integer.parseInt(carritoAnadirView.getTxtCodigo().getText());
+        Producto producto=productoDAO.buscarPorCodigo(codigo);
+        if(producto==null){
+            carritoAnadirView.mostrarMensaje("Producto no encontrado");
+            carritoAnadirView.getTxtNombre().setText("");
+            carritoAnadirView.getTxtPrecio().setText("");
+        }else{
+            carritoAnadirView.getTxtNombre().setText(producto.getNombre());
+            carritoAnadirView.getTxtPrecio().setText(String.valueOf(producto.getPrecio()));
+        }
+
+
+    }
+    private void mostarProductoEncontrado(Producto producto) {
+
     }
 
     private void guardarProducto() {
@@ -188,5 +222,13 @@ public class ProductoController {
     public void setProductoEliminarView(ProductoEliminar productoEliminarView) {
         this.productoEliminarView = productoEliminarView;
         configurarEliminarEventos();
+    }
+
+    public CarritoAnadirView getCarritoAnadirView() {
+        return carritoAnadirView;
+    }
+
+    public void setCarritoAnadirView(CarritoAnadirView carritoAnadirView) {
+        this.carritoAnadirView = carritoAnadirView;
     }
 }

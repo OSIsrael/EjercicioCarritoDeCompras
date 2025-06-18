@@ -86,7 +86,5 @@ public class ItemCarritoView extends JFrame {
     public void setPanelCarrito(JPanel panelCarrito) {
         this.panelCarrito = panelCarrito;
     }
-    public static void main(String[] args) {
-        new ItemCarritoView();
-    }
+
 }

@@ -173,6 +173,7 @@
             </constraints>
             <properties>
               <enabled value="false"/>
+              <text value=""/>
             </properties>
           </component>
           <component id="5a05a" class="javax.swing.JTextField" binding="txtTotal">

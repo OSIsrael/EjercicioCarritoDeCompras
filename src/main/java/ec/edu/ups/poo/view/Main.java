@@ -1,7 +1,10 @@
 package ec.edu.ups.poo.view;
 
+import ec.edu.ups.poo.controlador.CarritoController;
 import ec.edu.ups.poo.controlador.ProductoController;
+import ec.edu.ups.poo.dao.CarritoDAO;
 import ec.edu.ups.poo.dao.ProductoDAO;
+import ec.edu.ups.poo.dao.impl.CarritoDAOMemoria;
 import ec.edu.ups.poo.dao.impl.ProductoDAOMemoria;
 
 import java.awt.event.ActionEvent;
@@ -14,6 +17,8 @@ public class Main {
 
                 //instancias (singleton)
                 ProductoDAO productoDAO = new ProductoDAOMemoria();
+                CarritoDAO carritoDAO = new CarritoDAOMemoria();
+
 
                 //instancias de vistas
                 PrincipalView principalView = new PrincipalView();
@@ -25,7 +30,7 @@ public class Main {
 
                 //intancia controller
                 ProductoController productoController = new ProductoController(productoDAO,productoAnadirView,productoListaView,productoEditar,productoEliminar,carritoAnadirView);
-
+                CarritoController carritoController=new CarritoController(carritoDAO,productoDAO,carritoAnadirView);
 
 
                 principalView.getMenuItemCrearProducto().addActionListener(new ActionListener() {

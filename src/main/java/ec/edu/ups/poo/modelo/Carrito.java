@@ -58,13 +58,6 @@ public class Carrito {
         items.clear();
     }
 
-    public double calcularTotal() {
-        double total = 0;
-        for (ItemCarrito item : items) {
-            total += item.getProducto().getPrecio() * item.getCantidad();
-        }
-        return total;
-    }
 
     public List<ItemCarrito> obtenerItems() {
         return items;
@@ -73,5 +66,19 @@ public class Carrito {
     public boolean estaVacio() {
         return items.isEmpty();
     }
+    public double calcularSubtotal(){
+        double subtotal=0;
+        for (ItemCarrito item : items) {
+            subtotal+=item.getSubtotal();
+        }
+        return subtotal;
+    }
+    public double calcularIva(){
+        return calcularSubtotal()*0.12;
+    }
+    public double calcularTotal(){
+        return calcularSubtotal()+calcularIva();
+    }
+
 
 }

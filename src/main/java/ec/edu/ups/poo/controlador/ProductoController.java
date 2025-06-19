@@ -58,37 +58,6 @@ public class ProductoController {
 
     private void configurarCarritoEventos() {
         carritoAnadirView.getBtnBuscar().addActionListener(e -> buscarProductoCarrito());
-
-        carritoAnadirView.getBtnAnadir().addActionListener(e -> {
-
-                int codigo = Integer.parseInt(carritoAnadirView.getTxtCodigo().getText());
-                int cantidad = Integer.parseInt((String) carritoAnadirView.getCbxCanridad().getSelectedItem());
-                Producto producto = productoDAO.buscarPorCodigo(codigo);
-
-                if (producto != null) {
-                    carrito.agregarProducto(producto, cantidad);
-                    carritoAnadirView.mostrarMensaje("Producto añadido al carrito");
-                    actualizarTablaCarrito();
-                    actualizarTotales();
-                } else {
-                    carritoAnadirView.mostrarMensaje("Producto no encontrado");
-                }
-
-        });
-
-        carritoAnadirView.getBtnLimpiar().addActionListener(e -> {
-            carrito.vaciarCarrito();
-            actualizarTablaCarrito();
-            actualizarTotales();
-        });
-
-        carritoAnadirView.getBtnGuardar().addActionListener(e -> {
-            if (!carrito.estaVacio()) {
-                carritoAnadirView.mostrarMensaje("Carrito guardado exitosamente con " + carrito.getItems().size() + " productos.");
-            } else {
-                carritoAnadirView.mostrarMensaje("El carrito está vacío.");
-            }
-        });
     }
 
     private void buscarProductoCarrito() {

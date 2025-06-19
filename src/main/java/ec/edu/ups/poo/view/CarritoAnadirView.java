@@ -1,6 +1,7 @@
 package ec.edu.ups.poo.view;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 public class CarritoAnadirView extends JInternalFrame{
     private JPanel panelPrincipal;
@@ -23,6 +24,10 @@ public class CarritoAnadirView extends JInternalFrame{
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(500,500);
         cargarDatos();
+        DefaultTableModel model=new DefaultTableModel();
+        Object[] columnas=new Object[]{"Codigo","Nombre","Precio","Cantidad","Subtotal",};
+        model.setColumnIdentifiers(columnas);
+        tblMostrar.setModel(model);
     }
     private void cargarDatos(){
         cbxCanridad.removeAllItems();

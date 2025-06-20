@@ -3,11 +3,16 @@ package ec.edu.ups.poo.dao.impl;
 import ec.edu.ups.poo.dao.CarritoDAO;
 import ec.edu.ups.poo.modelo.Carrito;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class CarritoDAOMemoria implements CarritoDAO {
     private List<Carrito> carritos;
+    public CarritoDAOMemoria() {
+        carritos = new ArrayList<>();
+    }
+
     @Override
     public void crear(Carrito carrito) {
         carritos.add(carrito);

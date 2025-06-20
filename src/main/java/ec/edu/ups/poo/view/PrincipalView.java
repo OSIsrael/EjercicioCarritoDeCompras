@@ -84,4 +84,13 @@ public class PrincipalView extends JFrame {
     public void setMenuCarrito(JMenu menuCarrito) {
         this.menuCarrito = menuCarrito;
     }
+    public void mostrarMensaje(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje);
+    }
+    public void desactivar(){
+        getMenuItemCrearProducto().setEnabled(false);
+        getMenuItemEditarProducto().setEnabled(false);
+        getMenuItemEliminarProducto().setEnabled(false);
+        getMenuItemBuscarProducto().setEnabled(false);
+    }
 }

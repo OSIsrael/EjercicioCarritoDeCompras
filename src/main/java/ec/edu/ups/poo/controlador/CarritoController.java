@@ -62,7 +62,7 @@ public class CarritoController {
     }
     private void mostrarTotales(){
         String total=String.valueOf(carrito.calcularTotal());
-        String subtotal=String.valueOf(carrito.calcularIva());
+        String subtotal=String.valueOf(carrito.calcularSubtotal());
         String iva=String.valueOf(carrito.calcularIva());
         carritoAnadirView.getTxtTotal().setText(total);
         carritoAnadirView.getTxtSubtotal().setText(subtotal);

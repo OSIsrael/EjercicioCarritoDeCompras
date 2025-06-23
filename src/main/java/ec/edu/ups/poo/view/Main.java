@@ -18,7 +18,7 @@ public class Main {
     public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                //Iniciar sesion
+                //Iniciar sesio
                 UsuarioDAO usuarioDAO = new UsuarioDAOMemoria();
                 LoginView loginView = new LoginView();
                 loginView.setVisible(true);

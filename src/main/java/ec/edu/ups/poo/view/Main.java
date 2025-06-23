@@ -41,6 +41,7 @@ public class Main {
                             ProductoEliminar productoEliminar = new ProductoEliminar();
                             ProductoEditar productoEditar = new ProductoEditar();
                             CarritoAnadirView carritoAnadirView = new CarritoAnadirView();
+                            CarritoListarView carritoListarView=new CarritoListarView();
 
                             //intancia controller
                             ProductoController productoController = new ProductoController(productoDAO, productoAnadirView, productoListaView, productoEditar, productoEliminar, carritoAnadirView);
@@ -95,6 +96,16 @@ public class Main {
                                         principalView.getjDesktopPane().add(carritoAnadirView);
                                         carritoAnadirView.setVisible(true);
                                     }
+                                }
+                            });
+                            principalView.getMenuItemCarritoListar().addActionListener(new ActionListener() {
+
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                   if (!carritoListarView.isVisible()){
+                                       principalView.getjDesktopPane().add(carritoListarView);
+                                       carritoListarView.setVisible(true);
+                                   }
                                 }
                             });
                         } else {

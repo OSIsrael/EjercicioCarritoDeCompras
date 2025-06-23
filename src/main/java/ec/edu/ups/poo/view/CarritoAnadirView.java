@@ -2,8 +2,9 @@ package ec.edu.ups.poo.view;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 
-public class CarritoAnadirView extends JInternalFrame{
+public class CarritoAnadirView extends JInternalFrame {
     private JPanel panelPrincipal;
     private JTextField txtCodigo;
     private JButton btnBuscar;
@@ -16,26 +17,93 @@ public class CarritoAnadirView extends JInternalFrame{
     private JTextField txtTotal;
     private JButton btnGuardar;
     private JButton btnLimpiar;
-    private JComboBox cbxCanridad;
+    private JComboBox<String> cbxCanridad;
 
     public CarritoAnadirView() {
-        super("Carrito de Compras", true, true, false,true);
+        super("Carrito de Compras", true, true, false, true);
         setContentPane(panelPrincipal);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(500,500);
+        setSize(600, 600);
+        setMinimumSize(new Dimension(550, 500));
+
         cargarDatos();
-        DefaultTableModel model=new DefaultTableModel();
-        Object[] columnas=new Object[]{"Codigo","Nombre","Precio","Cantidad","Subtotal",};
-        model.setColumnIdentifiers(columnas);
-        tblMostrar.setModel(model);
+        configurarTabla();
+        configurarComponentes();
     }
-    private void cargarDatos(){
+
+    private void cargarDatos() {
         cbxCanridad.removeAllItems();
-        for (int i = 1; i <=20; i++) {
+        for (int i = 1; i <= 20; i++) {
             cbxCanridad.addItem(String.valueOf(i));
         }
     }
 
+    private void configurarTabla() {
+        DefaultTableModel model = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Hacer que la tabla no sea editable
+            }
+        };
+
+        Object[] columnas = new Object[]{"Código", "Nombre", "Precio", "Cantidad", "Subtotal"};
+        model.setColumnIdentifiers(columnas);
+        tblMostrar.setModel(model);
+
+        // Configurar el ancho de las columnas
+        tblMostrar.getColumnModel().getColumn(0).setPreferredWidth(80);  // Código
+        tblMostrar.getColumnModel().getColumn(1).setPreferredWidth(200); // Nombre
+        tblMostrar.getColumnModel().getColumn(2).setPreferredWidth(80);  // Precio
+        tblMostrar.getColumnModel().getColumn(3).setPreferredWidth(80);  // Cantidad
+        tblMostrar.getColumnModel().getColumn(4).setPreferredWidth(100); // Subtotal
+
+        // Configurar selección de fila
+        tblMostrar.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tblMostrar.setRowSelectionAllowed(true);
+        tblMostrar.setColumnSelectionAllowed(false);
+
+        // Agregar tooltip para informar sobre el clic derecho
+        tblMostrar.setToolTipText("Clic derecho en una fila para modificar o eliminar el item");
+    }
+
+    private void configurarComponentes() {
+        // Configurar campos de texto para que sean más visibles cuando están deshabilitados
+        txtNombre.setBackground(new Color(240, 240, 240));
+        txtPrecio.setBackground(new Color(240, 240, 240));
+        txtSubtotal.setBackground(new Color(240, 240, 240));
+        txtIva.setBackground(new Color(240, 240, 240));
+        txtTotal.setBackground(new Color(240, 240, 240));
+
+        // Configurar botones con colores
+        btnGuardar.setBackground(new Color(46, 125, 50));
+        btnGuardar.setForeground(Color.WHITE);
+        btnGuardar.setFocusPainted(false);
+
+        btnLimpiar.setBackground(new Color(211, 47, 47));
+        btnLimpiar.setForeground(Color.WHITE);
+        btnLimpiar.setFocusPainted(false);
+
+        btnAnadir.setBackground(new Color(25, 118, 210));
+        btnAnadir.setForeground(Color.WHITE);
+        btnAnadir.setFocusPainted(false);
+
+        btnBuscar.setBackground(new Color(255, 152, 0));
+        btnBuscar.setForeground(Color.WHITE);
+        btnBuscar.setFocusPainted(false);
+
+        // Configurar tooltips informativos
+        btnGuardar.setToolTipText("Guardar el carrito actual en la base de datos");
+        btnLimpiar.setToolTipText("Vaciar completamente el carrito");
+        btnAnadir.setToolTipText("Agregar el producto al carrito");
+        btnBuscar.setToolTipText("Buscar producto por código");
+
+        // Inicializar campos de totales en 0
+        txtSubtotal.setText("0.00");
+        txtIva.setText("0.00");
+        txtTotal.setText("0.00");
+    }
+
+    // Métodos getter y setter
     public JPanel getPanelPrincipal() {
         return panelPrincipal;
     }
@@ -132,14 +200,42 @@ public class CarritoAnadirView extends JInternalFrame{
         this.btnLimpiar = btnLimpiar;
     }
 
-    public JComboBox getCbxCanridad() {
+    public JComboBox<String> getCbxCanridad() {
         return cbxCanridad;
     }
 
-    public void setCbxCanridad(JComboBox cbxCanridad) {
+    public void setCbxCanridad(JComboBox<String> cbxCanridad) {
         this.cbxCanridad = cbxCanridad;
     }
+
     public void mostrarMensaje(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje);
+        JOptionPane.showMessageDialog(this, mensaje, "Información", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public void mostrarError(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    public void mostrarAdvertencia(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje, "Advertencia", JOptionPane.WARNING_MESSAGE);
+    }
+
+    public int mostrarConfirmacion(String mensaje) {
+        return JOptionPane.showConfirmDialog(this, mensaje, "Confirmación",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+    }
+
+    public void limpiarCamposProducto() {
+        txtCodigo.setText("");
+        txtNombre.setText("");
+        txtPrecio.setText("");
+        cbxCanridad.setSelectedIndex(0);
+    }
+
+    public void establecerProducto(String codigo, String nombre, String precio) {
+        txtCodigo.setText(codigo);
+        txtNombre.setText(nombre);
+        txtPrecio.setText(precio);
     }
 }

@@ -17,6 +17,11 @@ public class PrincipalView extends JFrame {
     private JDesktopPane jDesktopPane;
     private JMenu menuCarrito;
     private JMenuItem menuItemCarrito;
+    private JMenu menuAdmin;
+    private JMenuItem menuItemGestionarUsuarios;
+    private JMenu cerrarSesion;
+    private JMenuItem menuItemCerrarSesion;
+
 
     public PrincipalView() {
         jDesktopPane = new JDesktopPane();
@@ -37,6 +42,14 @@ public class PrincipalView extends JFrame {
         menuBar.add(menuCarrito);
         menuCarrito.add(menuItemCarrito);
         menuCarrito.add(menuItemCarritoListar);
+        menuAdmin=new JMenu("Administracion");
+        menuItemGestionarUsuarios=new JMenuItem("Gestionar Usuarios");
+        menuAdmin.add(menuItemGestionarUsuarios);
+        menuBar.add(menuAdmin);
+        cerrarSesion=new JMenu("CERRAR SESION");
+        menuItemCerrarSesion=new JMenuItem("Cerrar Sesion");
+        cerrarSesion.add(menuItemCerrarSesion);
+        menuBar.add(cerrarSesion);
 
 
         setJMenuBar(menuBar);
@@ -86,10 +99,19 @@ public class PrincipalView extends JFrame {
     public void setMenuCarrito(JMenu menuCarrito) {
         this.menuCarrito = menuCarrito;
     }
+
+    public JMenuItem getMenuItemGestionarUsuarios() {
+        return menuItemGestionarUsuarios;
+    }
+
+    public void setMenuItemGestionarUsuarios(JMenuItem menuItemGestionarUsuarios) {
+        this.menuItemGestionarUsuarios = menuItemGestionarUsuarios;
+    }
+
     public JMenuItem getMenuItemCarritoListar() {
         return menuItemCarritoListar;
     }
-
+    public JMenuItem getMenuItemCerrarSesion(){return menuItemCerrarSesion;}
     public void mostrarMensaje(String mensaje) {
         JOptionPane.showMessageDialog(this, mensaje);
     }
@@ -98,5 +120,10 @@ public class PrincipalView extends JFrame {
         getMenuItemEditarProducto().setEnabled(false);
         getMenuItemEliminarProducto().setEnabled(false);
         getMenuItemBuscarProducto().setEnabled(false);
+
+    }
+    public void configurarParaRolUsuario() {
+        // ... (desactivar otras opciones)
+        menuAdmin.setVisible(false); // Oculta todo el menú de administración
     }
 }

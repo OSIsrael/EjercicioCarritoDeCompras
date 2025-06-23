@@ -9,12 +9,14 @@ public class Carrito {
     private int codigo;
     private GregorianCalendar fechaCreacion;
     private List<ItemCarrito> items;
+    private Usuario usuario; // <-- ATRIBUTO AÑADIDO
 
     public Carrito() {
         items = new ArrayList<>();
         fechaCreacion = new GregorianCalendar();
     }
 
+    // --- GETTERS Y SETTERS ---
     public int getCodigo() {
         return codigo;
     }
@@ -39,85 +41,45 @@ public class Carrito {
         this.items = items;
     }
 
+    public Usuario getUsuario() { // <-- GETTER AÑADIDO
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) { // <-- SETTER AÑADIDO
+        this.usuario = usuario;
+    }
+
+    // --- LÓGICA DE NEGOCIO ---
     public void agregarProducto(Producto producto, int cantidad) {
-        // Verificar si el producto ya existe
+        if (producto == null || cantidad <= 0) {
+            return; // No agregar si los datos son inválidos
+        }
+        // Si el ítem ya existe, actualiza la cantidad
         for (ItemCarrito item : items) {
             if (item.getProducto().getCodigo() == producto.getCodigo()) {
-                // Si existe, incrementar la cantidad
                 item.setCantidad(item.getCantidad() + cantidad);
                 return;
             }
         }
-        // Si no existe, agregar nuevo item
+        // Si es nuevo, lo añade a la lista
         items.add(new ItemCarrito(producto, cantidad));
     }
 
-    public boolean eliminarProducto(int codigoProducto) {
-        Iterator<ItemCarrito> it = items.iterator();
-        while (it.hasNext()) {
-            ItemCarrito item = it.next();
-            if (item.getProducto().getCodigo() == codigoProducto) {
-                it.remove();
-                return true; // Producto eliminado exitosamente
-            }
-        }
-        return false; // Producto no encontrado
+    public void eliminarProducto(int codigoProducto) {
+        items.removeIf(item -> item.getProducto().getCodigo() == codigoProducto);
     }
 
-    public void vaciarCarrito() {
-        items.clear();
-    }
-
-    public List<ItemCarrito> obtenerItems() {
-        return new ArrayList<>(items); // Retornar una copia para evitar modificaciones externas
-    }
-
-    public boolean estaVacio() {
-        return items.isEmpty();
-    }
-
-    public int getCantidadItems() {
-        return items.size();
-    }
-
-    public int getCantidadTotalProductos() {
-        int total = 0;
-        for (ItemCarrito item : items) {
-            total += item.getCantidad();
-        }
-        return total;
-    }
-
-    public boolean contieneProducto(int codigoProducto) {
-        for (ItemCarrito item : items) {
-            if (item.getProducto().getCodigo() == codigoProducto) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public ItemCarrito obtenerItem(int codigoProducto) {
-        for (ItemCarrito item : items) {
-            if (item.getProducto().getCodigo() == codigoProducto) {
-                return item;
-            }
-        }
-        return null;
-    }
-
-    public boolean actualizarCantidadProducto(int codigoProducto, int nuevaCantidad) {
+    public void actualizarCantidad(int codigoProducto, int nuevaCantidad) {
         if (nuevaCantidad <= 0) {
-            return eliminarProducto(codigoProducto);
+            eliminarProducto(codigoProducto); // Si la cantidad es 0 o menos, se elimina
+            return;
         }
-
         for (ItemCarrito item : items) {
             if (item.getProducto().getCodigo() == codigoProducto) {
                 item.setCantidad(nuevaCantidad);
-                return true;
+                return;
             }
         }
-        return false;
     }
 
     public double calcularSubtotal() {
@@ -125,26 +87,22 @@ public class Carrito {
         for (ItemCarrito item : items) {
             subtotal += item.getSubtotal();
         }
-        return Math.round(subtotal * 100.0) / 100.0; // Redondear a 2 decimales
+        return subtotal;
     }
 
     public double calcularIva() {
-        double iva = calcularSubtotal() * 0.12;
-        return Math.round(iva * 100.0) / 100.0; // Redondear a 2 decimales
+        return calcularSubtotal() * 0.12; // Asumiendo IVA del 12%
     }
 
     public double calcularTotal() {
-        double total = calcularSubtotal() + calcularIva();
-        return Math.round(total * 100.0) / 100.0; // Redondear a 2 decimales
+        return calcularSubtotal() + calcularIva();
     }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Carrito #").append(codigo).append("\n");
-        sb.append("Fecha: ").append(fechaCreacion.getTime()).append("\n");
-        sb.append("Items: ").append(items.size()).append("\n");
-        sb.append("Total: $").append(calcularTotal()).append("\n");
-        return sb.toString();
+    public List<ItemCarrito> obtenerItems() {
+        return new ArrayList<>(items);
+    }
+
+    public boolean estaVacio() {
+        return items.isEmpty();
     }
 }

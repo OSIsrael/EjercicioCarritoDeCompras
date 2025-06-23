@@ -47,19 +47,19 @@ public class RegistroController {
             return;
         }
 
-        // Verificar si el usuario ya existe
+
         Usuario usuarioExistente = usuarioDAO.buscarPorUsername(username);
         if (usuarioExistente != null) {
             registrarUsuario.mostrarMensaje("El usuario ya existe. Elija otro nombre de usuario");
             return;
         }
 
-        // Crear nuevo usuario con rol USUARIO por defecto
+
         Usuario nuevoUsuario = new Usuario(username, password, Rol.USUARIO);
         usuarioDAO.crear(nuevoUsuario);
 
         registrarUsuario.mostrarMensaje("Usuario registrado exitosamente");
         registrarUsuario.limpiarCampos();
-        registrarUsuario.dispose(); // Cerrar ventana de registro
+        registrarUsuario.dispose();
     }
 }

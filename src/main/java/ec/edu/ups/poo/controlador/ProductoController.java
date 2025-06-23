@@ -6,6 +6,7 @@ import ec.edu.ups.poo.modelo.ItemCarrito;
 import ec.edu.ups.poo.modelo.Producto;
 import ec.edu.ups.poo.view.*;
 
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -157,15 +158,38 @@ public class ProductoController {
         productoEliminarView.cargarDatos(productoDAO.listarTodos());
     }
 
+    // En: ec.edu.ups.poo.controlador.ProductoController.java
+
     private void eliminarProducto() {
+        // Obtener la fila seleccionada de la tabla en la vista de eliminación
         int filaSeleccionada = productoEliminarView.getTblEliminarProducto().getSelectedRow();
-        if (filaSeleccionada >= 0) {
+
+        if (filaSeleccionada < 0) {
+            productoEliminarView.mostrarMensaje("Por favor, seleccione un producto de la tabla para eliminar.");
+            return;
+        }
+
+        // Pedir confirmación al usuario
+        int confirmacion = JOptionPane.showConfirmDialog(
+                productoEliminarView,
+                "¿Está seguro de que desea eliminar este producto?",
+                "Confirmar eliminación",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirmacion == JOptionPane.YES_OPTION) {
+            // Obtener el código del producto de la columna 0 de la fila seleccionada
             int codigo = (int) productoEliminarView.getTblEliminarProducto().getValueAt(filaSeleccionada, 0);
+
+            // Llamar al DAO para eliminar
             productoDAO.eliminar(codigo);
-            productoEliminarView.mostrarMensaje("Producto eliminado correctamente");
+
+            // Mostrar mensaje de éxito
+            productoEliminarView.mostrarMensaje("Producto eliminado correctamente.");
+
+            // Refrescar la lista de productos en la tabla
             listarProductosParaEliminar();
-        } else {
-            productoEliminarView.mostrarMensaje("Seleccione un producto de la tabla");
         }
     }
+
 }

@@ -19,59 +19,70 @@ import java.awt.event.WindowEvent;
 public class Main {
 
     public static void main(String[] args) {
+
+
         // Inicia la aplicación en el hilo de despacho de eventos de Swing
         SwingUtilities.invokeLater(() -> mostrarLogin());
     }
 
 
     private static void mostrarLogin() {
-        // --- DAOs ---
+        System.out.println("=== Iniciando aplicación ===");
+
+        // --- Inicializar DAOs ---
         UsuarioDAO usuarioDAO = new UsuarioDAOMemoria();
 
-        // Crear usuarios por defecto si no existen (para pruebas)
-        if (usuarioDAO.buscarPorUsername("admin") == null) {
-            usuarioDAO.crear(new Usuario("admin", "admin", Rol.ADMINISTRADOR));
-        }
-        if (usuarioDAO.buscarPorUsername("user") == null) {
-            usuarioDAO.crear(new Usuario("user", "user", Rol.USUARIO));
+        // Mostrar estadísticas iniciales
+        if (usuarioDAO instanceof UsuarioDAOMemoria) {
+            ((UsuarioDAOMemoria) usuarioDAO).mostrarEstadisticas();
         }
 
-        // --- Vistas ---
+        // --- Inicializar Vistas ---
         LoginView loginView = new LoginView();
-        // Usamos tu clase RegistrarUsuario
         RegistrarUsuario registrarUsuarioView = new RegistrarUsuario();
-        // Creamos la vista de administración de usuarios (necesaria para el controlador)
         UsuarioAdminView usuarioAdminView = new UsuarioAdminView();
 
-        // --- Controlador de Usuario ---
-        // Se pasa todas las vistas que el controlador de usuario gestiona
-        UsuarioController usuarioController = new UsuarioController(usuarioDAO, loginView, registrarUsuarioView, usuarioAdminView);
+        // --- Inicializar Controlador de Usuario ---
+        UsuarioController usuarioController = new UsuarioController(
+                usuarioDAO,
+                loginView,
+                registrarUsuarioView,
+                usuarioAdminView
+        );
 
-        // 2. Esperar a que la ventana de login se cierre para continuar
+        // --- Configurar evento de cierre de login ---
         loginView.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
                 Usuario usuarioAutenticado = usuarioController.getUsuarioAutenticado();
 
-                // 3. Si el login fue exitoso, iniciar la ventana principal
                 if (usuarioAutenticado != null) {
-                    // Pasamos el usuario autenticado, el controlador de usuario y la vista de admin
-                    // para que la aplicación principal pueda usarlos.
+                    System.out.println("Login exitoso para: " + usuarioAutenticado.getUsername() +
+                            " con rol: " + usuarioAutenticado.getRol());
                     iniciarAplicacionPrincipal(usuarioAutenticado, usuarioController, usuarioAdminView);
                 } else {
-                    System.out.println("Login cancelado o fallido. La aplicación se cerrará.");
-                    System.exit(0); // Cierra la aplicación si no hay login
+                    System.out.println("Login cancelado o fallido. Cerrando aplicación.");
+                    System.exit(0);
                 }
             }
         });
+
+        // Mostrar la ventana de login
         loginView.setVisible(true);
+        System.out.println("Ventana de login mostrada");
     }
 
-    private static void iniciarAplicacionPrincipal(Usuario usuarioAutenticado, UsuarioController usuarioController, UsuarioAdminView usuarioAdminView) {
+    private static void iniciarAplicacionPrincipal(Usuario usuarioAutenticado,
+                                                   UsuarioController usuarioController,
+                                                   UsuarioAdminView usuarioAdminView) {
 
+        System.out.println("=== Iniciando aplicación principal ===");
+
+        // --- Inicializar DAOs para productos y carrito ---
         ProductoDAO productoDAO = new ProductoDAOMemoria();
         CarritoDAO carritoDAO = new CarritoDAOMemoria();
 
+        // --- Inicializar Vistas ---
         PrincipalView principalView = new PrincipalView();
         ProductoAnadirView productoAnadirView = new ProductoAnadirView();
         ProductoListaView productoListaView = new ProductoListaView();
@@ -80,49 +91,167 @@ public class Main {
         CarritoAnadirView carritoAnadirView = new CarritoAnadirView();
         CarritoListarView carritoListarView = new CarritoListarView();
 
-        ProductoController productoController = new ProductoController(productoDAO, productoAnadirView, productoListaView, productoEditar, productoEliminar, carritoAnadirView);
-        CarritoController carritoController = new CarritoController(carritoDAO, productoDAO, carritoAnadirView, usuarioAutenticado, carritoListarView);
+        // --- Inicializar Controladores ---
+        ProductoController productoController = new ProductoController(
+                productoDAO,
+                productoAnadirView,
+                productoListaView,
+                productoEditar,
+                productoEliminar,
+                carritoAnadirView
+        );
 
-        principalView.mostrarMensaje("Bienvenido: " + usuarioAutenticado.getUsername());
+        CarritoController carritoController = new CarritoController(
+                carritoDAO,
+                productoDAO,
+                carritoAnadirView,
+                usuarioAutenticado,
+                carritoListarView
+        );
+
+        // --- Configurar ventana principal ---
+        principalView.mostrarMensaje("Bienvenido: " + usuarioAutenticado.getUsername() +
+                " (" + usuarioAutenticado.getRol() + ")");
 
         // Configurar opciones de menú según el rol del usuario
         if (usuarioAutenticado.getRol() == Rol.USUARIO) {
             principalView.configurarParaRolUsuario(); // Desactiva opciones de admin
+            System.out.println("Configuración de menú para usuario normal");
+        } else {
+            System.out.println("Configuración de menú para administrador");
         }
 
-        // --- Asignación de Eventos a los Menús ---
+        // --- Configurar eventos de los menús ---
+        configurarEventosProductos(principalView, productoAnadirView, productoListaView,
+                productoEditar, productoEliminar);
+
+        configurarEventosCarrito(principalView, carritoController, carritoAnadirView, carritoListarView);
+
+        configurarEventosUsuarios(principalView, usuarioController, usuarioAdminView);
+
+        configurarEventosCerrarSesion(principalView, usuarioController);
+
+        // --- Mostrar ventana principal ---
+        principalView.setVisible(true);
+        System.out.println("Aplicación principal iniciada exitosamente");
+    }
+
+    private static void configurarEventosProductos(PrincipalView principalView,
+                                                   ProductoAnadirView productoAnadirView,
+                                                   ProductoListaView productoListaView,
+                                                   ProductoEditar productoEditar,
+                                                   ProductoEliminar productoEliminar) {
+
         // Eventos para la gestión de Productos
-        principalView.getMenuItemCrearProducto().addActionListener(e -> mostrarVentana(principalView, productoAnadirView));
-        principalView.getMenuItemBuscarProducto().addActionListener(e -> mostrarVentana(principalView, productoListaView));
-        principalView.getMenuItemEditarProducto().addActionListener(e -> mostrarVentana(principalView, productoEditar));
-        principalView.getMenuItemEliminarProducto().addActionListener(e -> mostrarVentana(principalView, productoEliminar));
+        principalView.getMenuItemCrearProducto().addActionListener(e -> {
+            System.out.println("Abriendo ventana crear producto");
+            mostrarVentana(principalView, productoAnadirView);
+        });
+
+        principalView.getMenuItemBuscarProducto().addActionListener(e -> {
+            System.out.println("Abriendo ventana listar productos");
+            mostrarVentana(principalView, productoListaView);
+        });
+
+        principalView.getMenuItemEditarProducto().addActionListener(e -> {
+            System.out.println("Abriendo ventana editar producto");
+            mostrarVentana(principalView, productoEditar);
+        });
+
+        principalView.getMenuItemEliminarProducto().addActionListener(e -> {
+            System.out.println("Abriendo ventana eliminar producto");
+            mostrarVentana(principalView, productoEliminar);
+        });
+    }
+
+    private static void configurarEventosCarrito(PrincipalView principalView,
+                                                 CarritoController carritoController,
+                                                 CarritoAnadirView carritoAnadirView,
+                                                 CarritoListarView carritoListarView) {
 
         // Eventos para el Carrito
-        principalView.getMenuItemCarrito().addActionListener(e -> mostrarVentana(principalView, carritoAnadirView));
+        principalView.getMenuItemCarrito().addActionListener(e -> {
+            System.out.println("Abriendo carrito de compras");
+            mostrarVentana(principalView, carritoAnadirView);
+        });
+
         principalView.getMenuItemCarritoListar().addActionListener(e -> {
+            System.out.println("Listando carritos de compras");
             carritoController.listarTodosLosCarritos(); // Cargar datos antes de mostrar
             mostrarVentana(principalView, carritoListarView);
         });
+    }
+
+    private static void configurarEventosUsuarios(PrincipalView principalView,
+                                                  UsuarioController usuarioController,
+                                                  UsuarioAdminView usuarioAdminView) {
 
         // Eventos para la Gestión de Usuarios (solo para ADMIN)
         principalView.getMenuItemGestionarUsuarios().addActionListener(e -> {
-            usuarioController.listarUsuarios();
+            System.out.println("Abriendo gestión de usuarios");
+            usuarioController.listarUsuarios(); // Cargar usuarios antes de mostrar
             mostrarVentana(principalView, usuarioAdminView);
         });
+    }
 
+    private static void configurarEventosCerrarSesion(PrincipalView principalView,
+                                                      UsuarioController usuarioController) {
 
         principalView.getMenuItemCerrarSesion().addActionListener(e -> {
-            principalView.dispose();
-            mostrarLogin();
-        });
+            System.out.println("Cerrando sesión");
 
-        principalView.setVisible(true);
+            // Confirmar cierre de sesión
+            int opcion = JOptionPane.showConfirmDialog(
+                    principalView,
+                    "¿Está seguro de que desea cerrar sesión?",
+                    "Cerrar Sesión",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE
+            );
+
+            if (opcion == JOptionPane.YES_OPTION) {
+                usuarioController.cerrarSesion();
+                principalView.dispose();
+                System.out.println("Sesión cerrada, volviendo al login");
+                mostrarLogin();
+            }
+        });
     }
 
     private static void mostrarVentana(PrincipalView principal, JInternalFrame ventana) {
         if (!ventana.isVisible()) {
             principal.getjDesktopPane().add(ventana);
             ventana.setVisible(true);
+
+            // Centrar la ventana interna
+            try {
+                ventana.setSelected(true);
+                ventana.moveToFront();
+            } catch (Exception e) {
+                System.out.println("Error al centrar ventana: " + e.getMessage());
+            }
+        } else {
+            // Si ya está visible, traerla al frente
+            try {
+                ventana.setSelected(true);
+                ventana.moveToFront();
+            } catch (Exception e) {
+                System.out.println("Error al traer ventana al frente: " + e.getMessage());
+            }
         }
     }
+    private static void configurarEventosIdioma(PrincipalView principalView){
+        principalView.getMenuItemEspañol().addActionListener(e -> {
+            principalView.cambiarIdiomas("es","EC");
+
+        });
+        principalView.getMenuItemFrances().addActionListener(e -> {
+            principalView.cambiarIdiomas("fr","FR");
+
+        });
+        principalView.getMenuItemIngles().addActionListener(e -> {
+            principalView.cambiarIdiomas("en","US");
+        });
+    }
 }
+

@@ -120,7 +120,7 @@ public class CarritoController {
             return;
         }
         carritoDAO.crear(carritoActual);
-        carritoAnadirView.mostrarMensaje("Carrito guardado correctamente.");
+        carritoAnadirView.mostrarMensaje("Carrito guardado exitosamente.");
         limpiarCarritoActual();
     }
 

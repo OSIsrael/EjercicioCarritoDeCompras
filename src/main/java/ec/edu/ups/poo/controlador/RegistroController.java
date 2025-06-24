@@ -31,7 +31,6 @@ public class RegistroController {
         String username = registrarUsuario.getTxtUsuarioRe().getText().trim();
         String password = new String(registrarUsuario.getTxtContraRe().getPassword());
 
-        // Validaciones
         if (username.isEmpty()) {
             registrarUsuario.mostrarMensaje("El nombre de usuario no puede estar vacío");
             return;

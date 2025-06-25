@@ -130,6 +130,8 @@ public class Main {
         configurarEventosUsuarios(principalView, usuarioController, usuarioAdminView);
 
         configurarEventosCerrarSesion(principalView, usuarioController);
+        configurarEventosIdioma(principalView);
+
 
         // --- Mostrar ventana principal ---
         principalView.setVisible(true);

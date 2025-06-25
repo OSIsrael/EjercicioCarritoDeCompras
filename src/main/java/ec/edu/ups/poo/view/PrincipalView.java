@@ -159,7 +159,7 @@ public class PrincipalView extends JFrame {
     }
     public void cambiarIdiomas(String lenguaje,String pais){
         mensajeInternacionalizacionHandler.setLenguaje(lenguaje,pais);
-        setTitle(mensajeInternacionalizacionHandler.get("app.titulo"));
+        setTitle(mensajeInternacionalizacionHandler.get("titulo"));
         menuProducto.setText(mensajeInternacionalizacionHandler.get("menu.producto"));
         menuItemCrearProducto.setText(mensajeInternacionalizacionHandler.get("menu.producto.crear"));
         menuItemEditarProducto.setText(mensajeInternacionalizacionHandler.get("menu.producto.editar"));

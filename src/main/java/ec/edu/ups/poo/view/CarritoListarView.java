@@ -10,6 +10,7 @@ public class CarritoListarView extends JInternalFrame{
     private JButton btnListar;
     private JTable tblCarritos;
     private JPanel panelPrincipal;
+    private JTable tblDetalleCarrito;
     private DefaultTableModel modeloTabla;
     public CarritoListarView(){
         super("Listado de Carritos", true, true, true, true);

@@ -117,4 +117,8 @@ public class CarritoEliminarView extends JInternalFrame {
     public Carrito getCarritoSeleccionado() {
         return carritoSeleccionado;
     }
+
+    public void setBtnBuscar(JButton btnBuscar) {
+        this.btnBuscar = btnBuscar;
+    }
 }

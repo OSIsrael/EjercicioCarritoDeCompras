@@ -112,4 +112,5 @@ public class CarritoBuscarView extends JInternalFrame {
     public JTable getTblDetalleCarrito() {
         return tblDetalleCarrito;
     }
+
 }

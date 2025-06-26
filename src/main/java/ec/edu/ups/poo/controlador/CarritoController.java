@@ -6,10 +6,12 @@ import ec.edu.ups.poo.modelo.Carrito;
 import ec.edu.ups.poo.modelo.ItemCarrito;
 import ec.edu.ups.poo.modelo.Producto;
 import ec.edu.ups.poo.modelo.Usuario;
-import ec.edu.ups.poo.modelo.Rol; // Importar Rol
+import ec.edu.ups.poo.modelo.Rol;
 import ec.edu.ups.poo.view.*;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
 
@@ -31,8 +33,8 @@ public class CarritoController {
 
     public CarritoController(CarritoDAO carritoDAO, ProductoDAO productoDAO,
                              CarritoAnadirView carritoAnadirView, Usuario usuarioAutenticado,
-                             CarritoListarView carritoListarView, CarritoModificarView carritoModificarView,
-                             CarritoBuscarView carritoBuscarView, CarritoEliminarView carritoEliminarView) {
+                             CarritoListarView carritoListarView, CarritoBuscarView carritoBuscarView,
+                             CarritoModificarView carritoModificarView, CarritoEliminarView carritoEliminarView) {
         this.carritoDAO = carritoDAO;
         this.productoDAO = productoDAO;
         this.usuarioAutenticado = usuarioAutenticado;
@@ -74,7 +76,7 @@ public class CarritoController {
             return;
         }
         int codigo = Integer.parseInt(codigoStr);
-        Producto producto = productoDAO.buscar(codigo); // Usar buscar en ProductoDAO
+        Producto producto = productoDAO.buscarPorCodigo(codigo);
 
         if (producto == null) {
             carritoAnadirView.mostrarMensaje("Producto no encontrado.");
@@ -98,15 +100,15 @@ public class CarritoController {
             carritoAnadirView.mostrarMensaje("El carrito está vacío.");
             return;
         }
-        carritoDAO.crear(carritoActual); // El DAO asignará el código si es 0
+        carritoDAO.crear(carritoActual);
         carritoAnadirView.mostrarMensaje("Carrito guardado exitosamente con código: " + carritoActual.getCodigo());
         limpiarCarritoActual();
     }
 
     private void limpiarCarritoActual() {
-        iniciarNuevoCarrito(); // Reinicia el carrito actual para una nueva operación
-        actualizarVistaAnadir(); // Limpia la tabla y totales en la vista
-        limpiarCamposProductoAnadir(); // Limpia los campos de entrada
+        iniciarNuevoCarrito();
+        actualizarVistaAnadir();
+        limpiarCamposProductoAnadir();
     }
 
     private void actualizarVistaAnadir() {
@@ -125,24 +127,41 @@ public class CarritoController {
 
     private void limpiarCamposProductoAnadir() {
         carritoAnadirView.getTxtCodigo().setText("");
-        carritoAnadirView.getTxtNombre().setText(""); // Estos campos no se usan en la vista de añadir
-        carritoAnadirView.getTxtPrecio().setText(""); // Estos campos no se usan en la vista de añadir
+        carritoAnadirView.getTxtNombre().setText("");
+        carritoAnadirView.getTxtPrecio().setText("");
         carritoAnadirView.getCbxCanridad().setSelectedIndex(0);
     }
 
-
     // --- Lógica de CarritoListarView ---
     private void configurarEventosListar() {
-        // No hay un botón específico para listar en CarritoListarView,
-        // la carga se dispara cuando la vista se hace visible o desde el menú principal.
-        // La vista CarritoListarView tiene un método para cargar los carritos.
+        carritoListarView.getTblCarritos().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) {
+                    int fila = carritoListarView.getTblCarritos().getSelectedRow();
+                    if (fila >= 0) {
+                        int codigoCarrito = (int) carritoListarView.getTblCarritos().getValueAt(fila, 0);
+                        Carrito carrito = carritoDAO.buscar(codigoCarrito);
+                        if (carrito != null && tienePermiso(carrito)) {
+                            carritoListarView.mostrarDetallesCarrito(carrito);
+                        } else {
+                            carritoListarView.mostrarDetallesCarrito(null);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     public void listarCarritosDelUsuario() {
-        // Llama al DAO para obtener solo los carritos del usuario actual
-        List<Carrito> carritos = carritoDAO.listarPorUsuario(usuarioAutenticado);
-        // Pasa la lista filtrada a la vista para que la muestre
-        carritoListarView.mostrarCarritos(carritos);
+        List<Carrito> carritos;
+        if (usuarioAutenticado.getRol() == Rol.ADMINISTRADOR) {
+            carritos = carritoDAO.listarTodos(); // Todos los carritos
+        } else {
+            carritos = carritoDAO.listarPorUsuario(usuarioAutenticado);
+        }
+        carritoListarView.cargarCarritos(carritos);
+        carritoListarView.mostrarDetallesCarrito(null); // Limpia detalles al cargar lista
     }
 
     // --- Lógica de CarritoBuscarView ---
@@ -152,59 +171,45 @@ public class CarritoController {
 
     private void buscarCarritoParaVer() {
         String codigoStr = carritoBuscarView.getTxtBuscarCarrito().getText().trim();
-
         if (!esNumeroEntero(codigoStr)) {
             carritoBuscarView.mostrarMensaje("El código debe ser un número válido.");
-            carritoBuscarView.mostrarCarrito(null); // Limpiar vista si la entrada es inválida
+            carritoBuscarView.mostrarCarrito(null);
             return;
         }
         int codigo = Integer.parseInt(codigoStr);
-        Carrito carrito = carritoDAO.buscar(codigo); // Usar buscar en CarritoDAO
-
-        if (carrito != null && !tienePermiso(carrito)) {
-            carritoBuscarView.mostrarMensaje("No tiene permisos para ver este carrito.");
-            carritoBuscarView.mostrarCarrito(null); // Limpiar vista si no hay permiso
+        Carrito carrito = carritoDAO.buscar(codigo);
+        if (carrito == null || !tienePermiso(carrito)) {
+            carritoBuscarView.mostrarMensaje("No tiene permisos para ver este carrito o no existe.");
+            carritoBuscarView.mostrarCarrito(null);
             return;
-        }
-
-        if (carrito == null) {
-            carritoBuscarView.mostrarMensaje("No se encontró un carrito con ese código.");
         }
         carritoBuscarView.mostrarCarrito(carrito);
     }
 
     // --- Lógica de CarritoEliminarView ---
     private void configurarEventosEliminar() {
-        carritoEliminarView.getBtnBuscar().addActionListener(e -> buscarCarritoParaEliminar()); // Botón para buscar y cargar
-        carritoEliminarView.getBtnEliminar().addActionListener(e -> eliminarCarritoConfirmado()); // Botón para eliminar
+        carritoEliminarView.getBtnBuscar().addActionListener(e -> buscarCarritoParaEliminar());
+        carritoEliminarView.getBtnEliminar().addActionListener(e -> eliminarCarritoConfirmado());
     }
 
     private void buscarCarritoParaEliminar() {
-        String codigoStr = carritoEliminarView.getTxtCodigo().getText().trim();
-
+        String codigoStr = carritoEliminarView.getTxtEliminarCarrito().getText().trim();
         if (!esNumeroEntero(codigoStr)) {
             carritoEliminarView.mostrarMensaje("El código debe ser un número válido.");
-            carritoEliminarView.mostrarCarrito(null); // Limpiar vista si la entrada es inválida
+            carritoEliminarView.mostrarCarrito(null);
             this.carritoParaEliminar = null;
             return;
         }
         int codigo = Integer.parseInt(codigoStr);
-        Carrito carrito = carritoDAO.buscar(codigo); // Usar buscar en CarritoDAO
-
-        if (carrito != null && !tienePermiso(carrito)) {
-            carritoEliminarView.mostrarMensaje("No tiene permisos para eliminar este carrito.");
+        Carrito carrito = carritoDAO.buscar(codigo);
+        if (carrito == null || !tienePermiso(carrito)) {
+            carritoEliminarView.mostrarMensaje("No tiene permisos para eliminar este carrito o no existe.");
+            carritoEliminarView.mostrarCarrito(null);
             this.carritoParaEliminar = null;
-            carritoEliminarView.mostrarCarrito(null); // Limpiar vista si no hay permiso
             return;
         }
-
-        if (carrito == null) {
-            carritoEliminarView.mostrarMensaje("No se encontró un carrito con ese código.");
-            this.carritoParaEliminar = null;
-        }
-
-        this.carritoParaEliminar = carrito; // Guardar el carrito encontrado para la eliminación
-        carritoEliminarView.mostrarCarrito(carrito); // Cargar en la vista
+        this.carritoParaEliminar = carrito;
+        carritoEliminarView.mostrarCarrito(carrito);
     }
 
     private void eliminarCarritoConfirmado() {
@@ -212,51 +217,37 @@ public class CarritoController {
             carritoEliminarView.mostrarMensaje("Primero debe buscar un carrito válido para eliminar.");
             return;
         }
-
-        int confirmacion = JOptionPane.showConfirmDialog(
-                carritoEliminarView,
-                "¿Está seguro de que desea eliminar permanentemente el carrito " + carritoParaEliminar.getCodigo() + "?",
-                "Confirmar Eliminación", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-
-        if (confirmacion == JOptionPane.YES_OPTION) {
-            carritoDAO.eliminar(carritoParaEliminar.getCodigo());
-            carritoEliminarView.mostrarMensaje("Carrito eliminado exitosamente.");
-            carritoEliminarView.limpiarVista();
-            this.carritoParaEliminar = null;
-        }
+        // SIN confirmación extra, elimina directo
+        carritoDAO.eliminar(carritoParaEliminar.getCodigo());
+        carritoEliminarView.mostrarMensaje("Carrito eliminado exitosamente.");
+        carritoEliminarView.limpiarVista();
+        this.carritoParaEliminar = null;
     }
 
     // --- Lógica de CarritoModificarView ---
     private void configurarEventosModificar() {
         carritoModificarView.getBtnBuscar().addActionListener(e -> buscarCarritoParaModificar());
-        carritoModificarView.getBtnGuardarCambios().addActionListener(e -> guardarCambiosCarrito());
+        carritoModificarView.getBtnModificar().addActionListener(e -> guardarCambiosCarrito());
     }
 
     private void buscarCarritoParaModificar() {
         String codigoStr = carritoModificarView.getTxtCodigo().getText().trim();
         if (!esNumeroEntero(codigoStr)) {
             carritoModificarView.mostrarError("El código debe ser un número válido.");
-            carritoModificarView.cargarCarrito(null); // Limpiar vista si la entrada es inválida
+            carritoModificarView.cargarCarrito(null);
             this.carritoParaModificar = null;
             return;
         }
         int codigo = Integer.parseInt(codigoStr);
-        Carrito carrito = carritoDAO.buscar(codigo); // Usar buscar en CarritoDAO
-
-        if (carrito != null && !tienePermiso(carrito)) {
-            carritoModificarView.mostrarError("No tiene permisos para modificar este carrito.");
-            carritoModificarView.cargarCarrito(null); // Limpiar vista si no hay permiso
+        Carrito carrito = carritoDAO.buscar(codigo);
+        if (carrito == null || !tienePermiso(carrito)) {
+            carritoModificarView.mostrarError("No tiene permisos para modificar este carrito o no existe.");
+            carritoModificarView.cargarCarrito(null);
             this.carritoParaModificar = null;
             return;
         }
-
-        if (carrito == null) {
-            carritoModificarView.mostrarError("No se encontró un carrito con ese código.");
-            this.carritoParaModificar = null;
-        }
-
-        this.carritoParaModificar = carrito; // Guardar el carrito encontrado para modificar
-        carritoModificarView.cargarCarrito(carrito); // Cargar en la vista
+        this.carritoParaModificar = carrito;
+        carritoModificarView.cargarCarrito(carrito);
     }
 
     private void guardarCambiosCarrito() {
@@ -265,23 +256,28 @@ public class CarritoController {
             return;
         }
 
-        // Aquí deberías obtener los datos modificados de la vista y aplicarlos a carritoParaModificar
-        // Por ejemplo, si la vista permite cambiar la fecha o añadir/quitar items.
-        // Para este ejemplo, asumiremos que la modificación es solo a nivel de items
-        // y que la vista ya actualizó el objeto carritoParaModificar internamente.
-        // Si la vista solo muestra y el controlador modifica, necesitarías más lógica aquí.
+        int confirm = JOptionPane.showConfirmDialog(carritoModificarView, "¿Está seguro de modificar este carrito?", "Confirmar", JOptionPane.YES_NO_OPTION);
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
 
-        // Ejemplo: Si la vista tiene un método para obtener el carrito con cambios
-        // Carrito carritoConCambios = carritoModificarView.obtenerCarritoModificado();
-        // carritoDAO.actualizar(carritoConCambios);
+        // Leer los cambios en la tabla tblModificar (ejemplo, solo cantidad)
+        JTable tbl = carritoModificarView.getTblModificar();
+        for (int i = 0; i < tbl.getRowCount(); i++) {
+            int codigoProd = (int) tbl.getValueAt(i, 0);
+            int nuevaCantidad = Integer.parseInt(tbl.getValueAt(i, 2).toString());
+            for (ItemCarrito item : carritoParaModificar.obtenerItems()) {
+                if (item.getProducto().getCodigo() == codigoProd) {
+                    item.setCantidad(nuevaCantidad);
+                }
+            }
+        }
 
-        // Si la vista modifica directamente el objeto que se le pasó:
         carritoDAO.actualizar(this.carritoParaModificar);
         carritoModificarView.mostrarMensaje("Carrito modificado exitosamente.");
         carritoModificarView.limpiarVista();
         this.carritoParaModificar = null;
     }
-
 
     // --- Métodos Auxiliares ---
     private boolean esNumeroEntero(String texto) {
@@ -296,10 +292,9 @@ public class CarritoController {
 
     // Verifica si el usuario autenticado tiene permiso para ver/modificar/eliminar un carrito
     private boolean tienePermiso(Carrito carrito) {
-        if (usuarioAutenticado.getRol() == Rol.ADMINISTRADOR) { // Usar el enum Rol
-            return true; // El admin puede ver/modificar/eliminar todo
+        if (usuarioAutenticado.getRol() == Rol.ADMINISTRADOR) {
+            return true;
         }
-        // Un usuario normal solo puede ver/modificar/eliminar sus propios carritos
-        return carrito.getUsuario().equals(usuarioAutenticado); // Usar equals de Usuario
+        return carrito.getUsuario().equals(usuarioAutenticado);
     }
 }

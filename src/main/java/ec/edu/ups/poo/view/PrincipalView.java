@@ -20,7 +20,7 @@ public class PrincipalView extends JFrame {
     private JMenuItem menuItemCarrito; // Para "Añadir al Carrito"
     private JMenuItem menuItemCarritoBuscar; // Para "Buscar Carrito"
     private JMenuItem menuItemCarritoModificar; // Para "Modificar Carrito"
-    private JMenuItem menuItemCarritoEliminar; // Para "Eliminar Carrito"
+    private JMenuItem menuItemCarritoEliminar;// Para "Eliminar Carrito"
     private JMenu menuAdmin;
     private JMenuItem menuItemGestionarUsuarios;
     private JMenuItem menuItemCerrarSesion;
@@ -118,7 +118,6 @@ public class PrincipalView extends JFrame {
         menuAdmin.setVisible(false);
 
         // Oculta la opción de listar todos los carritos (solo para admin)
-        menuItemCarritoListar.setVisible(false);
     }
 
     /**

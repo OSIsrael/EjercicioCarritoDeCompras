@@ -116,4 +116,9 @@ public class CarritoModificarView extends JInternalFrame {
     public JTable getTblDetalleCarrito() {
         return tblDetalleCarrito;
     }
+
+    public JButton getBtnBuscar() {
+        return btnBuscar;
+    }
+
 }

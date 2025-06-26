@@ -19,21 +19,18 @@ import java.awt.event.WindowEvent;
 
 public class Main {
 
-    // DAOs como campos estáticos para que sean instancias únicas y persistan
     private static UsuarioDAO usuarioDAO;
     private static ProductoDAO productoDAO;
     private static CarritoDAO carritoDAO;
 
     public static void main(String[] args) {
 
-        // Inicializar DAOs UNA SOLA VEZ
+        // Inicializar DAOs una sola vez
         usuarioDAO = new UsuarioDAOMemoria();
         productoDAO = new ProductoDAOMemoria();
         carritoDAO = new CarritoDAOMemoria();
 
-        // Cargar datos iniciales UNA SOLA VEZ
-        // CORRECCIÓN: Usar el método 'buscar' o 'buscarPorUsername' según tu DAO
-        // Si tu DAO tiene 'buscarPorUsername', úsalo. Si no, cámbialo a 'buscar'.
+        // Cargar datos iniciales si no existen
         if (usuarioDAO.buscarPorUsername("admin") == null) {
             usuarioDAO.crear(new Usuario("admin", "admin", Rol.ADMINISTRADOR));
         }
@@ -44,13 +41,11 @@ public class Main {
         productoDAO.crear(new Producto(2, "Teclado Mecánico", 85.50));
         productoDAO.crear(new Producto(3, "Mouse Inalámbrico", 30.00));
         productoDAO.crear(new Producto(4, "Monitor 27 pulgadas", 350.00));
-        System.out.println("Datos iniciales (usuarios y productos) cargados.");
 
-        SwingUtilities.invokeLater(() -> mostrarLogin());
+        SwingUtilities.invokeLater(Main::mostrarLogin);
     }
 
     private static void mostrarLogin() {
-        System.out.println("=== Iniciando proceso de Login ===");
         LoginView loginView = new LoginView();
         RegistrarUsuario registrarUsuarioView = new RegistrarUsuario();
         UsuarioAdminView usuarioAdminView = new UsuarioAdminView();
@@ -63,10 +58,8 @@ public class Main {
             public void windowClosed(WindowEvent e) {
                 Usuario usuarioAutenticado = usuarioController.getUsuarioAutenticado();
                 if (usuarioAutenticado != null) {
-                    System.out.println("Login exitoso para: " + usuarioAutenticado.getUsername());
                     iniciarAplicacionPrincipal(usuarioAutenticado, usuarioController, usuarioAdminView);
                 } else {
-                    System.out.println("Login cancelado. Cerrando aplicación.");
                     System.exit(0);
                 }
             }
@@ -77,39 +70,34 @@ public class Main {
     private static void iniciarAplicacionPrincipal(Usuario usuarioAutenticado,
                                                    UsuarioController usuarioController,
                                                    UsuarioAdminView usuarioAdminView) {
-        System.out.println("=== Iniciando aplicación principal para " + usuarioAutenticado.getUsername() + " ===");
 
-        // --- Inicializar Vistas ---
+        // Instanciar vistas
         PrincipalView principalView = new PrincipalView();
         ProductoAnadirView productoAnadirView = new ProductoAnadirView();
         ProductoListaView productoListaView = new ProductoListaView();
         ProductoEliminar productoEliminar = new ProductoEliminar();
         ProductoEditar productoEditar = new ProductoEditar();
 
-        // Vistas de Carrito (todas las que hemos creado)
         CarritoAnadirView carritoAnadirView = new CarritoAnadirView();
         CarritoListarView carritoListarView = new CarritoListarView();
         CarritoBuscarView carritoBuscarView = new CarritoBuscarView();
         CarritoModificarView carritoModificarView = new CarritoModificarView();
         CarritoEliminarView carritoEliminarView = new CarritoEliminarView();
 
-        // --- Inicializar Controladores (usando los DAOs únicos) ---
+        // Instanciar controladores
         ProductoController productoController = new ProductoController(
                 productoDAO, productoAnadirView, productoListaView,
                 productoEditar, productoEliminar, carritoAnadirView);
 
         CarritoController carritoController = new CarritoController(
                 carritoDAO, productoDAO, carritoAnadirView, usuarioAutenticado,
-                carritoListarView, carritoModificarView, carritoBuscarView, carritoEliminarView); // Pasa todas las vistas
+                carritoListarView, carritoBuscarView, carritoModificarView, carritoEliminarView);
 
-        // --- Configurar ventana principal ---
         principalView.mostrarMensaje("Bienvenido: " + usuarioAutenticado.getUsername() + " (" + usuarioAutenticado.getRol() + ")");
-
         if (usuarioAutenticado.getRol() == Rol.USUARIO) {
             principalView.configurarParaRolUsuario();
         }
 
-        // --- Configurar eventos de los menús ---
         configurarEventosProductos(principalView, productoAnadirView, productoListaView, productoEditar, productoEliminar);
         configurarEventosCarrito(principalView, carritoAnadirView, carritoListarView, carritoBuscarView, carritoModificarView, carritoEliminarView, carritoController);
         configurarEventosUsuarios(principalView, usuarioController, usuarioAdminView);
@@ -131,24 +119,20 @@ public class Main {
                                                  CarritoModificarView carritoModificarView, CarritoEliminarView carritoEliminarView,
                                                  CarritoController carritoController) {
         principalView.getMenuItemCarrito().addActionListener(e -> mostrarVentana(principalView, carritoAnadirView));
-
         principalView.getMenuItemCarritoListar().addActionListener(e -> {
-            carritoController.listarTodosLosCarritos(); // Cargar datos antes de mostrar
+            carritoController.listarCarritosDelUsuario(); // Cargar solo los carritos del usuario actual
             mostrarVentana(principalView, carritoListarView);
         });
-
         principalView.getMenuItemCarritoBuscar().addActionListener(e -> {
-            carritoBuscarView.limpiarVista(); // Limpiar antes de mostrar
+            carritoController.listarCarritosDelUsuario();
             mostrarVentana(principalView, carritoBuscarView);
         });
-
         principalView.getMenuItemCarritoModificar().addActionListener(e -> {
-            carritoModificarView.limpiarVista(); // Limpiar antes de mostrar
+            carritoController.listarCarritosDelUsuario();
             mostrarVentana(principalView, carritoModificarView);
         });
-
         principalView.getMenuItemCarritoEliminar().addActionListener(e -> {
-            carritoEliminarView.limpiarVista(); // Limpiar antes de mostrar
+            carritoController.listarCarritosDelUsuario();
             mostrarVentana(principalView, carritoEliminarView);
         });
     }
@@ -177,7 +161,6 @@ public class Main {
     }
 
     private static void mostrarVentana(PrincipalView principal, JInternalFrame ventana) {
-
         if (!ventana.isVisible()) {
             principal.getjDesktopPane().add(ventana);
             ventana.setVisible(true);

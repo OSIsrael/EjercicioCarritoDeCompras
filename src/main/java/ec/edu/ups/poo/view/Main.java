@@ -120,19 +120,19 @@ public class Main {
                                                  CarritoController carritoController) {
         principalView.getMenuItemCarrito().addActionListener(e -> mostrarVentana(principalView, carritoAnadirView));
         principalView.getMenuItemCarritoListar().addActionListener(e -> {
-            carritoController.listarCarritosDelUsuario(); // Cargar solo los carritos del usuario actual
+            carritoController.listarCarritosDelUsuario();
             mostrarVentana(principalView, carritoListarView);
         });
         principalView.getMenuItemCarritoBuscar().addActionListener(e -> {
-            carritoController.listarCarritosDelUsuario();
+            carritoBuscarView.limpiarVista();
             mostrarVentana(principalView, carritoBuscarView);
         });
         principalView.getMenuItemCarritoModificar().addActionListener(e -> {
-            carritoController.listarCarritosDelUsuario();
+            carritoModificarView.limpiarVista();
             mostrarVentana(principalView, carritoModificarView);
         });
         principalView.getMenuItemCarritoEliminar().addActionListener(e -> {
-            carritoController.listarCarritosDelUsuario();
+            carritoEliminarView.limpiarVista();
             mostrarVentana(principalView, carritoEliminarView);
         });
     }

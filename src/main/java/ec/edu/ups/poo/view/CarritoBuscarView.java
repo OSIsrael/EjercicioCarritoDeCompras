@@ -10,7 +10,7 @@ import java.text.SimpleDateFormat;
 
 public class CarritoBuscarView extends JInternalFrame {
     // Variables de instancia que coinciden con el diseño
-    private JPanel panelPrincipal; // Asumiendo que es el panel raíz del .form
+    private JPanel panelPrincipal = new JPanel(); // Asumiendo que es el panel raíz del .form
     private JTextField txtBuscarCarrito;
     private JButton btnBuscarCarrito;
     private JTable tblBuscarCarrito; // Para los ítems del carrito
@@ -21,6 +21,8 @@ public class CarritoBuscarView extends JInternalFrame {
 
     public CarritoBuscarView() {
         super("Buscar Carrito", true, true, true, true);
+        setContentPane(panelPrincipal);
+
         // CORRECCIÓN: Eliminar la línea this.setContentPane(panelPrincipal);
         // El diseñador de GUI se encarga de inicializar panelPrincipal y establecerlo como contentPane.
         this.setSize(700, 500); // Ajusta el tamaño según tu diseño

@@ -173,7 +173,6 @@ public class CarritoController {
 
     // --- Lógica de CarritoEliminarView ---
     private void configurarEventosEliminar() {
-        carritoEliminarView.getBtnBuscar().addActionListener(e -> buscarCarritoParaEliminar());
         carritoEliminarView.getBtnEliminar().addActionListener(e -> eliminarCarrito());
     }
 

@@ -18,6 +18,7 @@ public class CarritoListarView extends JInternalFrame {
 
     public CarritoListarView() {
         super("Listado de Carritos", true, true, true, true);
+        setContentPane(panelPrincipal);
         // CORRECCIÓN: Eliminar la línea this.setContentPane(panelPrincipal);
         // El diseñador de GUI se encarga de inicializar panelPrincipal y establecerlo como contentPane.
         this.setSize(700, 400); // Ajusta el tamaño según tu diseño

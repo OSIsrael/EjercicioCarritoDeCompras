@@ -2,6 +2,7 @@ package ec.edu.ups.poo.dao.impl;
 
 import ec.edu.ups.poo.dao.CarritoDAO;
 import ec.edu.ups.poo.modelo.Carrito;
+import ec.edu.ups.poo.modelo.Usuario;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -9,12 +10,18 @@ import java.util.List;
 
 public class CarritoDAOMemoria implements CarritoDAO {
     private List<Carrito> carritos;
+    private int nextCodigo = 1; // Para asignar códigos automáticamente
+
     public CarritoDAOMemoria() {
         carritos = new ArrayList<>();
     }
 
     @Override
     public void crear(Carrito carrito) {
+        // Asignar un código si no tiene uno (para nuevos carritos)
+        if (carrito.getCodigo() == 0) {
+            carrito.setCodigo(nextCodigo++);
+        }
         carritos.add(carrito);
     }
 
@@ -27,22 +34,21 @@ public class CarritoDAOMemoria implements CarritoDAO {
                 iterator.remove();
                 break;
             }
-
         }
     }
 
     @Override
-    public void actualzar(Carrito carrito) {
+    public void actualizar(Carrito carrito) {
         for (int i = 0; i < carritos.size(); i++) {
             if (carritos.get(i).getCodigo() == carrito.getCodigo()) {
                 carritos.set(i, carrito);
-                break;
+                return; // Se encontró y actualizó, salir
             }
         }
     }
 
     @Override
-    public Carrito buscarPorCodigo(int codigo) {
+    public Carrito buscar(int codigo) {
         for (Carrito carrito : carritos) {
             if (carrito.getCodigo() == codigo) {
                 return carrito;
@@ -53,6 +59,20 @@ public class CarritoDAOMemoria implements CarritoDAO {
 
     @Override
     public List<Carrito> listarTodos() {
-            return carritos;
+        return new ArrayList<>(carritos); // Devolver una copia para evitar modificaciones externas
+    }
+
+    @Override
+    public List<Carrito> listarPorUsuario(Usuario usuario) {
+        List<Carrito> carritosDelUsuario = new ArrayList<>();
+        if (usuario == null) {
+            return carritosDelUsuario;
+        }
+        for (Carrito carrito : carritos) {
+            if (carrito.getUsuario() != null && carrito.getUsuario().equals(usuario)) {
+                carritosDelUsuario.add(carrito);
+            }
+        }
+        return carritosDelUsuario;
     }
 }

@@ -9,7 +9,7 @@ public class Carrito {
     private int codigo;
     private GregorianCalendar fechaCreacion;
     private List<ItemCarrito> items;
-    private Usuario usuario; // <-- ATRIBUTO AÑADIDO
+    private Usuario usuario;
 
     public Carrito() {
         items = new ArrayList<>();

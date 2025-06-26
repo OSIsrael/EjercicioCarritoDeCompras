@@ -5,8 +5,6 @@ import ec.edu.ups.poo.modelo.ItemCarrito;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-import java.text.SimpleDateFormat;
 
 public class CarritoModificarView extends JInternalFrame {
 
@@ -16,6 +14,7 @@ public class CarritoModificarView extends JInternalFrame {
     private JButton btnModificar; // Mapeado a 'btnModificar' en el .form
     private JTable tblModificar; // Mapeado a 'tblModificar' en el .form
     private JPanel panelPrincipal; // Asumiendo que es el panel raíz del .form
+    private JButton btnBuscar;
 
     private DefaultTableModel modeloTablaItems; // Modelo para tblModificar
     private DefaultTableModel modeloTablaDetalleItem; // Modelo para tblDetalleCarrito

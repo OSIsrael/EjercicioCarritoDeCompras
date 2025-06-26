@@ -5,7 +5,6 @@ import ec.edu.ups.poo.modelo.ItemCarrito;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
 import java.text.SimpleDateFormat;
 
 public class CarritoEliminarView extends JInternalFrame {

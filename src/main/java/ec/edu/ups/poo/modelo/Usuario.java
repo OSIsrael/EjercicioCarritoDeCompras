@@ -1,5 +1,7 @@
 package ec.edu.ups.poo.modelo;
 
+import java.util.Objects;
+
 public class Usuario {
     private String username;
     private String password;
@@ -38,12 +40,33 @@ public class Usuario {
         this.rol = rol;
     }
 
+    /**
+     * Compara dos objetos Usuario basándose en su 'username'.
+     * Es crucial para que las búsquedas y comparaciones funcionen correctamente.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Usuario usuario = (Usuario) o;
+        return Objects.equals(username, usuario.username); // Comparamos por username
+    }
+
+    /**
+     * Genera un código hash basado en el 'username'.
+     * Debe ser consistente con equals().
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(username);
+    }
+
+    /**
+     * Se modifica para devolver solo el username, lo cual es más útil
+     * para mostrar en componentes de la interfaz de usuario (como etiquetas o tablas).
+     */
     @Override
     public String toString() {
-        return "Usuario{" +
-                "username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", rol=" + rol +
-                '}';
+        return username;
     }
 }

@@ -134,23 +134,7 @@ public class CarritoController {
 
     // --- Lógica de CarritoListarView ---
     private void configurarEventosListar() {
-        carritoListarView.getTblCarritos().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (!e.getValueIsAdjusting()) {
-                    int fila = carritoListarView.getTblCarritos().getSelectedRow();
-                    if (fila >= 0) {
-                        int codigoCarrito = (int) carritoListarView.getTblCarritos().getValueAt(fila, 0);
-                        Carrito carrito = carritoDAO.buscar(codigoCarrito);
-                        if (carrito != null && tienePermiso(carrito)) {
-                            carritoListarView.mostrarDetallesCarrito(carrito);
-                        } else {
-                            carritoListarView.mostrarDetallesCarrito(null);
-                        }
-                    }
-                }
-            }
-        });
+        carritoListarView.getBtnListar().addActionListener(e -> listarCarritosDelUsuario());
     }
 
     public void listarCarritosDelUsuario() {
@@ -163,7 +147,6 @@ public class CarritoController {
         carritoListarView.cargarCarritos(carritos);
         carritoListarView.mostrarDetallesCarrito(null); // Limpia detalles al cargar lista
     }
-
     // --- Lógica de CarritoBuscarView ---
     private void configurarEventosBuscar() {
         carritoBuscarView.getBtnBuscarCarrito().addActionListener(e -> buscarCarritoParaVer());

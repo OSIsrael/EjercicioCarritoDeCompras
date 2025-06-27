@@ -34,7 +34,8 @@ public class Carrito {
     }
 
     public List<ItemCarrito> getItems() {
-        return items;
+
+        return new ArrayList<>(items);
     }
 
     public void setItems(List<ItemCarrito> items) {

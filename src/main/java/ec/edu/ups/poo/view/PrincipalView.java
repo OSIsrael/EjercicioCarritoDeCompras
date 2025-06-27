@@ -24,6 +24,7 @@ public class PrincipalView extends JFrame {
     private JMenu menuAdmin;
     private JMenuItem menuItemGestionarUsuarios;
     private JMenuItem menuItemCerrarSesion;
+    private JMenuItem menuItemBuscarUsuario;
     private JMenu menuIdiomas;
     private JMenuItem menuItemIngles;
     private JMenuItem menuItemEspañol;
@@ -102,6 +103,10 @@ public class PrincipalView extends JFrame {
         JOptionPane.showMessageDialog(this, mensaje);
     }
 
+    public JMenuItem getMenuItemBuscarUsuario() {
+        return menuItemBuscarUsuario;
+    }
+
     /**
      * Configura la visibilidad de los menús para un usuario con rol normal (no administrador).
      */
@@ -156,7 +161,9 @@ public class PrincipalView extends JFrame {
         // Menú Administración
         menuAdmin = new JMenu(mensajeInternacionalizacionHandler.get("menu.administrador"));
         menuItemGestionarUsuarios = new JMenuItem(mensajeInternacionalizacionHandler.get("menu.administrador.gestionar"));
+        menuItemBuscarUsuario = new JMenuItem(mensajeInternacionalizacionHandler.get("menu.administrador.buscar"));
         menuAdmin.add(menuItemGestionarUsuarios);
+        menuAdmin.add(menuItemBuscarUsuario);
         menuBar.add(menuAdmin);
 
         // Opción Cerrar Sesión (directamente en la barra de menú, con un espaciador)

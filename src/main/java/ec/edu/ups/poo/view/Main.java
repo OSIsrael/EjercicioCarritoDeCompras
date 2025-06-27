@@ -49,16 +49,17 @@ public class Main {
         LoginView loginView = new LoginView();
         RegistrarUsuario registrarUsuarioView = new RegistrarUsuario();
         UsuarioAdminView usuarioAdminView = new UsuarioAdminView();
+        UsuarioBuscarView usuarioBuscarView = new UsuarioBuscarView();
 
         UsuarioController usuarioController = new UsuarioController(
-                usuarioDAO, loginView, registrarUsuarioView, usuarioAdminView);
+                usuarioDAO, loginView, registrarUsuarioView, usuarioAdminView, usuarioBuscarView);
 
         loginView.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
                 Usuario usuarioAutenticado = usuarioController.getUsuarioAutenticado();
                 if (usuarioAutenticado != null) {
-                    iniciarAplicacionPrincipal(usuarioAutenticado, usuarioController, usuarioAdminView);
+                    iniciarAplicacionPrincipal(usuarioAutenticado, usuarioController, usuarioAdminView, usuarioBuscarView);
                 } else {
                     System.exit(0);
                 }
@@ -69,7 +70,8 @@ public class Main {
 
     private static void iniciarAplicacionPrincipal(Usuario usuarioAutenticado,
                                                    UsuarioController usuarioController,
-                                                   UsuarioAdminView usuarioAdminView) {
+                                                   UsuarioAdminView usuarioAdminView,
+                                                   UsuarioBuscarView usuarioBuscarView) {
 
         // Instanciar vistas
         PrincipalView principalView = new PrincipalView();
@@ -100,7 +102,7 @@ public class Main {
 
         configurarEventosProductos(principalView, productoAnadirView, productoListaView, productoEditar, productoEliminar);
         configurarEventosCarrito(principalView, carritoAnadirView, carritoListarView, carritoBuscarView, carritoModificarView, carritoEliminarView, carritoController);
-        configurarEventosUsuarios(principalView, usuarioController, usuarioAdminView);
+        configurarEventosUsuarios(principalView, usuarioController, usuarioAdminView, usuarioBuscarView);
         configurarEventosCerrarSesion(principalView);
         configurarEventosIdioma(principalView);
 
@@ -140,10 +142,20 @@ public class Main {
         });
     }
 
-    private static void configurarEventosUsuarios(PrincipalView principalView, UsuarioController usuarioController, UsuarioAdminView usuarioAdminView) {
+    // --- AJUSTADO: Integración de UsuarioBuscarView ---
+    private static void configurarEventosUsuarios(
+            PrincipalView principalView,
+            UsuarioController usuarioController,
+            UsuarioAdminView usuarioAdminView,
+            UsuarioBuscarView usuarioBuscarView) {
         principalView.getMenuItemGestionarUsuarios().addActionListener(e -> {
             usuarioController.listarUsuarios();
             mostrarVentana(principalView, usuarioAdminView);
+        });
+        principalView.getMenuItemBuscarUsuario().addActionListener(e -> {
+            usuarioBuscarView.limpiarVista();
+            usuarioController.listarTodosAction();
+            mostrarVentana(principalView, usuarioBuscarView);
         });
     }
 

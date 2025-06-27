@@ -6,6 +6,7 @@ import ec.edu.ups.poo.modelo.Usuario;
 import ec.edu.ups.poo.view.LoginView;
 import ec.edu.ups.poo.view.RegistrarUsuario;
 import ec.edu.ups.poo.view.UsuarioAdminView;
+import ec.edu.ups.poo.view.UsuarioBuscarView;
 
 import java.util.List;
 
@@ -15,12 +16,14 @@ public class UsuarioController {
     private RegistrarUsuario registrarUsuarioView;
     private UsuarioAdminView usuarioAdminView;
     private Usuario usuarioAutenticado;
+    private UsuarioBuscarView usuarioBuscarView;
 
-    public UsuarioController(UsuarioDAO usuarioDAO, LoginView loginView, RegistrarUsuario registrarUsuarioView, UsuarioAdminView usuarioAdminView) {
+    public UsuarioController(UsuarioDAO usuarioDAO, LoginView loginView, RegistrarUsuario registrarUsuarioView, UsuarioAdminView usuarioAdminView, UsuarioBuscarView usuarioBuscarView) {
         this.usuarioDAO = usuarioDAO;
         this.loginView = loginView;
         this.registrarUsuarioView = registrarUsuarioView;
         this.usuarioAdminView = usuarioAdminView;
+        this.usuarioBuscarView = usuarioBuscarView;
         configurarEventos();
     }
 
@@ -36,6 +39,11 @@ public class UsuarioController {
         this.usuarioAdminView.getBtnActualizar().addActionListener(e -> actualizarUsuario());
         this.usuarioAdminView.getBtnEliminar().addActionListener(e -> eliminarUsuario());
         this.usuarioAdminView.getBtnRefrescar().addActionListener(e -> listarUsuarios());
+        //Eventos UsuarioBuscarView
+        if (usuarioBuscarView != null) {
+            usuarioBuscarView.getBtnBuscar().addActionListener(e -> buscarUsuarioAction());
+            usuarioBuscarView.getBtnListar().addActionListener(e -> listarTodosAction());
+        }
     }
 
     private void login() {
@@ -210,5 +218,19 @@ public class UsuarioController {
 
     public void cerrarSesion() {
         this.usuarioAutenticado = null;
+    }
+    private void buscarUsuarioAction() {
+        String username = usuarioBuscarView.getTxtUsername().getText().trim();
+        if (username.isEmpty()) {
+            usuarioBuscarView.mostrarMensaje("Ingrese un nombre de usuario.");
+            return;
+        }
+        Usuario usuario = usuarioDAO.buscarPorUsername(username);
+        usuarioBuscarView.mostrarUsuario(usuario);
+    }
+
+    public void listarTodosAction() {
+        List<Usuario> usuarios = usuarioDAO.listarTodos();
+        usuarioBuscarView.cargarUsuarios(usuarios);
     }
 }

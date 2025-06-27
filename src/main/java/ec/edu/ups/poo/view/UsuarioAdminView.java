@@ -16,6 +16,7 @@ public class UsuarioAdminView extends JInternalFrame {
     private JButton btnEliminar;
     private JButton btnRefrescar;
     private JPanel panelPrincipal;
+    private JLabel lblSeleccione;
     private JLabel lblRol;
     private JLabel lblUsuarioSeleccionado;
 

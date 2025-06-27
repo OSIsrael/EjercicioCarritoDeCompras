@@ -18,6 +18,14 @@ public class CarritoAnadirView extends JInternalFrame {
     private JButton btnGuardar;
     private JButton btnLimpiar;
     private JComboBox<String> cbxCanridad;
+    private JPanel lblDatosProducto;
+    private JLabel lblCodigo;
+    private JLabel lblPrecio;
+    private JLabel lblNombre;
+    private JLabel lblCantidad;
+    private JLabel lblSubtotal;
+    private JLabel lblIva;
+    private JLabel lblTotal;
 
     public CarritoAnadirView() {
         super("Carrito de Compras", true, true, false, true);

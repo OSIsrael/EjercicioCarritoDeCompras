@@ -8,6 +8,9 @@ public class UsuarioCrearView extends JInternalFrame {
     private JPasswordField txtContrasena;
     private JButton btnCrear;
     private JButton btnBorrar;
+    private JLabel lblUsuario;
+    private JLabel lblContrasena;
+
     public UsuarioCrearView() {
         super("Crear Usuario",true,true,true,true);
         setContentPane(panelPrincipal);

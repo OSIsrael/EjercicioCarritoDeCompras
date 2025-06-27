@@ -9,6 +9,8 @@ public class LoginView extends JFrame{
     private JPasswordField txtPassword;
     private JButton btnIniciarSesion;
     private JButton btnRegistrarse;
+    private JLabel lblUsuario;
+    private JLabel lblContrasena;
 
     public LoginView(){
         setContentPane(panelPrincipal);

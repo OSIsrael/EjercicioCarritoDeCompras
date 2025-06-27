@@ -9,6 +9,8 @@ public class UsuarioModificarDatosView extends JInternalFrame {
     private JButton btnBorrar;
     private JTextField txtUsuario;
     private JPasswordField txtContra;
+    private JLabel lblUsuario;
+    private JLabel lblContrasena;
 
     public UsuarioModificarDatosView() {
         super("Modificar Datos", true, true, true, true);

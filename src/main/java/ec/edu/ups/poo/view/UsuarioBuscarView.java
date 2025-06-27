@@ -13,6 +13,7 @@ public class UsuarioBuscarView extends JInternalFrame {
     private JButton btnBuscar;
     private JButton btnListar;
     private JTable tblUsuarios;
+    private JLabel lblUsuario;
     private DefaultTableModel modeloTablaUsuarios;
 
     private List<Usuario> ultimoListadoUsuarios;

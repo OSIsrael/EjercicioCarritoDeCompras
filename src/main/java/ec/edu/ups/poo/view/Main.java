@@ -129,11 +129,12 @@ public class Main {
         });
         principalView.getMenuItemCarritoModificar().addActionListener(e -> {
             carritoModificarView.limpiarVista();
+            carritoController.mostrarCarritosUsuarioParaModificar();
             mostrarVentana(principalView, carritoModificarView);
         });
         principalView.getMenuItemCarritoEliminar().addActionListener(e -> {
-            carritoEliminarView.limpiarVista();
-            mostrarVentana(principalView, carritoEliminarView);
+            carritoModificarView.limpiarVista();
+            mostrarVentana(principalView, carritoModificarView);
         });
     }
 

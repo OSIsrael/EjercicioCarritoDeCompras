@@ -22,7 +22,7 @@ public class CarritoController {
     private final CarritoBuscarView carritoBuscarView;
     private final CarritoModificarView carritoModificarView;
     private final CarritoEliminarView carritoEliminarView;
-
+    private List<Carrito> carritosUltimosMostradosModificar;
     // DAOs y Modelos
     private final CarritoDAO carritoDAO;
     private final ProductoDAO productoDAO;
@@ -45,6 +45,8 @@ public class CarritoController {
         this.carritoBuscarView = carritoBuscarView;
         this.carritoModificarView = carritoModificarView;
         this.carritoEliminarView = carritoEliminarView;
+        this.carritosUltimosMostradosModificar = null;
+
 
         iniciarNuevoCarrito(); // Inicializa el carrito para la vista de añadir
 
@@ -218,7 +220,6 @@ public class CarritoController {
         if (!esNumeroEntero(codigoStr)) {
             carritoModificarView.mostrarError("El código debe ser un número válido.");
             carritoModificarView.cargarCarrito(null);
-            this.carritoParaModificar = null;
             return;
         }
         int codigo = Integer.parseInt(codigoStr);
@@ -226,40 +227,65 @@ public class CarritoController {
         if (carrito == null || !tienePermiso(carrito)) {
             carritoModificarView.mostrarError("No tiene permisos para modificar este carrito o no existe.");
             carritoModificarView.cargarCarrito(null);
-            this.carritoParaModificar = null;
             return;
         }
-        this.carritoParaModificar = carrito;
         carritoModificarView.cargarCarrito(carrito);
     }
 
     private void guardarCambiosCarrito() {
-        if (this.carritoParaModificar == null) {
-            carritoModificarView.mostrarError("Primero debe buscar un carrito válido para modificar.");
+        int fila = carritoModificarView.getTblModificar().getSelectedRow();
+        if (fila == -1) {
+            carritoModificarView.mostrarError("Seleccione un carrito para modificar.");
+            return;
+        }
+        int codigoCarrito = (int) carritoModificarView.getTblModificar().getValueAt(fila, 0);
+        Carrito carrito = carritoDAO.buscar(codigoCarrito);
+
+        if (carrito == null) {
+            carritoModificarView.mostrarError("Carrito no encontrado.");
+            return;
+        }
+        int nuevaCantidadTotal;
+        try {
+            nuevaCantidadTotal = Integer.parseInt(carritoModificarView.getTblModificar().getValueAt(fila, 3).toString());
+        } catch (NumberFormatException e) {
+            carritoModificarView.mostrarError("Cantidad inválida.");
             return;
         }
 
-        int confirm = JOptionPane.showConfirmDialog(carritoModificarView, "¿Está seguro de modificar este carrito?", "Confirmar", JOptionPane.YES_NO_OPTION);
+        int cantidadOriginal = carrito.obtenerItems().stream().mapToInt(ItemCarrito::getCantidad).sum();
+        if (cantidadOriginal == 0) {
+            carritoModificarView.mostrarError("El carrito no tiene productos.");
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(carritoModificarView, "¿Está seguro de modificar la cantidad total?", "Confirmar", JOptionPane.YES_NO_OPTION);
         if (confirm != JOptionPane.YES_OPTION) {
             return;
         }
 
-        // Leer los cambios en la tabla tblModificar (ejemplo, solo cantidad)
-        JTable tbl = carritoModificarView.getTblModificar();
-        for (int i = 0; i < tbl.getRowCount(); i++) {
-            int codigoProd = (int) tbl.getValueAt(i, 0);
-            int nuevaCantidad = Integer.parseInt(tbl.getValueAt(i, 2).toString());
-            for (ItemCarrito item : carritoParaModificar.obtenerItems()) {
-                if (item.getProducto().getCodigo() == codigoProd) {
-                    item.setCantidad(nuevaCantidad);
-                }
+        // Repartir la cantidad nueva proporcionalmente entre los items
+        List<ItemCarrito> items = carrito.obtenerItems();
+        int cantidadAcumulada = 0;
+        int totalItems = items.size();
+
+        for (int i = 0; i < totalItems; i++) {
+            ItemCarrito item = items.get(i);
+            int cantidadAntigua = item.getCantidad();
+            int nuevaCantidad;
+            if (i < totalItems - 1) {
+                nuevaCantidad = (int) Math.round((cantidadAntigua * 1.0 / cantidadOriginal) * nuevaCantidadTotal);
+                cantidadAcumulada += nuevaCantidad;
+            } else {
+                // Al último le asigno el resto para que cuadre exacto el total
+                nuevaCantidad = nuevaCantidadTotal - cantidadAcumulada;
             }
+            item.setCantidad(nuevaCantidad);
         }
 
-        carritoDAO.actualizar(this.carritoParaModificar);
+        carritoDAO.actualizar(carrito);
         carritoModificarView.mostrarMensaje("Carrito modificado exitosamente.");
-        carritoModificarView.limpiarVista();
-        this.carritoParaModificar = null;
+        mostrarCarritosUsuarioParaModificar(); // refresca la lista
     }
 
     // --- Métodos Auxiliares ---
@@ -279,5 +305,10 @@ public class CarritoController {
             return true;
         }
         return carrito.getUsuario().equals(usuarioAutenticado);
+    }
+    public void mostrarCarritosUsuarioParaModificar() {
+        List<Carrito> carritos = carritoDAO.listarPorUsuario(usuarioAutenticado);
+        carritoModificarView.cargarCarritosUsuario(carritos);
+        this.carritosUltimosMostradosModificar = carritos;
     }
 }

@@ -5,91 +5,155 @@ import ec.edu.ups.poo.modelo.ItemCarrito;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.text.SimpleDateFormat;
+import java.util.List;
 
 public class CarritoModificarView extends JInternalFrame {
 
-    // Variables de instancia que coinciden con el diseño y el .form
-    private JTextField txtCodigo; // Mapeado a 'txtCodigo' en el .form
-    private JTable tblDetalleCarrito; // Mapeado a 'tblDetalleCarrito' en el .form
-    private JButton btnModificar; // Mapeado a 'btnModificar' en el .form
-    private JTable tblModificar; // Mapeado a 'tblModificar' en el .form
-    private JPanel panelPrincipal; // Asumiendo que es el panel raíz del .form
+    private JTextField txtCodigo;
+    private JTable tblDetalleCarrito;
+    private JButton btnModificar;
+    private JTable tblModificar;
+    private JPanel panelPrincipal;
     private JButton btnBuscar;
 
-    private DefaultTableModel modeloTablaItems; // Modelo para tblModificar
-    private DefaultTableModel modeloTablaDetalleItem; // Modelo para tblDetalleCarrito
+    private DefaultTableModel modeloTablaCarritos; // Para tblModificar
+    private DefaultTableModel modeloTablaDetalle;  // Para tblDetalleCarrito
+
+    private List<Carrito> ultimoListado;
 
     public CarritoModificarView() {
         super("Modificar Carrito", true, true, true, true);
+
+        panelPrincipal = new JPanel(new BorderLayout());
+
+        // Panel superior para búsqueda (opcional)
+        JPanel panelSuperior = new JPanel();
+        panelSuperior.add(new JLabel("Código de Carrito:"));
+        txtCodigo = new JTextField(10);
+        panelSuperior.add(txtCodigo);
+        btnBuscar = new JButton("Buscar");
+        panelSuperior.add(btnBuscar);
+
+        panelPrincipal.add(panelSuperior, BorderLayout.NORTH);
+
+        // Modelo para la tabla de carritos
+        modeloTablaCarritos = new DefaultTableModel(
+                new Object[]{"Código", "Fecha", "N° Items", "Cantidad total", "Usuario"}, 0
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                // Solo la columna de cantidad total es editable (col 3)
+                return column == 3;
+            }
+        };
+        tblModificar = new JTable(modeloTablaCarritos);
+
+        // Modelo para la tabla de detalles
+        modeloTablaDetalle = new DefaultTableModel(
+                new Object[]{"Código Prod.", "Nombre", "Cantidad", "Subtotal"}, 0
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
+        tblDetalleCarrito = new JTable(modeloTablaDetalle);
+
+        // Panel central con las dos tablas
+        JPanel panelTablas = new JPanel(new GridLayout(2, 1));
+        panelTablas.add(new JScrollPane(tblModificar));
+        panelTablas.add(new JScrollPane(tblDetalleCarrito));
+        panelPrincipal.add(panelTablas, BorderLayout.CENTER);
+
+        // Panel inferior con el botón modificar
+        JPanel panelInferior = new JPanel();
+        btnModificar = new JButton("Modificar");
+        panelInferior.add(btnModificar);
+        panelPrincipal.add(panelInferior, BorderLayout.SOUTH);
+
         setContentPane(panelPrincipal);
-        // CORRECCIÓN: Eliminar la línea this.setContentPane(panelPrincipal);
-        // El diseñador de GUI se encarga de inicializar panelPrincipal y establecerlo como contentPane.
-        this.setSize(700, 500); // Ajusta el tamaño según tu diseño
+        setSize(800, 550);
 
-        // Configuración de tblModificar (ítems del carrito)
-        modeloTablaItems = new DefaultTableModel();
-        modeloTablaItems.addColumn("Código Prod.");
-        modeloTablaItems.addColumn("Nombre");
-        modeloTablaItems.addColumn("Cantidad");
-        modeloTablaItems.addColumn("Subtotal");
-        tblModificar.setModel(modeloTablaItems);
-
-        // Configuración de tblDetalleCarrito (detalle del ítem seleccionado)
-        modeloTablaDetalleItem = new DefaultTableModel();
-        modeloTablaDetalleItem.addColumn("Propiedad");
-        modeloTablaDetalleItem.addColumn("Valor");
-        tblDetalleCarrito.setModel(modeloTablaDetalleItem);
-
-        // Listener para seleccionar fila en tblModificar y mostrar detalles en tblDetalleCarrito
+        // Listener: al seleccionar un carrito, muestra detalles
         tblModificar.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting() && tblModificar.getSelectedRow() != -1) {
-                int selectedRow = tblModificar.getSelectedRow();
-                mostrarDetalleItemSeleccionado(selectedRow);
+            if (!e.getValueIsAdjusting() && tblModificar.getSelectedRow() != -1 && ultimoListado != null) {
+                int fila = tblModificar.getSelectedRow();
+                if (fila >= 0 && fila < ultimoListado.size()) {
+                    Carrito carrito = ultimoListado.get(fila);
+                    cargarDetalleCarrito(carrito);
+                }
             }
         });
     }
 
-    // Método para cargar los ítems de un carrito en tblModificar
-    public void cargarCarrito(Carrito carrito) {
-        modeloTablaItems.setRowCount(0); // Limpiar tabla de ítems
-        modeloTablaDetalleItem.setRowCount(0); // Limpiar tabla de detalles de ítem
+    // Cargar todos los carritos
+    public void cargarCarritosUsuario(List<Carrito> carritos) {
+        modeloTablaCarritos.setRowCount(0);
+        ultimoListado = carritos;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        if (carritos != null) {
+            for (Carrito carrito : carritos) {
+                int cantidadItems = carrito.obtenerItems().size();
+                int cantidadTotal = carrito.obtenerItems().stream().mapToInt(ItemCarrito::getCantidad).sum();
+                String nombreUsuario = (carrito.getUsuario() != null) ? carrito.getUsuario().getUsername() : "N/A";
+                modeloTablaCarritos.addRow(new Object[]{
+                        carrito.getCodigo(),
+                        sdf.format(carrito.getFechaCreacion().getTime()),
+                        cantidadItems,
+                        cantidadTotal,
+                        nombreUsuario
+                });
+            }
+        }
+        modeloTablaDetalle.setRowCount(0);
+    }
 
+    // Cargar solo un carrito filtrado (por código)
+    public void cargarCarrito(Carrito carrito) {
+        modeloTablaCarritos.setRowCount(0);
+        ultimoListado = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        if (carrito != null) {
+            int cantidadItems = carrito.obtenerItems().size();
+            int cantidadTotal = carrito.obtenerItems().stream().mapToInt(ItemCarrito::getCantidad).sum();
+            String nombreUsuario = (carrito.getUsuario() != null) ? carrito.getUsuario().getUsername() : "N/A";
+            modeloTablaCarritos.addRow(new Object[]{
+                    carrito.getCodigo(),
+                    sdf.format(carrito.getFechaCreacion().getTime()),
+                    cantidadItems,
+                    cantidadTotal,
+                    nombreUsuario
+            });
+            cargarDetalleCarrito(carrito);
+        } else {
+            modeloTablaDetalle.setRowCount(0);
+        }
+    }
+
+    // Muestra los detalles del carrito seleccionado
+    public void cargarDetalleCarrito(Carrito carrito) {
+        modeloTablaDetalle.setRowCount(0);
         if (carrito != null) {
             for (ItemCarrito item : carrito.obtenerItems()) {
-                modeloTablaItems.addRow(new Object[]{
+                modeloTablaDetalle.addRow(new Object[]{
                         item.getProducto().getCodigo(),
                         item.getProducto().getNombre(),
                         item.getCantidad(),
                         String.format("%.2f", item.getSubtotal())
                 });
             }
-        } else {
-            mostrarMensaje("Carrito no encontrado o no tiene permisos.");
-        }
-    }
-
-    // Método auxiliar para mostrar detalles del ítem seleccionado
-    private void mostrarDetalleItemSeleccionado(int rowIndex) {
-        modeloTablaDetalleItem.setRowCount(0); // Limpiar tabla de detalles
-
-        if (rowIndex >= 0 && rowIndex < modeloTablaItems.getRowCount()) {
-            // Obtener datos del ítem de la fila seleccionada
-            Object codigoProd = modeloTablaItems.getValueAt(rowIndex, 0);
-            Object nombreProd = modeloTablaItems.getValueAt(rowIndex, 1);
-            Object cantidad = modeloTablaItems.getValueAt(rowIndex, 2);
-            Object subtotal = modeloTablaItems.getValueAt(rowIndex, 3);
-
-            modeloTablaDetalleItem.addRow(new Object[]{"Código Producto", codigoProd});
-            modeloTablaDetalleItem.addRow(new Object[]{"Nombre", nombreProd});
-            modeloTablaDetalleItem.addRow(new Object[]{"Cantidad", cantidad});
-            modeloTablaDetalleItem.addRow(new Object[]{"Subtotal", subtotal});
+            // Fila vacía
+            modeloTablaDetalle.addRow(new Object[]{"", "", "", ""});
+            modeloTablaDetalle.addRow(new Object[]{"", "Subtotal", "", String.format("%.2f", carrito.calcularSubtotal())});
+            modeloTablaDetalle.addRow(new Object[]{"", "IVA", "", String.format("%.2f", carrito.calcularIva())});
+            modeloTablaDetalle.addRow(new Object[]{"", "Total", "", String.format("%.2f", carrito.calcularTotal())});
         }
     }
 
     public void limpiarVista() {
         txtCodigo.setText("");
-        modeloTablaItems.setRowCount(0);
-        modeloTablaDetalleItem.setRowCount(0);
+        modeloTablaCarritos.setRowCount(0);
+        modeloTablaDetalle.setRowCount(0);
     }
 
     public void mostrarMensaje(String mensaje) {
@@ -101,24 +165,9 @@ public class CarritoModificarView extends JInternalFrame {
     }
 
     // Getters para el controlador
-    public JTextField getTxtCodigo() {
-        return txtCodigo;
-    }
-
-    public JButton getBtnModificar() {
-        return btnModificar;
-    }
-
-    public JTable getTblModificar() {
-        return tblModificar;
-    }
-
-    public JTable getTblDetalleCarrito() {
-        return tblDetalleCarrito;
-    }
-
-    public JButton getBtnBuscar() {
-        return btnBuscar;
-    }
-
+    public JTextField getTxtCodigo() { return txtCodigo; }
+    public JButton getBtnModificar() { return btnModificar; }
+    public JTable getTblModificar() { return tblModificar; }
+    public JTable getTblDetalleCarrito() { return tblDetalleCarrito; }
+    public JButton getBtnBuscar() { return btnBuscar; }
 }

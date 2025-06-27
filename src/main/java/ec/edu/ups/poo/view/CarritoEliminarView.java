@@ -6,69 +6,86 @@ import ec.edu.ups.poo.modelo.ItemCarrito;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 public class CarritoEliminarView extends JInternalFrame {
     // Variables de instancia que coinciden con el diseño
-    private JPanel panelPrincipal; // Asumiendo que es el panel raíz del .form
-    private JTextField txtEliminarCarrito;
+    private JPanel panelPrincipal;
     private JButton btnEliminar;
-    private JButton btnBuscar;
-    private JTable tblEliminarCarrito; // Para el resumen del carrito a eliminar
-    private JTable tblMostrarDetalleCarrito; // Para los ítems del carrito a eliminar
+    private JButton btnListar;
+    private JTable tblEliminarCarrito;
+    private JTable tblMostrarDetalleCarrito;
 
-    private DefaultTableModel modeloTablaCarritos; // Para tblEliminarCarrito
-    private DefaultTableModel modeloTablaDetalle; // Para tblMostrarDetalleCarrito
+    private DefaultTableModel modeloTablaCarritos;
+    private DefaultTableModel modeloTablaDetalle;
 
-    // Variable para mantener el carrito seleccionado para eliminar
     private Carrito carritoSeleccionado;
+    private List<Carrito> ultimoListado; // Mantener referencia para selección
 
     public CarritoEliminarView() {
         super("Eliminar Carrito", true, true, true, true);
         setContentPane(panelPrincipal);
-        // CORRECCIÓN: Eliminar la línea this.setContentPane(panelPrincipal);
-        // El diseñador de GUI se encarga de inicializar panelPrincipal y establecerlo como contentPane.
-        this.setSize(700, 500); // Ajusta el tamaño según tu diseño
+        this.setSize(700, 500);
 
-        // Configuración de tblEliminarCarrito (resumen del carrito)
-        modeloTablaCarritos = new DefaultTableModel();
-        modeloTablaCarritos.addColumn("Código");
-        modeloTablaCarritos.addColumn("Usuario");
-        modeloTablaCarritos.addColumn("Fecha");
-        modeloTablaCarritos.addColumn("Total");
+        // Modelo para la tabla de carritos
+        modeloTablaCarritos = new DefaultTableModel(
+                new Object[]{"Código", "Usuario", "Fecha", "Total"}, 0
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
         tblEliminarCarrito.setModel(modeloTablaCarritos);
 
-        // Configuración de tblMostrarDetalleCarrito (ítems del carrito)
-        modeloTablaDetalle = new DefaultTableModel();
-        modeloTablaDetalle.addColumn("Código Prod.");
-        modeloTablaDetalle.addColumn("Nombre");
-        modeloTablaDetalle.addColumn("Cantidad");
-        modeloTablaDetalle.addColumn("Subtotal");
+        // Modelo para la tabla de detalles
+        modeloTablaDetalle = new DefaultTableModel(
+                new Object[]{"Código Prod.", "Nombre", "Cantidad", "Subtotal"}, 0
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
         tblMostrarDetalleCarrito.setModel(modeloTablaDetalle);
 
-        // Deshabilitar el botón de eliminar hasta que se encuentre un carrito
         btnEliminar.setEnabled(false);
+
+        // Listener: al seleccionar un carrito, muestra detalles y habilita Eliminar
+        tblEliminarCarrito.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting() && tblEliminarCarrito.getSelectedRow() != -1 && ultimoListado != null) {
+                int fila = tblEliminarCarrito.getSelectedRow();
+                if (fila >= 0 && fila < ultimoListado.size()) {
+                    mostrarCarrito(ultimoListado.get(fila));
+                }
+            }
+        });
     }
 
-    // Método para mostrar el carrito a eliminar
-    public void mostrarCarrito(Carrito carrito) {
-        modeloTablaCarritos.setRowCount(0); // Limpiar tabla de resumen
-        modeloTablaDetalle.setRowCount(0); // Limpiar tabla de ítems
-        btnEliminar.setEnabled(false); // Deshabilitar eliminar por defecto
-
-        if (carrito != null) {
-            this.carritoSeleccionado = carrito;
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+    // Mostrar TODOS los carritos en la tabla principal
+    public void cargarCarritosUsuario(List<Carrito> carritos) {
+        modeloTablaCarritos.setRowCount(0);
+        modeloTablaDetalle.setRowCount(0);
+        ultimoListado = carritos;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        for (Carrito carrito : carritos) {
             String nombreUsuario = (carrito.getUsuario() != null) ? carrito.getUsuario().getUsername() : "N/A";
-
-            // Cargar resumen en tblEliminarCarrito
             modeloTablaCarritos.addRow(new Object[]{
                     carrito.getCodigo(),
                     nombreUsuario,
-                    sdf.format(carrito.getFechaCreacion()),
+                    sdf.format(carrito.getFechaCreacion().getTime()),
                     String.format("%.2f", carrito.calcularTotal())
             });
+        }
+        btnEliminar.setEnabled(false);
+        carritoSeleccionado = null;
+    }
 
-            // Cargar ítems en tblMostrarDetalleCarrito
+    // Mostrar detalle de carrito seleccionado
+    public void mostrarCarrito(Carrito carrito) {
+        modeloTablaDetalle.setRowCount(0);
+        carritoSeleccionado = null;
+        if (carrito != null) {
             for (ItemCarrito item : carrito.obtenerItems()) {
                 modeloTablaDetalle.addRow(new Object[]{
                         item.getProducto().getCodigo(),
@@ -77,19 +94,18 @@ public class CarritoEliminarView extends JInternalFrame {
                         String.format("%.2f", item.getSubtotal())
                 });
             }
-            btnEliminar.setEnabled(true); // Habilitar eliminar
+            btnEliminar.setEnabled(true);
+            carritoSeleccionado = carrito;
         } else {
-            this.carritoSeleccionado = null;
-            mostrarMensaje("Carrito no encontrado o no tiene permisos.");
+            btnEliminar.setEnabled(false);
         }
     }
 
     public void limpiarVista() {
-        txtEliminarCarrito.setText("");
         modeloTablaCarritos.setRowCount(0);
         modeloTablaDetalle.setRowCount(0);
         btnEliminar.setEnabled(false);
-        this.carritoSeleccionado = null;
+        carritoSeleccionado = null;
     }
 
     public void mostrarMensaje(String mensaje) {
@@ -101,24 +117,16 @@ public class CarritoEliminarView extends JInternalFrame {
         return respuesta == JOptionPane.YES_OPTION;
     }
 
-    // Getters para el controlador
-    public JTextField getTxtEliminarCarrito() {
-        return txtEliminarCarrito;
-    }
-
+    // Getters
     public JButton getBtnEliminar() {
         return btnEliminar;
     }
 
-    public JButton getBtnBuscar() {
-        return btnBuscar;
+    public JButton getBtnListar() {
+        return btnListar;
     }
 
     public Carrito getCarritoSeleccionado() {
         return carritoSeleccionado;
-    }
-
-    public void setBtnBuscar(JButton btnBuscar) {
-        this.btnBuscar = btnBuscar;
     }
 }

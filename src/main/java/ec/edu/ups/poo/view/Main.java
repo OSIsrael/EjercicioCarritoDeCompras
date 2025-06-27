@@ -133,8 +133,9 @@ public class Main {
             mostrarVentana(principalView, carritoModificarView);
         });
         principalView.getMenuItemCarritoEliminar().addActionListener(e -> {
-            carritoModificarView.limpiarVista();
-            mostrarVentana(principalView, carritoModificarView);
+            carritoEliminarView.limpiarVista();
+            carritoController.mostrarCarritosUsuarioParaEliminar();
+            mostrarVentana(principalView, carritoEliminarView);
         });
     }
 

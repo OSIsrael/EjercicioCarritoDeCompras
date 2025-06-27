@@ -172,41 +172,29 @@ public class CarritoController {
     }
 
     // --- Lógica de CarritoEliminarView ---
-    private void configurarEventosEliminar() {
-        carritoEliminarView.getBtnBuscar().addActionListener(e -> buscarCarritoParaEliminar());
-        carritoEliminarView.getBtnEliminar().addActionListener(e -> eliminarCarritoConfirmado());
+    public void mostrarCarritosUsuarioParaEliminar() {
+        List<Carrito> carritos = carritoDAO.listarPorUsuario(usuarioAutenticado);
+        carritoEliminarView.cargarCarritosUsuario(carritos);
     }
 
-    private void buscarCarritoParaEliminar() {
-        String codigoStr = carritoEliminarView.getTxtEliminarCarrito().getText().trim();
-        if (!esNumeroEntero(codigoStr)) {
-            carritoEliminarView.mostrarMensaje("El código debe ser un número válido.");
-            carritoEliminarView.mostrarCarrito(null);
-            this.carritoParaEliminar = null;
-            return;
-        }
-        int codigo = Integer.parseInt(codigoStr);
-        Carrito carrito = carritoDAO.buscar(codigo);
-        if (carrito == null || !tienePermiso(carrito)) {
-            carritoEliminarView.mostrarMensaje("No tiene permisos para eliminar este carrito o no existe.");
-            carritoEliminarView.mostrarCarrito(null);
-            this.carritoParaEliminar = null;
-            return;
-        }
-        this.carritoParaEliminar = carrito;
-        carritoEliminarView.mostrarCarrito(carrito);
+    // Configuración de eventos
+    private void configurarEventosEliminar() {
+        carritoEliminarView.getBtnEliminar().addActionListener(e -> eliminarCarritoConfirmado());
+        carritoEliminarView.getBtnListar().addActionListener(e -> mostrarCarritosUsuarioParaEliminar());
     }
 
     private void eliminarCarritoConfirmado() {
-        if (this.carritoParaEliminar == null) {
-            carritoEliminarView.mostrarMensaje("Primero debe buscar un carrito válido para eliminar.");
+        Carrito carrito = carritoEliminarView.getCarritoSeleccionado();
+        if (carrito == null) {
+            carritoEliminarView.mostrarMensaje("Seleccione un carrito para eliminar.");
             return;
         }
-        // SIN confirmación extra, elimina directo
-        carritoDAO.eliminar(carritoParaEliminar.getCodigo());
+        boolean confirmar = carritoEliminarView.confirmarAccion("¿Está seguro de eliminar este carrito?");
+        if (!confirmar) return;
+
+        carritoDAO.eliminar(carrito.getCodigo());
         carritoEliminarView.mostrarMensaje("Carrito eliminado exitosamente.");
-        carritoEliminarView.limpiarVista();
-        this.carritoParaEliminar = null;
+        mostrarCarritosUsuarioParaEliminar(); // Refresca la lista
     }
 
     // --- Lógica de CarritoModificarView ---
@@ -311,4 +299,5 @@ public class CarritoController {
         carritoModificarView.cargarCarritosUsuario(carritos);
         this.carritosUltimosMostradosModificar = carritos;
     }
+
 }

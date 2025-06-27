@@ -8,22 +8,6 @@
     <properties/>
     <border type="none"/>
     <children>
-      <component id="319b" class="javax.swing.JLabel">
-        <constraints>
-          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="CODIGO"/>
-        </properties>
-      </component>
-      <component id="3afe9" class="javax.swing.JTextField" binding="txtEliminarCarrito">
-        <constraints>
-          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-            <preferred-size width="150" height="-1"/>
-          </grid>
-        </constraints>
-        <properties/>
-      </component>
       <component id="7d875" class="javax.swing.JButton" binding="btnEliminar">
         <constraints>
           <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -58,12 +42,12 @@
           </component>
         </children>
       </scrollpane>
-      <component id="3557d" class="javax.swing.JButton" binding="btnBuscar">
+      <component id="3557d" class="javax.swing.JButton" binding="btnListar">
         <constraints>
-          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="BUSCAR"/>
+          <text value="LISTAR"/>
         </properties>
       </component>
     </children>

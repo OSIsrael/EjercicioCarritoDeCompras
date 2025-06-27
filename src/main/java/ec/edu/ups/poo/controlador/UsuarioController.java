@@ -3,10 +3,7 @@ package ec.edu.ups.poo.controlador;
 import ec.edu.ups.poo.dao.UsuarioDAO;
 import ec.edu.ups.poo.modelo.Rol;
 import ec.edu.ups.poo.modelo.Usuario;
-import ec.edu.ups.poo.view.LoginView;
-import ec.edu.ups.poo.view.RegistrarUsuario;
-import ec.edu.ups.poo.view.UsuarioAdminView;
-import ec.edu.ups.poo.view.UsuarioBuscarView;
+import ec.edu.ups.poo.view.*;
 
 import java.util.List;
 
@@ -17,13 +14,15 @@ public class UsuarioController {
     private UsuarioAdminView usuarioAdminView;
     private Usuario usuarioAutenticado;
     private UsuarioBuscarView usuarioBuscarView;
+    private UsuarioCrearView usuarioCrearView;
 
-    public UsuarioController(UsuarioDAO usuarioDAO, LoginView loginView, RegistrarUsuario registrarUsuarioView, UsuarioAdminView usuarioAdminView, UsuarioBuscarView usuarioBuscarView) {
+    public UsuarioController(UsuarioDAO usuarioDAO, LoginView loginView, RegistrarUsuario registrarUsuarioView, UsuarioAdminView usuarioAdminView, UsuarioBuscarView usuarioBuscarView,UsuarioCrearView usuarioCrearView) {
         this.usuarioDAO = usuarioDAO;
         this.loginView = loginView;
         this.registrarUsuarioView = registrarUsuarioView;
         this.usuarioAdminView = usuarioAdminView;
         this.usuarioBuscarView = usuarioBuscarView;
+        this.usuarioCrearView = usuarioCrearView;
         configurarEventos();
     }
 
@@ -43,6 +42,11 @@ public class UsuarioController {
         if (usuarioBuscarView != null) {
             usuarioBuscarView.getBtnBuscar().addActionListener(e -> buscarUsuarioAction());
             usuarioBuscarView.getBtnListar().addActionListener(e -> listarTodosAction());
+        }
+        if (usuarioCrearView != null) {
+            usuarioCrearView.getBtnCrear().addActionListener(e -> crearUsuarioDesdeCrearView());
+            usuarioCrearView.getBtnBorrar().addActionListener(e -> usuarioCrearView.getTxtUsuario().setText(""));
+            usuarioCrearView.getBtnBorrar().addActionListener(e -> usuarioCrearView.getTxtContrasena().setText(""));
         }
     }
 
@@ -232,5 +236,30 @@ public class UsuarioController {
     public void listarTodosAction() {
         List<Usuario> usuarios = usuarioDAO.listarTodos();
         usuarioBuscarView.cargarUsuarios(usuarios);
+    }
+    private void crearUsuarioDesdeCrearView() {
+        String username = usuarioCrearView.getTxtUsuario().getText().trim();
+        String password = new String(usuarioCrearView.getTxtContrasena().getPassword());
+
+        if (username.isEmpty()) {
+            usuarioCrearView.mostrarMensaje("El nombre de usuario no puede estar vacío.");
+            return;
+        }
+        if (password.isEmpty()) {
+            usuarioCrearView.mostrarMensaje("La contraseña no puede estar vacía.");
+            return;
+        }
+        if (usuarioDAO.buscarPorUsername(username) != null) {
+            usuarioCrearView.mostrarMensaje("El usuario ya existe.");
+            return;
+        }
+        Usuario nuevo = new Usuario(username, password, Rol.USUARIO);
+        usuarioDAO.crear(nuevo);
+        usuarioCrearView.mostrarMensaje("Usuario creado exitosamente.");
+        usuarioCrearView.getTxtUsuario().setText("");
+        usuarioCrearView.getTxtContrasena().setText("");
+        // Refresca otras vistas
+        if (usuarioAdminView != null) listarUsuarios();
+        if (usuarioBuscarView != null) listarTodosAction();
     }
 }

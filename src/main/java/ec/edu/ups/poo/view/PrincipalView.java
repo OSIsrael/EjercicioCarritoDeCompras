@@ -25,6 +25,7 @@ public class PrincipalView extends JFrame {
     private JMenuItem menuItemGestionarUsuarios;
     private JMenuItem menuItemCerrarSesion;
     private JMenuItem menuItemBuscarUsuario;
+    private JMenuItem menuItemCrearUsuario;
     private JMenu menuIdiomas;
     private JMenuItem menuItemIngles;
     private JMenuItem menuItemEspañol;
@@ -124,6 +125,10 @@ public class PrincipalView extends JFrame {
 
         // Oculta la opción de listar todos los carritos (solo para admin)
     }
+    public JMenuItem getMenuItemCrearUsuario() {
+        return menuItemCrearUsuario;
+    }
+
 
     /**
      * Inicializa todos los componentes de la interfaz gráfica.
@@ -162,8 +167,10 @@ public class PrincipalView extends JFrame {
         menuAdmin = new JMenu(mensajeInternacionalizacionHandler.get("menu.administrador"));
         menuItemGestionarUsuarios = new JMenuItem(mensajeInternacionalizacionHandler.get("menu.administrador.gestionar"));
         menuItemBuscarUsuario = new JMenuItem(mensajeInternacionalizacionHandler.get("menu.administrador.buscar"));
+        menuItemCrearUsuario = new JMenuItem(mensajeInternacionalizacionHandler.get("menu.administrador.crear"));
         menuAdmin.add(menuItemGestionarUsuarios);
         menuAdmin.add(menuItemBuscarUsuario);
+        menuAdmin.add(menuItemCrearUsuario);
         menuBar.add(menuAdmin);
 
         // Opción Cerrar Sesión (directamente en la barra de menú, con un espaciador)

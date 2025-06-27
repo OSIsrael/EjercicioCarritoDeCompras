@@ -26,6 +26,8 @@ public class PrincipalView extends JFrame {
     private JMenuItem menuItemCerrarSesion;
     private JMenuItem menuItemBuscarUsuario;
     private JMenuItem menuItemCrearUsuario;
+    private JMenu menuUser;
+    private JMenuItem menuItemUser;
     private JMenu menuIdiomas;
     private JMenuItem menuItemIngles;
     private JMenuItem menuItemEspañol;
@@ -129,6 +131,9 @@ public class PrincipalView extends JFrame {
         return menuItemCrearUsuario;
     }
 
+    public JMenuItem getMenuItemUser() {
+        return menuItemUser;
+    }
 
     /**
      * Inicializa todos los componentes de la interfaz gráfica.
@@ -172,6 +177,13 @@ public class PrincipalView extends JFrame {
         menuAdmin.add(menuItemBuscarUsuario);
         menuAdmin.add(menuItemCrearUsuario);
         menuBar.add(menuAdmin);
+
+        // Menú Usuario
+        menuUser = new JMenu(mensajeInternacionalizacionHandler.get("menu.usuario"));
+        menuItemUser = new JMenuItem(mensajeInternacionalizacionHandler.get("menu.usuario.usuario"));
+        menuUser.add(menuItemUser);
+        menuBar.add(menuUser);
+
 
         // Opción Cerrar Sesión (directamente en la barra de menú, con un espaciador)
         menuItemCerrarSesion = new JMenuItem(mensajeInternacionalizacionHandler.get("menu.cerrarSesion.cerrar"));

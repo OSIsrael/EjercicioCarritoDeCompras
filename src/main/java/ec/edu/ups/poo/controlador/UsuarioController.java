@@ -5,6 +5,7 @@ import ec.edu.ups.poo.modelo.Rol;
 import ec.edu.ups.poo.modelo.Usuario;
 import ec.edu.ups.poo.view.*;
 
+import javax.swing.*;
 import java.util.List;
 
 public class UsuarioController {
@@ -15,14 +16,16 @@ public class UsuarioController {
     private Usuario usuarioAutenticado;
     private UsuarioBuscarView usuarioBuscarView;
     private UsuarioCrearView usuarioCrearView;
+    private UsuarioModificarDatosView usuarioModificarDatosView;
 
-    public UsuarioController(UsuarioDAO usuarioDAO, LoginView loginView, RegistrarUsuario registrarUsuarioView, UsuarioAdminView usuarioAdminView, UsuarioBuscarView usuarioBuscarView,UsuarioCrearView usuarioCrearView) {
+    public UsuarioController(UsuarioDAO usuarioDAO, LoginView loginView, RegistrarUsuario registrarUsuarioView, UsuarioAdminView usuarioAdminView, UsuarioBuscarView usuarioBuscarView,UsuarioCrearView usuarioCrearView,UsuarioModificarDatosView usuarioModificarDatosView) {
         this.usuarioDAO = usuarioDAO;
         this.loginView = loginView;
         this.registrarUsuarioView = registrarUsuarioView;
         this.usuarioAdminView = usuarioAdminView;
         this.usuarioBuscarView = usuarioBuscarView;
         this.usuarioCrearView = usuarioCrearView;
+        this.usuarioModificarDatosView = usuarioModificarDatosView;
         configurarEventos();
     }
 
@@ -47,6 +50,10 @@ public class UsuarioController {
             usuarioCrearView.getBtnCrear().addActionListener(e -> crearUsuarioDesdeCrearView());
             usuarioCrearView.getBtnBorrar().addActionListener(e -> usuarioCrearView.getTxtUsuario().setText(""));
             usuarioCrearView.getBtnBorrar().addActionListener(e -> usuarioCrearView.getTxtContrasena().setText(""));
+        }
+        if (usuarioModificarDatosView != null) {
+            usuarioModificarDatosView.getBtnModificar().addActionListener(e -> modificarDatosUsuario());
+            usuarioModificarDatosView.getBtnBorrar().addActionListener(e -> usuarioModificarDatosView.limpiarCampos());
         }
     }
 
@@ -261,5 +268,36 @@ public class UsuarioController {
         // Refresca otras vistas
         if (usuarioAdminView != null) listarUsuarios();
         if (usuarioBuscarView != null) listarTodosAction();
+    }
+    private void modificarDatosUsuario() {
+        String nuevoUsername = usuarioModificarDatosView.getTxtUsuario().getText().trim();
+        String nuevaContra = new String(usuarioModificarDatosView.getTxtContra().getPassword());
+
+        if (nuevoUsername.isEmpty() || nuevaContra.isEmpty()) {
+            mostrarMensaje("Usuario y contraseña no pueden estar vacíos.");
+            return;
+        }
+        // Si el username cambió y está ocupado por otro usuario
+        if (!nuevoUsername.equals(usuarioAutenticado.getUsername()) && usuarioDAO.buscarPorUsername(nuevoUsername) != null) {
+            mostrarMensaje("El nombre de usuario ya está en uso.");
+            return;
+        }
+        // Actualiza los datos
+        usuarioAutenticado.setUsername(nuevoUsername);
+        usuarioAutenticado.setPassword(nuevaContra);
+        usuarioDAO.actualizar(usuarioAutenticado);
+
+        mostrarMensaje("Datos actualizados correctamente.");
+        usuarioModificarDatosView.mostrarDatosUsuario(usuarioAutenticado);
+
+        // Refrescar otras vistas si corresponde
+        if (usuarioAdminView != null) listarUsuarios();
+        if (usuarioBuscarView != null) listarTodosAction();
+    }
+
+    private void mostrarMensaje(String mensaje) {
+        if (usuarioModificarDatosView != null) {
+            JOptionPane.showMessageDialog(usuarioModificarDatosView, mensaje);
+        }
     }
 }

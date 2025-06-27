@@ -51,16 +51,18 @@ public class Main {
         UsuarioAdminView usuarioAdminView = new UsuarioAdminView();
         UsuarioBuscarView usuarioBuscarView = new UsuarioBuscarView();
         UsuarioCrearView usuarioCrearView = new UsuarioCrearView();
+        UsuarioModificarDatosView usuarioModificarDatosView = new UsuarioModificarDatosView();
 
         UsuarioController usuarioController = new UsuarioController(
-                usuarioDAO, loginView, registrarUsuarioView, usuarioAdminView, usuarioBuscarView, usuarioCrearView);
+                usuarioDAO, loginView, registrarUsuarioView, usuarioAdminView,
+                usuarioBuscarView, usuarioCrearView, usuarioModificarDatosView);
 
         loginView.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
                 Usuario usuarioAutenticado = usuarioController.getUsuarioAutenticado();
                 if (usuarioAutenticado != null) {
-                    iniciarAplicacionPrincipal(usuarioAutenticado, usuarioController, usuarioAdminView, usuarioBuscarView, usuarioCrearView);
+                    iniciarAplicacionPrincipal(usuarioAutenticado, usuarioController, usuarioAdminView, usuarioBuscarView, usuarioCrearView, usuarioModificarDatosView);
                 } else {
                     System.exit(0);
                 }
@@ -73,7 +75,8 @@ public class Main {
                                                    UsuarioController usuarioController,
                                                    UsuarioAdminView usuarioAdminView,
                                                    UsuarioBuscarView usuarioBuscarView,
-                                                   UsuarioCrearView usuarioCrearView) {
+                                                   UsuarioCrearView usuarioCrearView,
+                                                   UsuarioModificarDatosView usuarioModificarDatosView) {
 
         // Instanciar vistas
         PrincipalView principalView = new PrincipalView();
@@ -104,7 +107,7 @@ public class Main {
 
         configurarEventosProductos(principalView, productoAnadirView, productoListaView, productoEditar, productoEliminar);
         configurarEventosCarrito(principalView, carritoAnadirView, carritoListarView, carritoBuscarView, carritoModificarView, carritoEliminarView, carritoController);
-        configurarEventosUsuarios(principalView, usuarioController, usuarioAdminView, usuarioBuscarView, usuarioCrearView);
+        configurarEventosUsuarios(principalView, usuarioController, usuarioAdminView, usuarioBuscarView, usuarioCrearView, usuarioModificarDatosView);
         configurarEventosCerrarSesion(principalView);
         configurarEventosIdioma(principalView);
 
@@ -146,7 +149,8 @@ public class Main {
             UsuarioController usuarioController,
             UsuarioAdminView usuarioAdminView,
             UsuarioBuscarView usuarioBuscarView,
-            UsuarioCrearView usuarioCrearView) {
+            UsuarioCrearView usuarioCrearView,
+            UsuarioModificarDatosView usuarioModificarDatosView) {
         principalView.getMenuItemGestionarUsuarios().addActionListener(e -> {
             usuarioController.listarUsuarios();
             mostrarVentana(principalView, usuarioAdminView);
@@ -160,6 +164,11 @@ public class Main {
             usuarioCrearView.getTxtUsuario().setText("");
             usuarioCrearView.getTxtContrasena().setText("");
             mostrarVentana(principalView, usuarioCrearView);
+        });
+        // Menú para que el usuario modifique sus propios datos
+        principalView.getMenuItemUser().addActionListener(e -> {
+            usuarioModificarDatosView.mostrarDatosUsuario(usuarioController.getUsuarioAutenticado());
+            mostrarVentana(principalView, usuarioModificarDatosView);
         });
     }
 

@@ -1,15 +1,18 @@
 package ec.edu.ups.poo.controlador;
 
+import ec.edu.ups.poo.dao.PreguntaDAO;
 import ec.edu.ups.poo.dao.UsuarioDAO;
+import ec.edu.ups.poo.modelo.Pregunta;
 import ec.edu.ups.poo.modelo.Rol;
 import ec.edu.ups.poo.modelo.Usuario;
 import ec.edu.ups.poo.view.*;
 
 import javax.swing.*;
-import java.util.List;
+import java.util.*;
 
 public class UsuarioController {
     private UsuarioDAO usuarioDAO;
+    private PreguntaDAO preguntaDAO;
     private LoginView loginView;
     private RegistrarUsuario registrarUsuarioView;
     private UsuarioAdminView usuarioAdminView;
@@ -17,15 +20,26 @@ public class UsuarioController {
     private UsuarioBuscarView usuarioBuscarView;
     private UsuarioCrearView usuarioCrearView;
     private UsuarioModificarDatosView usuarioModificarDatosView;
+    private OlvideContrasenaView olvideContrasenaView;
 
-    public UsuarioController(UsuarioDAO usuarioDAO, LoginView loginView, RegistrarUsuario registrarUsuarioView, UsuarioAdminView usuarioAdminView, UsuarioBuscarView usuarioBuscarView,UsuarioCrearView usuarioCrearView,UsuarioModificarDatosView usuarioModificarDatosView) {
+    // Variables para el flujo de recuperación
+    private Usuario usuarioRecuperacion;
+    private Integer idPreguntaRecuperacion;
+
+    public UsuarioController(UsuarioDAO usuarioDAO, PreguntaDAO preguntaDAO, LoginView loginView,
+                             RegistrarUsuario registrarUsuarioView, UsuarioAdminView usuarioAdminView,
+                             UsuarioBuscarView usuarioBuscarView, UsuarioCrearView usuarioCrearView,
+                             UsuarioModificarDatosView usuarioModificarDatosView,
+                             OlvideContrasenaView olvideContrasenaView) {
         this.usuarioDAO = usuarioDAO;
+        this.preguntaDAO = preguntaDAO;
         this.loginView = loginView;
         this.registrarUsuarioView = registrarUsuarioView;
         this.usuarioAdminView = usuarioAdminView;
         this.usuarioBuscarView = usuarioBuscarView;
         this.usuarioCrearView = usuarioCrearView;
         this.usuarioModificarDatosView = usuarioModificarDatosView;
+        this.olvideContrasenaView = olvideContrasenaView;
         configurarEventos();
     }
 
@@ -33,14 +47,20 @@ public class UsuarioController {
         // Eventos de LoginView
         this.loginView.getBtnIniciarSesion().addActionListener(e -> login());
         this.loginView.getBtnRegistrarse().addActionListener(e -> abrirVentanaRegistro());
+        this.loginView.getBtnOlvideContrasena().addActionListener(e -> abrirOlvideContrasena());
 
         // Eventos de RegistrarUsuario
         this.registrarUsuarioView.getBtnRegistrarse().addActionListener(e -> registrarUsuario());
+
+        // Eventos de OlvideContrasenaView
+        this.olvideContrasenaView.getBtnValidar().addActionListener(e -> validarPreguntaRecuperacion());
+        this.olvideContrasenaView.getBtnCambiar().addActionListener(e -> cambiarContrasenaRecuperacion());
 
         // Eventos de UsuarioAdminView
         this.usuarioAdminView.getBtnActualizar().addActionListener(e -> actualizarUsuario());
         this.usuarioAdminView.getBtnEliminar().addActionListener(e -> eliminarUsuario());
         this.usuarioAdminView.getBtnRefrescar().addActionListener(e -> listarUsuarios());
+
         //Eventos UsuarioBuscarView
         if (usuarioBuscarView != null) {
             usuarioBuscarView.getBtnBuscar().addActionListener(e -> buscarUsuarioAction());
@@ -61,26 +81,20 @@ public class UsuarioController {
         String username = loginView.getTxtUsername().getText().trim();
         String password = new String(loginView.getTxtPassword().getPassword());
 
-        // Validar campos vacíos
         if (username.isEmpty() || password.isEmpty()) {
             loginView.mostrar("Por favor, ingrese usuario y contraseña.");
             return;
         }
 
-        // Buscar usuario
         Usuario usuario = usuarioDAO.buscarPorUsername(username);
         if (usuario == null) {
             loginView.mostrar("Usuario no encontrado.");
             return;
         }
-
-        // Verificar contraseña
         if (!usuario.getPassword().equals(password)) {
             loginView.mostrar("Contraseña incorrecta.");
             return;
         }
-
-        // Login exitoso
         this.usuarioAutenticado = usuario;
         loginView.dispose();
     }
@@ -98,36 +112,99 @@ public class UsuarioController {
         String username = registrarUsuarioView.getTxtUsuarioRe().getText().trim();
         String password = new String(registrarUsuarioView.getTxtContraRe().getPassword());
 
-        // Validaciones
         if (username.isEmpty()) {
             registrarUsuarioView.mostrarMensaje("El nombre de usuario no puede estar vacío.");
             return;
         }
-
         if (password.isEmpty()) {
             registrarUsuarioView.mostrarMensaje("La contraseña no puede estar vacía.");
             return;
         }
-
         if (password.length() < 4) {
             registrarUsuarioView.mostrarMensaje("La contraseña debe tener al menos 4 caracteres.");
             return;
         }
-
-        // Verificar si el usuario ya existe
         if (usuarioDAO.buscarPorUsername(username) != null) {
             registrarUsuarioView.mostrarMensaje("El nombre de usuario ya existe. Elija otro nombre.");
             return;
         }
-
-        // Crear usuario
+        // Recoger preguntas y respuestas de seguridad
+        Pregunta pregunta1 = (Pregunta) registrarUsuarioView.getCmbPregunta1().getSelectedItem();
+        Pregunta pregunta2 = (Pregunta) registrarUsuarioView.getCmbPregunta2().getSelectedItem();
+        String respuesta1 = registrarUsuarioView.getTxtRespuesta1().getText().trim();
+        String respuesta2 = registrarUsuarioView.getTxtRespuesta2().getText().trim();
+        if (pregunta1 == null || respuesta1.isEmpty() || pregunta2 == null || respuesta2.isEmpty()) {
+            registrarUsuarioView.mostrarMensaje("Debes seleccionar y responder ambas preguntas de seguridad.");
+            return;
+        }
+        if (pregunta1.getId() == pregunta2.getId()) {
+            registrarUsuarioView.mostrarMensaje("Las preguntas de seguridad deben ser diferentes.");
+            return;
+        }
         Usuario nuevoUsuario = new Usuario(username, password, Rol.USUARIO);
+        Map<Integer, String> preguntasSeguridad = new HashMap<>();
+        preguntasSeguridad.put(pregunta1.getId(), respuesta1);
+        preguntasSeguridad.put(pregunta2.getId(), respuesta2);
+        nuevoUsuario.setPreguntasSeguridad(preguntasSeguridad);
+
         usuarioDAO.crear(nuevoUsuario);
 
         registrarUsuarioView.mostrarMensaje("Usuario registrado exitosamente.");
         registrarUsuarioView.limpiarCampos();
         registrarUsuarioView.dispose();
     }
+
+    // =============== FLUJO OLVIDE CONTRASEÑA ================
+
+    private void abrirOlvideContrasena() {
+        olvideContrasenaView.limpiarCampos();
+        olvideContrasenaView.setVisible(true);
+    }
+
+    private void validarPreguntaRecuperacion() {
+        String username = olvideContrasenaView.getUsername().trim();
+        Usuario usuario = usuarioDAO.buscarPorUsername(username);
+        if (usuario == null) {
+            olvideContrasenaView.mostrarMensaje("Usuario no encontrado.");
+            return;
+        }
+        Map<Integer, String> preguntas = usuario.getPreguntasSeguridad();
+        if (preguntas == null || preguntas.isEmpty()) {
+            olvideContrasenaView.mostrarMensaje("Este usuario no tiene preguntas de seguridad registradas.");
+            return;
+        }
+        // Selecciona pregunta aleatoria
+        List<Integer> idPreguntas = new ArrayList<>(preguntas.keySet());
+        Random random = new Random();
+        int idx = random.nextInt(idPreguntas.size());
+        idPreguntaRecuperacion = idPreguntas.get(idx);
+        Pregunta pregunta = preguntaDAO.buscarPorId(idPreguntaRecuperacion);
+        usuarioRecuperacion = usuario;
+        olvideContrasenaView.setPregunta(pregunta != null ? pregunta.getTexto() : "Pregunta desconocida");
+        olvideContrasenaView.mostrarCamposNuevaContrasena(true);
+    }
+
+    private void cambiarContrasenaRecuperacion() {
+        if (usuarioRecuperacion == null || idPreguntaRecuperacion == null)
+            return;
+        String respuestaUser = olvideContrasenaView.getRespuesta().trim();
+        String respuestaCorrecta = usuarioRecuperacion.getPreguntasSeguridad().get(idPreguntaRecuperacion);
+        if (respuestaUser.equalsIgnoreCase(respuestaCorrecta)) {
+            String nuevaContra = olvideContrasenaView.getNuevaContrasena();
+            if (nuevaContra.length() < 4) {
+                olvideContrasenaView.mostrarMensaje("La nueva contraseña debe tener al menos 4 caracteres.");
+                return;
+            }
+            usuarioRecuperacion.setPassword(nuevaContra);
+            usuarioDAO.actualizar(usuarioRecuperacion);
+            olvideContrasenaView.mostrarMensaje("Contraseña cambiada exitosamente.");
+            olvideContrasenaView.setVisible(false);
+        } else {
+            olvideContrasenaView.mostrarMensaje("Respuesta incorrecta. No se cambió la contraseña.");
+        }
+    }
+
+    // =======================================================
 
     public void listarUsuarios() {
         List<Usuario> todosLosUsuarios = usuarioDAO.listarTodos();
@@ -147,7 +224,7 @@ public class UsuarioController {
             return;
         }
 
-        String nuevoUsername = (String) usuarioAdminView.getModeloTabla().getValueAt(fila, 0); // <-- Nuevo username editable
+        String nuevoUsername = (String) usuarioAdminView.getModeloTabla().getValueAt(fila, 0);
         Rol rolActual = (Rol) usuarioAdminView.getTblUsuarios().getValueAt(fila, 1);
         Rol nuevoRol = (Rol) usuarioAdminView.getCbxRol().getSelectedItem();
 
@@ -157,16 +234,11 @@ public class UsuarioController {
             return;
         }
 
-        // Verificar si el nombre ya existe (y no es el mismo usuario)
         Usuario usuarioBuscado = usuarioDAO.buscarPorUsername(nuevoUsername);
         if (usuarioBuscado != null && !usuarioAdminView.getTblUsuarios().getValueAt(fila, 0).equals(usuarioBuscado.getUsername())) {
             usuarioAdminView.mostrarError("El nombre de usuario ya está en uso.");
             return;
         }
-
-        // Buscar el usuario original (antes del cambio de username)
-        // Por ejemplo, podrías guardar el username original en otro campo oculto, o usar un modelo con objetos Usuario.
-        // Aquí suponemos que tienes una referencia directa al usuario original, si no, puedes adaptar esto.
 
         Usuario usuario = usuarioDAO.buscarPorUsername((String) usuarioAdminView.getTblUsuarios().getValueAt(fila, 0));
         if (usuario == null) {
@@ -174,11 +246,6 @@ public class UsuarioController {
             return;
         }
 
-        // Verificar si se intenta cambiar el rol del usuario autenticado
-        // (ajustar según tu lógica de autenticación)
-        // if (usuarioAutenticado.getUsername().equals(nuevoUsername)) { ... }
-
-        // Confirmar la acción
         String mensaje = "¿Está seguro de modificar el usuario a '" + nuevoUsername +
                 "' y rol " + nuevoRol + "?";
 
@@ -186,12 +253,10 @@ public class UsuarioController {
             return;
         }
 
-        // Actualizar datos
         usuario.setUsername(nuevoUsername);
         usuario.setRol(nuevoRol);
         usuarioDAO.actualizar(usuario);
 
-        // Refrescar la lista
         listarUsuarios();
         usuarioAdminView.mostrarMensaje("Usuario actualizado exitosamente.");
     }
@@ -206,20 +271,17 @@ public class UsuarioController {
 
         String username = (String) usuarioAdminView.getTblUsuarios().getValueAt(fila, 0);
 
-        // Verificar que no se elimine a sí mismo
         if (usuarioAutenticado.getUsername().equals(username)) {
             usuarioAdminView.mostrarError("No puede eliminarse a sí mismo.");
             return;
         }
 
-        // Verificar que el usuario existe
         Usuario usuario = usuarioDAO.buscarPorUsername(username);
         if (usuario == null) {
             usuarioAdminView.mostrarError("Usuario no encontrado.");
             return;
         }
 
-        // Confirmar eliminación
         String mensaje = "¿Está seguro de eliminar al usuario '" + username + "'?\n" +
                 "Esta acción no se puede deshacer.";
 
@@ -227,10 +289,8 @@ public class UsuarioController {
             return;
         }
 
-        // Eliminar usuario
         usuarioDAO.eliminar(username);
 
-        // Refrescar la lista y limpiar selección
         listarUsuarios();
         usuarioAdminView.limpiarSeleccion();
         usuarioAdminView.mostrarMensaje("Usuario eliminado exitosamente.");
@@ -239,6 +299,7 @@ public class UsuarioController {
     public void cerrarSesion() {
         this.usuarioAutenticado = null;
     }
+
     private void buscarUsuarioAction() {
         String username = usuarioBuscarView.getTxtUsername().getText().trim();
         if (username.isEmpty()) {
@@ -253,6 +314,7 @@ public class UsuarioController {
         List<Usuario> usuarios = usuarioDAO.listarTodos();
         usuarioBuscarView.cargarUsuarios(usuarios);
     }
+
     private void crearUsuarioDesdeCrearView() {
         String username = usuarioCrearView.getTxtUsuario().getText().trim();
         String password = new String(usuarioCrearView.getTxtContrasena().getPassword());
@@ -274,10 +336,10 @@ public class UsuarioController {
         usuarioCrearView.mostrarMensaje("Usuario creado exitosamente.");
         usuarioCrearView.getTxtUsuario().setText("");
         usuarioCrearView.getTxtContrasena().setText("");
-        // Refresca otras vistas
         if (usuarioAdminView != null) listarUsuarios();
         if (usuarioBuscarView != null) listarTodosAction();
     }
+
     private void modificarDatosUsuario() {
         String nuevoUsername = usuarioModificarDatosView.getTxtUsuario().getText().trim();
         String nuevaContra = new String(usuarioModificarDatosView.getTxtContra().getPassword());
@@ -286,12 +348,10 @@ public class UsuarioController {
             mostrarMensaje("Usuario y contraseña no pueden estar vacíos.");
             return;
         }
-        // Si el username cambió y está ocupado por otro usuario
         if (!nuevoUsername.equals(usuarioAutenticado.getUsername()) && usuarioDAO.buscarPorUsername(nuevoUsername) != null) {
             mostrarMensaje("El nombre de usuario ya está en uso.");
             return;
         }
-        // Actualiza los datos
         usuarioAutenticado.setUsername(nuevoUsername);
         usuarioAutenticado.setPassword(nuevaContra);
         usuarioDAO.actualizar(usuarioAutenticado);
@@ -299,7 +359,6 @@ public class UsuarioController {
         mostrarMensaje("Datos actualizados correctamente.");
         usuarioModificarDatosView.mostrarDatosUsuario(usuarioAutenticado);
 
-        // Refrescar otras vistas si corresponde
         if (usuarioAdminView != null) listarUsuarios();
         if (usuarioBuscarView != null) listarTodosAction();
     }

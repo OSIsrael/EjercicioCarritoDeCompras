@@ -1,11 +1,14 @@
 package ec.edu.ups.poo.modelo;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class Usuario {
     private String username;
     private String password;
     private Rol rol;
+    private Map<Integer,String> preguntasSeguridad=new HashMap<>();
 
     public Usuario() {
     }
@@ -50,6 +53,10 @@ public class Usuario {
         if (o == null || getClass() != o.getClass()) return false;
         Usuario usuario = (Usuario) o;
         return Objects.equals(username, usuario.username); // Comparamos por username
+    }
+    public Map<Integer, String> getPreguntasSeguridad() { return preguntasSeguridad; }
+    public void setPreguntasSeguridad(Map<Integer, String> preguntasSeguridad) {
+        this.preguntasSeguridad = preguntasSeguridad;
     }
 
     /**

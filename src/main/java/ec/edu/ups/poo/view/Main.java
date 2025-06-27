@@ -96,18 +96,24 @@ public class Main {
                 productoDAO, productoAnadirView, productoListaView,
                 productoEditar, productoEliminar, carritoAnadirView);
 
+        // CarritoController debe filtrar los carritos según el usuario autenticado, ya sea admin o usuario normal
         CarritoController carritoController = new CarritoController(
                 carritoDAO, productoDAO, carritoAnadirView, usuarioAutenticado,
                 carritoListarView, carritoBuscarView, carritoModificarView, carritoEliminarView);
 
-        principalView.mostrarMensaje("Bienvenido: " + usuarioAutenticado.getUsername() + " (" + usuarioAutenticado.getRol() + ")");
+        // Configura los menús según el rol
         if (usuarioAutenticado.getRol() == Rol.USUARIO) {
             principalView.configurarParaRolUsuario();
+        } else if (usuarioAutenticado.getRol() == Rol.ADMINISTRADOR) {
+            principalView.configurarParaRolAdmin();
         }
 
+        principalView.mostrarMensaje("Bienvenido: " + usuarioAutenticado.getUsername() + " (" + usuarioAutenticado.getRol() + ")");
+
+        // Asignar eventos
         configurarEventosProductos(principalView, productoAnadirView, productoListaView, productoEditar, productoEliminar);
-        configurarEventosCarrito(principalView, carritoAnadirView, carritoListarView, carritoBuscarView, carritoModificarView, carritoEliminarView, carritoController);
-        configurarEventosUsuarios(principalView, usuarioController, usuarioAdminView, usuarioBuscarView, usuarioCrearView, usuarioModificarDatosView);
+        configurarEventosCarrito(principalView, carritoAnadirView, carritoListarView, carritoBuscarView, carritoModificarView, carritoEliminarView, carritoController, usuarioAutenticado);
+        configurarEventosUsuarios(principalView, usuarioController, usuarioAdminView, usuarioBuscarView, usuarioCrearView, usuarioModificarDatosView, usuarioAutenticado);
         configurarEventosCerrarSesion(principalView);
         configurarEventosIdioma(principalView);
 
@@ -121,15 +127,29 @@ public class Main {
         principalView.getMenuItemEliminarProducto().addActionListener(e -> mostrarVentana(principalView, productoEliminar));
     }
 
-    private static void configurarEventosCarrito(PrincipalView principalView, CarritoAnadirView carritoAnadirView,
-                                                 CarritoListarView carritoListarView, CarritoBuscarView carritoBuscarView,
-                                                 CarritoModificarView carritoModificarView, CarritoEliminarView carritoEliminarView,
-                                                 CarritoController carritoController) {
+    // Carrito: solo admins pueden listar todos los carritos, usuarios ven solo los suyos
+    private static void configurarEventosCarrito(
+            PrincipalView principalView,
+            CarritoAnadirView carritoAnadirView,
+            CarritoListarView carritoListarView,
+            CarritoBuscarView carritoBuscarView,
+            CarritoModificarView carritoModificarView,
+            CarritoEliminarView carritoEliminarView,
+            CarritoController carritoController,
+            Usuario usuarioAutenticado
+    ) {
         principalView.getMenuItemCarrito().addActionListener(e -> mostrarVentana(principalView, carritoAnadirView));
+
+        // Listar: Admins ven todos, usuarios solo los suyos
         principalView.getMenuItemCarritoListar().addActionListener(e -> {
-            carritoController.listarCarritosDelUsuario();
+            if (usuarioAutenticado.getRol() == Rol.ADMINISTRADOR) {
+                carritoController.listarCarritosDelUsuario();
+            } else {
+                carritoController.listarCarritosDelUsuario();
+            }
             mostrarVentana(principalView, carritoListarView);
         });
+
         principalView.getMenuItemCarritoBuscar().addActionListener(e -> {
             carritoBuscarView.limpiarVista();
             mostrarVentana(principalView, carritoBuscarView);
@@ -150,26 +170,34 @@ public class Main {
             UsuarioAdminView usuarioAdminView,
             UsuarioBuscarView usuarioBuscarView,
             UsuarioCrearView usuarioCrearView,
-            UsuarioModificarDatosView usuarioModificarDatosView) {
-        principalView.getMenuItemGestionarUsuarios().addActionListener(e -> {
-            usuarioController.listarUsuarios();
-            mostrarVentana(principalView, usuarioAdminView);
-        });
-        principalView.getMenuItemBuscarUsuario().addActionListener(e -> {
-            usuarioBuscarView.limpiarVista();
-            usuarioController.listarTodosAction();
-            mostrarVentana(principalView, usuarioBuscarView);
-        });
-        principalView.getMenuItemCrearUsuario().addActionListener(e -> {
-            usuarioCrearView.getTxtUsuario().setText("");
-            usuarioCrearView.getTxtContrasena().setText("");
-            mostrarVentana(principalView, usuarioCrearView);
-        });
-        // Menú para que el usuario modifique sus propios datos
-        principalView.getMenuItemUser().addActionListener(e -> {
-            usuarioModificarDatosView.mostrarDatosUsuario(usuarioController.getUsuarioAutenticado());
-            mostrarVentana(principalView, usuarioModificarDatosView);
-        });
+            UsuarioModificarDatosView usuarioModificarDatosView,
+            Usuario usuarioAutenticado
+    ) {
+        // Solo admins pueden gestionar/crear/buscar usuarios
+        if (usuarioAutenticado.getRol() == Rol.ADMINISTRADOR) {
+            principalView.getMenuItemGestionarUsuarios().addActionListener(e -> {
+                usuarioController.listarUsuarios();
+                mostrarVentana(principalView, usuarioAdminView);
+            });
+            principalView.getMenuItemBuscarUsuario().addActionListener(e -> {
+                usuarioBuscarView.limpiarVista();
+                usuarioController.listarTodosAction();
+                mostrarVentana(principalView, usuarioBuscarView);
+            });
+            principalView.getMenuItemCrearUsuario().addActionListener(e -> {
+                usuarioCrearView.getTxtUsuario().setText("");
+                usuarioCrearView.getTxtContrasena().setText("");
+                mostrarVentana(principalView, usuarioCrearView);
+            });
+        }
+
+        // Solo usuarios normales pueden modificar sus datos
+        if (usuarioAutenticado.getRol() == Rol.USUARIO) {
+            principalView.getMenuItemUser().addActionListener(e -> {
+                usuarioModificarDatosView.mostrarDatosUsuario(usuarioAutenticado);
+                mostrarVentana(principalView, usuarioModificarDatosView);
+            });
+        }
     }
 
     private static void configurarEventosCerrarSesion(PrincipalView principalView) {

@@ -23,6 +23,7 @@ public class CarritoController {
     private final CarritoModificarView carritoModificarView;
     private final CarritoEliminarView carritoEliminarView;
     private List<Carrito> carritosUltimosMostradosModificar;
+    private List<Carrito> carritosUltimosMostradosBuscar;
     // DAOs y Modelos
     private final CarritoDAO carritoDAO;
     private final ProductoDAO productoDAO;
@@ -46,6 +47,8 @@ public class CarritoController {
         this.carritoModificarView = carritoModificarView;
         this.carritoEliminarView = carritoEliminarView;
         this.carritosUltimosMostradosModificar = null;
+        this.carritosUltimosMostradosBuscar = null;
+
 
 
         iniciarNuevoCarrito(); // Inicializa el carrito para la vista de añadir
@@ -152,8 +155,17 @@ public class CarritoController {
     // --- Lógica de CarritoBuscarView ---
     private void configurarEventosBuscar() {
         carritoBuscarView.getBtnBuscarCarrito().addActionListener(e -> buscarCarritoParaVer());
+        carritoBuscarView.getBtnListar().addActionListener(e -> listarCarritosBuscar());
     }
 
+    // Al mostrar la ventana (en Main):
+    public void mostrarCarritosUsuarioParaBuscar() {
+        List<Carrito> carritos = carritoDAO.listarPorUsuario(usuarioAutenticado);
+        carritoBuscarView.cargarCarritosUsuario(carritos);
+        this.carritosUltimosMostradosBuscar = carritos;
+    }
+
+    // Buscar por código
     private void buscarCarritoParaVer() {
         String codigoStr = carritoBuscarView.getTxtBuscarCarrito().getText().trim();
         if (!esNumeroEntero(codigoStr)) {
@@ -169,6 +181,11 @@ public class CarritoController {
             return;
         }
         carritoBuscarView.mostrarCarrito(carrito);
+    }
+
+    // Listar todos los carritos (al presionar btnListar)
+    private void listarCarritosBuscar() {
+        mostrarCarritosUsuarioParaBuscar();
     }
 
     // --- Lógica de CarritoEliminarView ---

@@ -125,6 +125,7 @@ public class Main {
         });
         principalView.getMenuItemCarritoBuscar().addActionListener(e -> {
             carritoBuscarView.limpiarVista();
+            carritoController.mostrarCarritosUsuarioParaBuscar();
             mostrarVentana(principalView, carritoBuscarView);
         });
         principalView.getMenuItemCarritoModificar().addActionListener(e -> {

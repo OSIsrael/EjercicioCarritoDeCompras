@@ -114,18 +114,21 @@ public class PrincipalView extends JFrame {
      * Configura la visibilidad de los menús para un usuario con rol normal (no administrador).
      */
     public void configurarParaRolUsuario() {
-        // CORRECCIÓN: Oculta solo las opciones de producto para administradores.
-        menuItemCrearProducto.setVisible(false);
-        menuItemEditarProducto.setVisible(false);
-        menuItemEliminarProducto.setVisible(false);
+        // Mostrar solo menú de carritos y usuario
+        menuProducto.setVisible(false);      // Oculta productos
+        menuAdmin.setVisible(false);         // Oculta administración
+        menuUser.setVisible(true);           // Deja visible menú usuario
+        menuCarrito.setVisible(true);        // Carrito visible
 
-        // MANTIENE VISIBLE la opción de buscar, para que el usuario pueda ver los productos.
-        menuItemBuscarProducto.setVisible(true);
-
-        // Oculta completamente el menú de Administración
-        menuAdmin.setVisible(false);
-
-        // Oculta la opción de listar todos los carritos (solo para admin)
+        // Solo permitir añadir, listar, buscar, modificar y eliminar carritos (los items ya existen)
+        // No ocultes nada de carritos aquí, el controlador debe filtrar por usuario autenticado
+    }
+    public void configurarParaRolAdmin() {
+        // Mostrar todo menos el menú "usuario" (modificar sus propios datos)
+        menuProducto.setVisible(true);
+        menuAdmin.setVisible(true);
+        menuUser.setVisible(false);      // Los admin no necesitan modificar sus datos aquí
+        menuCarrito.setVisible(true);
     }
     public JMenuItem getMenuItemCrearUsuario() {
         return menuItemCrearUsuario;

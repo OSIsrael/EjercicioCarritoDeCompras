@@ -130,7 +130,7 @@ public class UsuarioController {
     }
 
     public void listarUsuarios() {
-        List<Usuario> todosLosUsuarios = usuarioDAO.listarPorRol(Rol.USUARIO);
+        List<Usuario> todosLosUsuarios = usuarioDAO.listarTodos();
         usuarioAdminView.cargarUsuarios(todosLosUsuarios);
     }
 
@@ -147,44 +147,53 @@ public class UsuarioController {
             return;
         }
 
-        String username = (String) usuarioAdminView.getTblUsuarios().getValueAt(fila, 0);
+        String nuevoUsername = (String) usuarioAdminView.getModeloTabla().getValueAt(fila, 0); // <-- Nuevo username editable
         Rol rolActual = (Rol) usuarioAdminView.getTblUsuarios().getValueAt(fila, 1);
         Rol nuevoRol = (Rol) usuarioAdminView.getCbxRol().getSelectedItem();
 
         // Verificar si hay cambios
-        if (rolActual == nuevoRol) {
-            usuarioAdminView.mostrarMensaje("El usuario ya tiene el rol seleccionado.");
+        if (rolActual == nuevoRol && nuevoUsername.equals(usuarioDAO.buscarPorUsername(nuevoUsername).getUsername())) {
+            usuarioAdminView.mostrarMensaje("No hay cambios en el usuario seleccionado.");
             return;
         }
 
-        // Buscar el usuario
-        Usuario usuario = usuarioDAO.buscarPorUsername(username);
+        // Verificar si el nombre ya existe (y no es el mismo usuario)
+        Usuario usuarioBuscado = usuarioDAO.buscarPorUsername(nuevoUsername);
+        if (usuarioBuscado != null && !usuarioAdminView.getTblUsuarios().getValueAt(fila, 0).equals(usuarioBuscado.getUsername())) {
+            usuarioAdminView.mostrarError("El nombre de usuario ya está en uso.");
+            return;
+        }
+
+        // Buscar el usuario original (antes del cambio de username)
+        // Por ejemplo, podrías guardar el username original en otro campo oculto, o usar un modelo con objetos Usuario.
+        // Aquí suponemos que tienes una referencia directa al usuario original, si no, puedes adaptar esto.
+
+        Usuario usuario = usuarioDAO.buscarPorUsername((String) usuarioAdminView.getTblUsuarios().getValueAt(fila, 0));
         if (usuario == null) {
             usuarioAdminView.mostrarError("Usuario no encontrado.");
             return;
         }
 
         // Verificar si se intenta cambiar el rol del usuario autenticado
-        if (usuarioAutenticado.getUsername().equals(username)) {
-            usuarioAdminView.mostrarError("No puede cambiar su propio rol.");
-            return;
-        }
+        // (ajustar según tu lógica de autenticación)
+        // if (usuarioAutenticado.getUsername().equals(nuevoUsername)) { ... }
 
         // Confirmar la acción
-        String mensaje = "¿Está seguro de cambiar el rol del usuario '" + username +
-                "' de " + rolActual + " a " + nuevoRol + "?";
+        String mensaje = "¿Está seguro de modificar el usuario a '" + nuevoUsername +
+                "' y rol " + nuevoRol + "?";
 
         if (!usuarioAdminView.confirmarAccion(mensaje)) {
             return;
         }
 
-        // Actualizar el rol
+        // Actualizar datos
+        usuario.setUsername(nuevoUsername);
         usuario.setRol(nuevoRol);
         usuarioDAO.actualizar(usuario);
 
         // Refrescar la lista
         listarUsuarios();
-        usuarioAdminView.mostrarMensaje("Rol actualizado exitosamente.");
+        usuarioAdminView.mostrarMensaje("Usuario actualizado exitosamente.");
     }
 
     private void eliminarUsuario() {

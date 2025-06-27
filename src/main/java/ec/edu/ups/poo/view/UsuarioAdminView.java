@@ -36,7 +36,8 @@ public class UsuarioAdminView extends JInternalFrame {
         modeloTabla = new DefaultTableModel() {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Hacer la tabla no editable
+                // SOLO el username es editable (columna 0)
+                return column == 0;
             }
         };
         modeloTabla.addColumn("Username");
@@ -52,7 +53,7 @@ public class UsuarioAdminView extends JInternalFrame {
         cbxRol.addItem(Rol.USUARIO);
 
         // Botones
-        btnActualizar = new JButton("Actualizar Rol");
+        btnActualizar = new JButton("Actualizar");
         btnEliminar = new JButton("Eliminar Usuario");
         btnRefrescar = new JButton("Refrescar Lista");
 
@@ -159,6 +160,10 @@ public class UsuarioAdminView extends JInternalFrame {
     // Getters para el controlador
     public JTable getTblUsuarios() {
         return tblUsuarios;
+    }
+
+    public DefaultTableModel getModeloTabla() {
+        return modeloTabla;
     }
 
     public JComboBox<Rol> getCbxRol() {

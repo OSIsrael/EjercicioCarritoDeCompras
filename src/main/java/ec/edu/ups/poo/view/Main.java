@@ -9,10 +9,12 @@ import ec.edu.ups.poo.dao.UsuarioDAO;
 import ec.edu.ups.poo.dao.impl.CarritoDAOMemoria;
 import ec.edu.ups.poo.dao.impl.ProductoDAOMemoria;
 import ec.edu.ups.poo.dao.impl.UsuarioDAOMemoria;
+import ec.edu.ups.poo.modelo.Pregunta;
 import ec.edu.ups.poo.modelo.Producto;
 import ec.edu.ups.poo.modelo.Rol;
 import ec.edu.ups.poo.modelo.Usuario;
-
+import ec.edu.ups.poo.dao.PreguntaDAO;
+import ec.edu.ups.poo.dao.impl.PreguntaDAOMemoria;
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -22,6 +24,7 @@ public class Main {
     private static UsuarioDAO usuarioDAO;
     private static ProductoDAO productoDAO;
     private static CarritoDAO carritoDAO;
+    private static PreguntaDAO preguntaDAO;
 
     public static void main(String[] args) {
 
@@ -29,6 +32,10 @@ public class Main {
         usuarioDAO = new UsuarioDAOMemoria();
         productoDAO = new ProductoDAOMemoria();
         carritoDAO = new CarritoDAOMemoria();
+        preguntaDAO = new PreguntaDAOMemoria();
+        preguntaDAO.crear(new Pregunta(1, "¿Nombre de tu primera mascota?"));
+        preguntaDAO.crear(new Pregunta(2, "¿Ciudad de nacimiento?"));
+        preguntaDAO.crear(new Pregunta(3, "¿Comida favorita?"));
 
         // Cargar datos iniciales si no existen
         if (usuarioDAO.buscarPorUsername("admin") == null) {
@@ -52,9 +59,13 @@ public class Main {
         UsuarioBuscarView usuarioBuscarView = new UsuarioBuscarView();
         UsuarioCrearView usuarioCrearView = new UsuarioCrearView();
         UsuarioModificarDatosView usuarioModificarDatosView = new UsuarioModificarDatosView();
+        for (Pregunta pregunta: preguntaDAO.listarTodas()) {
+            registrarUsuarioView.getCbxPregunta1().addItem(pregunta);
+            registrarUsuarioView.getCbxPregunta2().addItem(pregunta);
+        }
 
         UsuarioController usuarioController = new UsuarioController(
-                usuarioDAO, loginView, registrarUsuarioView, usuarioAdminView,
+                usuarioDAO,preguntaDAO, loginView, registrarUsuarioView, usuarioAdminView,
                 usuarioBuscarView, usuarioCrearView, usuarioModificarDatosView);
 
         loginView.addWindowListener(new WindowAdapter() {

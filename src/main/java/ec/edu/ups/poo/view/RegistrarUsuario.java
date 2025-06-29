@@ -10,14 +10,12 @@ public class RegistrarUsuario extends JFrame {
     private JTextField txtUsuarioRe;
     private JPasswordField txtContraRe;
     private JButton btnRegistrarse;
-    private JComboBox cbxPregunta1;
-    private JComboBox cbxPregunta2;
-
-    // Nuevos campos para preguntas de seguridad
-    private JComboBox<Pregunta> cmbPregunta1;
+    private JComboBox<Pregunta> cbxPregunta1;
+    private JComboBox<Pregunta> cbxPregunta2;
     private JTextField txtRespuesta1;
-    private JComboBox<Pregunta> cmbPregunta2;
     private JTextField txtRespuesta2;
+
+
 
     public RegistrarUsuario() {
         setContentPane(panel1);
@@ -28,33 +26,77 @@ public class RegistrarUsuario extends JFrame {
 
     }
 
-    // Getters para acceder a los componentes desde el controlador
+    public JPanel getPanel1() {
+        return panel1;
+    }
+
+    public void setPanel1(JPanel panel1) {
+        this.panel1 = panel1;
+    }
+
+    public JPanel getPanelPrincipal() {
+        return panelPrincipal;
+    }
+
+    public void setPanelPrincipal(JPanel panelPrincipal) {
+        this.panelPrincipal = panelPrincipal;
+    }
+
     public JTextField getTxtUsuarioRe() {
         return txtUsuarioRe;
+    }
+
+    public void setTxtUsuarioRe(JTextField txtUsuarioRe) {
+        this.txtUsuarioRe = txtUsuarioRe;
     }
 
     public JPasswordField getTxtContraRe() {
         return txtContraRe;
     }
 
+    public void setTxtContraRe(JPasswordField txtContraRe) {
+        this.txtContraRe = txtContraRe;
+    }
+
     public JButton getBtnRegistrarse() {
         return btnRegistrarse;
     }
 
-    public JComboBox<Pregunta> getCmbPregunta1() {
-        return cmbPregunta1;
+    public void setBtnRegistrarse(JButton btnRegistrarse) {
+        this.btnRegistrarse = btnRegistrarse;
     }
+
+    public JComboBox<Pregunta> getCbxPregunta1() {
+        return cbxPregunta1;
+    }
+
+    public void setCbxPregunta1(JComboBox<Pregunta> cbxPregunta1) {
+        this.cbxPregunta1 = cbxPregunta1;
+    }
+
+    public JComboBox<Pregunta> getCbxPregunta2() {
+        return cbxPregunta2;
+    }
+
+    public void setCbxPregunta2(JComboBox<Pregunta> cbxPregunta2) {
+        this.cbxPregunta2 = cbxPregunta2;
+    }
+
     public JTextField getTxtRespuesta1() {
         return txtRespuesta1;
     }
-    public JComboBox<Pregunta> getCmbPregunta2() {
-        return cmbPregunta2;
+
+    public void setTxtRespuesta1(JTextField txtRespuesta1) {
+        this.txtRespuesta1 = txtRespuesta1;
     }
+
     public JTextField getTxtRespuesta2() {
         return txtRespuesta2;
     }
 
-
+    public void setTxtRespuesta2(JTextField txtRespuesta2) {
+        this.txtRespuesta2 = txtRespuesta2;
+    }
 
     public void mostrarMensaje(String mensaje) {
         JOptionPane.showMessageDialog(this, mensaje);
@@ -65,8 +107,8 @@ public class RegistrarUsuario extends JFrame {
         txtContraRe.setText("");
         txtRespuesta1.setText("");
         txtRespuesta2.setText("");
-        cmbPregunta1.setSelectedIndex(0);
-        cmbPregunta2.setSelectedIndex(0);
+        if (cbxPregunta1.getItemCount() > 0) cbxPregunta1.setSelectedIndex(0);
+        if (cbxPregunta2.getItemCount() > 0) cbxPregunta2.setSelectedIndex(0);
     }
 
 

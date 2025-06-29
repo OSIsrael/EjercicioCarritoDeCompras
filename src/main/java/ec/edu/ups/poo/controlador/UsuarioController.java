@@ -26,7 +26,7 @@ public class UsuarioController {
     private Usuario usuarioRecuperacion;
     private Integer idPreguntaRecuperacion;
 
-    public UsuarioController(UsuarioDAO usuarioDAO,LoginView loginView,
+    public UsuarioController(UsuarioDAO usuarioDAO,PreguntaDAO preguntaDAO,LoginView loginView,
                              RegistrarUsuario registrarUsuarioView, UsuarioAdminView usuarioAdminView,
                              UsuarioBuscarView usuarioBuscarView, UsuarioCrearView usuarioCrearView,
                              UsuarioModificarDatosView usuarioModificarDatosView
@@ -39,13 +39,14 @@ public class UsuarioController {
         this.usuarioBuscarView = usuarioBuscarView;
         this.usuarioCrearView = usuarioCrearView;
         this.usuarioModificarDatosView = usuarioModificarDatosView;
-        this.olvideContrasenaView = olvideContrasenaView;
+        this.olvideContrasenaView = new OlvideContrasenaView();
         configurarEventos();
     }
 
     private void configurarEventos() {
         // Eventos de LoginView
         this.loginView.getBtnIniciarSesion().addActionListener(e -> login());
+        this.loginView.getBtnOlvide().addActionListener(e ->  abrirOlvideContrasena());
         this.loginView.getBtnRegistrarse().addActionListener(e -> abrirVentanaRegistro());
 
         // Eventos de RegistrarUsuario
@@ -53,7 +54,8 @@ public class UsuarioController {
 
         // Eventos de OlvideContrasenaView
 
-
+        olvideContrasenaView.getBtnValidar().addActionListener(e -> validarUsuarioYMostrarPregunta());
+        olvideContrasenaView.getBtnCambiar().addActionListener(e -> cambiarContrasena());
         // Eventos de UsuarioAdminView
         this.usuarioAdminView.getBtnActualizar().addActionListener(e -> actualizarUsuario());
         this.usuarioAdminView.getBtnEliminar().addActionListener(e -> eliminarUsuario());
@@ -74,7 +76,58 @@ public class UsuarioController {
             usuarioModificarDatosView.getBtnBorrar().addActionListener(e -> usuarioModificarDatosView.limpiarCampos());
         }
     }
-
+    private void abrirOlvideContrasena() {
+        olvideContrasenaView.getTxtUsername().setText("");
+        olvideContrasenaView.getLblPregunta().setText("");
+        olvideContrasenaView.getTxtRespuesta().setText("");
+        olvideContrasenaView.getLblNuevaContrasena().setVisible(false);
+        olvideContrasenaView.getTxtNuevaContrasena().setVisible(false);
+        olvideContrasenaView.getBtnCambiar().setVisible(false);
+        olvideContrasenaView.setVisible(true);
+    }
+    private void validarUsuarioYMostrarPregunta() {
+        String username = olvideContrasenaView.getTxtUsername().getText().trim();
+        Usuario usuario = usuarioDAO.buscarPorUsername(username);
+        if (usuario == null) {
+            JOptionPane.showMessageDialog(olvideContrasenaView, "Usuario no encontrado.");
+            return;
+        }
+        usuarioRecuperacion = usuario;
+        List<Integer> idsPreguntas = new ArrayList<>(usuario.getPreguntasSeguridad().keySet());
+        if (idsPreguntas.isEmpty()) {
+            JOptionPane.showMessageDialog(olvideContrasenaView, "No hay preguntas de seguridad para este usuario.");
+            return;
+        }
+        // Selecciona una pregunta al azar
+        idPreguntaRecuperacion = idsPreguntas.get(new Random().nextInt(idsPreguntas.size()));
+        Pregunta pregunta = preguntaDAO.buscarPorId(idPreguntaRecuperacion);
+        if (pregunta != null) {
+            olvideContrasenaView.getLblPregunta().setText(pregunta.getPregunta());
+        } else {
+            olvideContrasenaView.getLblPregunta().setText("Pregunta no encontrada.");
+        }
+        // Hacer visibles los campos de respuesta y demás
+        olvideContrasenaView.getLblNuevaContrasena().setVisible(true);
+        olvideContrasenaView.getTxtNuevaContrasena().setVisible(true);
+        olvideContrasenaView.getBtnCambiar().setVisible(true);
+    }
+    private void cambiarContrasena() {
+        String respuesta = olvideContrasenaView.getTxtRespuesta().getText().trim();
+        String respuestaCorrecta = usuarioRecuperacion.getPreguntasSeguridad().get(idPreguntaRecuperacion);
+        if (!respuesta.equals(respuestaCorrecta)) {
+            JOptionPane.showMessageDialog(olvideContrasenaView, "Respuesta incorrecta.");
+            return;
+        }
+        String nuevaContra = new String(olvideContrasenaView.getTxtNuevaContrasena().getPassword());
+        if (nuevaContra.isEmpty()) {
+            JOptionPane.showMessageDialog(olvideContrasenaView, "Ingrese una nueva contraseña.");
+            return;
+        }
+        usuarioRecuperacion.setPassword(nuevaContra);
+        usuarioDAO.actualizar(usuarioRecuperacion);
+        JOptionPane.showMessageDialog(olvideContrasenaView, "Contraseña actualizada correctamente.");
+        olvideContrasenaView.dispose();
+    }
     private void login() {
         String username = loginView.getTxtUsername().getText().trim();
         String password = new String(loginView.getTxtPassword().getPassword());
@@ -109,44 +162,26 @@ public class UsuarioController {
     private void registrarUsuario() {
         String username = registrarUsuarioView.getTxtUsuarioRe().getText().trim();
         String password = new String(registrarUsuarioView.getTxtContraRe().getPassword());
+        Pregunta pregunta1 = (Pregunta) registrarUsuarioView.getCbxPregunta1().getSelectedItem();
+        Pregunta pregunta2 = (Pregunta) registrarUsuarioView.getCbxPregunta2().getSelectedItem();
+        String respuesta1 = registrarUsuarioView.getTxtRespuesta1().getText().trim();
+        String respuesta2 = registrarUsuarioView.getTxtRespuesta2().getText().trim();
 
-        if (username.isEmpty()) {
-            registrarUsuarioView.mostrarMensaje("El nombre de usuario no puede estar vacío.");
-            return;
-        }
-        if (password.isEmpty()) {
-            registrarUsuarioView.mostrarMensaje("La contraseña no puede estar vacía.");
-            return;
-        }
-        if (password.length() < 4) {
-            registrarUsuarioView.mostrarMensaje("La contraseña debe tener al menos 4 caracteres.");
+        if (username.isEmpty() || password.isEmpty() || pregunta1 == null || pregunta2 == null ||
+                respuesta1.isEmpty() || respuesta2.isEmpty() || pregunta1.getId() == pregunta2.getId()) {
+            registrarUsuarioView.mostrarMensaje("Debe llenar todos los campos y seleccionar preguntas distintas.");
             return;
         }
         if (usuarioDAO.buscarPorUsername(username) != null) {
-            registrarUsuarioView.mostrarMensaje("El nombre de usuario ya existe. Elija otro nombre.");
+            registrarUsuarioView.mostrarMensaje("El usuario ya existe.");
             return;
         }
-        // Recoger preguntas y respuestas de seguridad
-        Pregunta pregunta1 = (Pregunta) registrarUsuarioView.getCmbPregunta1().getSelectedItem();
-        Pregunta pregunta2 = (Pregunta) registrarUsuarioView.getCmbPregunta2().getSelectedItem();
-        String respuesta1 = registrarUsuarioView.getTxtRespuesta1().getText().trim();
-        String respuesta2 = registrarUsuarioView.getTxtRespuesta2().getText().trim();
-        if (pregunta1 == null || respuesta1.isEmpty() || pregunta2 == null || respuesta2.isEmpty()) {
-            registrarUsuarioView.mostrarMensaje("Debes seleccionar y responder ambas preguntas de seguridad.");
-            return;
-        }
-        if (pregunta1.getId() == pregunta2.getId()) {
-            registrarUsuarioView.mostrarMensaje("Las preguntas de seguridad deben ser diferentes.");
-            return;
-        }
-        Usuario nuevoUsuario = new Usuario(username, password, Rol.USUARIO);
+        Usuario nuevo = new Usuario(username, password, Rol.USUARIO);
         Map<Integer, String> preguntasSeguridad = new HashMap<>();
         preguntasSeguridad.put(pregunta1.getId(), respuesta1);
         preguntasSeguridad.put(pregunta2.getId(), respuesta2);
-        nuevoUsuario.setPreguntasSeguridad(preguntasSeguridad);
-
-        usuarioDAO.crear(nuevoUsuario);
-
+        nuevo.setPreguntasSeguridad(preguntasSeguridad);
+        usuarioDAO.crear(nuevo);
         registrarUsuarioView.mostrarMensaje("Usuario registrado exitosamente.");
         registrarUsuarioView.limpiarCampos();
         registrarUsuarioView.dispose();

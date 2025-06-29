@@ -8,8 +8,7 @@ public class LoginView extends JFrame{
     private JTextField txtUsername;
     private JPasswordField txtPassword;
     private JButton btnIniciarSesion;
-    private JButton btnRegistrarse;
-    private JButton btnOlvideContrasena; // NUEVO
+    private JButton btnRegistrarse;// NUEVO
     private JLabel lblUsuario;
     private JLabel lblContrasena;
     private JButton btnOlvide;
@@ -70,9 +69,12 @@ public class LoginView extends JFrame{
         this.btnRegistrarse = btnRegistrarse;
     }
 
-    // Getter para el nuevo botón
-    public JButton getBtnOlvideContrasena() {
-        return btnOlvideContrasena;
+    public JButton getBtnOlvide() {
+        return btnOlvide;
+    }
+
+    public void setBtnOlvide(JButton btnOlvide) {
+        this.btnOlvide = btnOlvide;
     }
 
     public void mostrar (String mensaje){

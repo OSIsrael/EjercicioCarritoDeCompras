@@ -12,6 +12,7 @@ public class LoginView extends JFrame{
     private JButton btnOlvideContrasena; // NUEVO
     private JLabel lblUsuario;
     private JLabel lblContrasena;
+    private JButton btnOlvide;
 
     public LoginView(){
         setContentPane(panelPrincipal);
@@ -19,9 +20,6 @@ public class LoginView extends JFrame{
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(600,400);
         setLocationRelativeTo(null);
-
-        // Si usas un layout manager en panelPrincipal, agrégalo bien:
-        btnOlvideContrasena = new JButton("¿Olvidaste tu contraseña?");
         panelPrincipal.add(btnOlvideContrasena);
     }
 

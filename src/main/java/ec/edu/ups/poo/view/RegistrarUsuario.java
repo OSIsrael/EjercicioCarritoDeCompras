@@ -10,6 +10,8 @@ public class RegistrarUsuario extends JFrame {
     private JTextField txtUsuarioRe;
     private JPasswordField txtContraRe;
     private JButton btnRegistrarse;
+    private JComboBox cbxPregunta1;
+    private JComboBox cbxPregunta2;
 
     // Nuevos campos para preguntas de seguridad
     private JComboBox<Pregunta> cmbPregunta1;
@@ -24,65 +26,93 @@ public class RegistrarUsuario extends JFrame {
         setSize(500, 400);
         setLocationRelativeTo(null);
 
-        // Inicializar combos de preguntas y campos de respuesta
-        cmbPregunta1 = new JComboBox<>(preguntasDisponibles.toArray(new Pregunta[0]));
-        txtRespuesta1 = new JTextField();
-        cmbPregunta2 = new JComboBox<>(preguntasDisponibles.toArray(new Pregunta[0]));
-        txtRespuesta2 = new JTextField();
-
-        // Agrega los campos al panelPrincipal o panel1 según tu layout
-        panelPrincipal.add(new JLabel("Pregunta de seguridad 1:"));
-        panelPrincipal.add(cmbPregunta1);
-        panelPrincipal.add(new JLabel("Respuesta 1:"));
-        panelPrincipal.add(txtRespuesta1);
-
-        panelPrincipal.add(new JLabel("Pregunta de seguridad 2:"));
-        panelPrincipal.add(cmbPregunta2);
-        panelPrincipal.add(new JLabel("Respuesta 2:"));
-        panelPrincipal.add(txtRespuesta2);
     }
 
-    // Getters para acceder a los componentes desde el controlador
+    public JPanel getPanel1() {
+        return panel1;
+    }
+
+    public void setPanel1(JPanel panel1) {
+        this.panel1 = panel1;
+    }
+
+    public JPanel getPanelPrincipal() {
+        return panelPrincipal;
+    }
+
+    public void setPanelPrincipal(JPanel panelPrincipal) {
+        this.panelPrincipal = panelPrincipal;
+    }
+
     public JTextField getTxtUsuarioRe() {
         return txtUsuarioRe;
+    }
+
+    public void setTxtUsuarioRe(JTextField txtUsuarioRe) {
+        this.txtUsuarioRe = txtUsuarioRe;
     }
 
     public JPasswordField getTxtContraRe() {
         return txtContraRe;
     }
 
+    public void setTxtContraRe(JPasswordField txtContraRe) {
+        this.txtContraRe = txtContraRe;
+    }
+
     public JButton getBtnRegistrarse() {
         return btnRegistrarse;
+    }
+
+    public void setBtnRegistrarse(JButton btnRegistrarse) {
+        this.btnRegistrarse = btnRegistrarse;
+    }
+
+    public JComboBox getCbxPregunta1() {
+        return cbxPregunta1;
+    }
+
+    public void setCbxPregunta1(JComboBox cbxPregunta1) {
+        this.cbxPregunta1 = cbxPregunta1;
+    }
+
+    public JComboBox getCbxPregunta2() {
+        return cbxPregunta2;
+    }
+
+    public void setCbxPregunta2(JComboBox cbxPregunta2) {
+        this.cbxPregunta2 = cbxPregunta2;
     }
 
     public JComboBox<Pregunta> getCmbPregunta1() {
         return cmbPregunta1;
     }
+
+    public void setCmbPregunta1(JComboBox<Pregunta> cmbPregunta1) {
+        this.cmbPregunta1 = cmbPregunta1;
+    }
+
     public JTextField getTxtRespuesta1() {
         return txtRespuesta1;
     }
+
+    public void setTxtRespuesta1(JTextField txtRespuesta1) {
+        this.txtRespuesta1 = txtRespuesta1;
+    }
+
     public JComboBox<Pregunta> getCmbPregunta2() {
         return cmbPregunta2;
     }
+
+    public void setCmbPregunta2(JComboBox<Pregunta> cmbPregunta2) {
+        this.cmbPregunta2 = cmbPregunta2;
+    }
+
     public JTextField getTxtRespuesta2() {
         return txtRespuesta2;
     }
 
-    public Pregunta getPregunta1() { return (Pregunta) cmbPregunta1.getSelectedItem(); }
-    public String getRespuesta1() { return txtRespuesta1.getText(); }
-    public Pregunta getPregunta2() { return (Pregunta) cmbPregunta2.getSelectedItem(); }
-    public String getRespuesta2() { return txtRespuesta2.getText(); }
-
-    public void mostrarMensaje(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje);
-    }
-
-    public void limpiarCampos() {
-        txtUsuarioRe.setText("");
-        txtContraRe.setText("");
-        txtRespuesta1.setText("");
-        txtRespuesta2.setText("");
-        cmbPregunta1.setSelectedIndex(0);
-        cmbPregunta2.setSelectedIndex(0);
+    public void setTxtRespuesta2(JTextField txtRespuesta2) {
+        this.txtRespuesta2 = txtRespuesta2;
     }
 }

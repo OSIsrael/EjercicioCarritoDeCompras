@@ -17,78 +17,79 @@ public class OlvideContrasenaView extends JDialog {
         setTitle("Recuperar Contraseña");
         setSize(400, 300);
         setLocationRelativeTo(null);
-        setModal(true);
-
-        panelPrincipal = new JPanel();
-        panelPrincipal.setLayout(new BoxLayout(panelPrincipal, BoxLayout.Y_AXIS));
-
-        panelPrincipal.add(new JLabel("Nombre de usuario:"));
-        txtUsername = new JTextField();
-        panelPrincipal.add(txtUsername);
-
-        lblPregunta = new JLabel("Pregunta de seguridad:");
-        panelPrincipal.add(lblPregunta);
-
-        txtRespuesta = new JTextField();
-        panelPrincipal.add(new JLabel("Respuesta:"));
-        panelPrincipal.add(txtRespuesta);
-
-        btnValidar = new JButton("Validar respuesta");
-        panelPrincipal.add(btnValidar);
-
-        lblNuevaContrasena = new JLabel("Nueva contraseña:");
-        lblNuevaContrasena.setVisible(false);
-        panelPrincipal.add(lblNuevaContrasena);
-
-        txtNuevaContrasena = new JPasswordField();
-        txtNuevaContrasena.setVisible(false);
-        panelPrincipal.add(txtNuevaContrasena);
-
-        btnCambiar = new JButton("Cambiar contraseña");
-        btnCambiar.setVisible(false);
-        panelPrincipal.add(btnCambiar);
 
         setContentPane(panelPrincipal);
     }
 
-    public String getUsername() {
-        return txtUsername.getText();
+    public JPanel getPanelPrincipal() {
+        return panelPrincipal;
     }
 
-    public String getRespuesta() {
-        return txtRespuesta.getText();
+    public void setPanelPrincipal(JPanel panelPrincipal) {
+        this.panelPrincipal = panelPrincipal;
     }
 
-    public String getNuevaContrasena() {
-        return new String(txtNuevaContrasena.getPassword());
+    public JLabel getLblUsuario() {
+        return lblUsuario;
+    }
+
+    public void setLblUsuario(JLabel lblUsuario) {
+        this.lblUsuario = lblUsuario;
+    }
+
+    public JTextField getTxtUsername() {
+        return txtUsername;
+    }
+
+    public void setTxtUsername(JTextField txtUsername) {
+        this.txtUsername = txtUsername;
+    }
+
+    public JLabel getLblPregunta() {
+        return lblPregunta;
+    }
+
+    public void setLblPregunta(JLabel lblPregunta) {
+        this.lblPregunta = lblPregunta;
+    }
+
+    public JTextField getTxtRespuesta() {
+        return txtRespuesta;
+    }
+
+    public void setTxtRespuesta(JTextField txtRespuesta) {
+        this.txtRespuesta = txtRespuesta;
     }
 
     public JButton getBtnValidar() {
         return btnValidar;
     }
 
+    public void setBtnValidar(JButton btnValidar) {
+        this.btnValidar = btnValidar;
+    }
+
+    public JLabel getLblNuevaContrasena() {
+        return lblNuevaContrasena;
+    }
+
+    public void setLblNuevaContrasena(JLabel lblNuevaContrasena) {
+        this.lblNuevaContrasena = lblNuevaContrasena;
+    }
+
+    public JPasswordField getTxtNuevaContrasena() {
+        return txtNuevaContrasena;
+    }
+
+    public void setTxtNuevaContrasena(JPasswordField txtNuevaContrasena) {
+        this.txtNuevaContrasena = txtNuevaContrasena;
+    }
+
     public JButton getBtnCambiar() {
         return btnCambiar;
     }
 
-    public void setPregunta(String pregunta) {
-        lblPregunta.setText("Pregunta de seguridad: " + pregunta);
-    }
-
-    public void mostrarCamposNuevaContrasena(boolean mostrar) {
-        lblNuevaContrasena.setVisible(mostrar);
-        txtNuevaContrasena.setVisible(mostrar);
-        btnCambiar.setVisible(mostrar);
-    }
-
-    public void mostrarMensaje(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje);
-    }
-
-    public void limpiarCampos() {
-        txtUsername.setText("");
-        txtRespuesta.setText("");
-        txtNuevaContrasena.setText("");
-        mostrarCamposNuevaContrasena(false);
+    public void setBtnCambiar(JButton btnCambiar) {
+        this.btnCambiar = btnCambiar;
     }
 }

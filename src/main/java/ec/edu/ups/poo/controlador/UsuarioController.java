@@ -26,11 +26,11 @@ public class UsuarioController {
     private Usuario usuarioRecuperacion;
     private Integer idPreguntaRecuperacion;
 
-    public UsuarioController(UsuarioDAO usuarioDAO, PreguntaDAO preguntaDAO, LoginView loginView,
+    public UsuarioController(UsuarioDAO usuarioDAO,LoginView loginView,
                              RegistrarUsuario registrarUsuarioView, UsuarioAdminView usuarioAdminView,
                              UsuarioBuscarView usuarioBuscarView, UsuarioCrearView usuarioCrearView,
-                             UsuarioModificarDatosView usuarioModificarDatosView,
-                             OlvideContrasenaView olvideContrasenaView) {
+                             UsuarioModificarDatosView usuarioModificarDatosView
+                             ) {
         this.usuarioDAO = usuarioDAO;
         this.preguntaDAO = preguntaDAO;
         this.loginView = loginView;
@@ -47,14 +47,12 @@ public class UsuarioController {
         // Eventos de LoginView
         this.loginView.getBtnIniciarSesion().addActionListener(e -> login());
         this.loginView.getBtnRegistrarse().addActionListener(e -> abrirVentanaRegistro());
-        this.loginView.getBtnOlvideContrasena().addActionListener(e -> abrirOlvideContrasena());
 
         // Eventos de RegistrarUsuario
         this.registrarUsuarioView.getBtnRegistrarse().addActionListener(e -> registrarUsuario());
 
         // Eventos de OlvideContrasenaView
-        this.olvideContrasenaView.getBtnValidar().addActionListener(e -> validarPreguntaRecuperacion());
-        this.olvideContrasenaView.getBtnCambiar().addActionListener(e -> cambiarContrasenaRecuperacion());
+
 
         // Eventos de UsuarioAdminView
         this.usuarioAdminView.getBtnActualizar().addActionListener(e -> actualizarUsuario());
@@ -154,57 +152,6 @@ public class UsuarioController {
         registrarUsuarioView.dispose();
     }
 
-    // =============== FLUJO OLVIDE CONTRASEÑA ================
-
-    private void abrirOlvideContrasena() {
-        olvideContrasenaView.limpiarCampos();
-        olvideContrasenaView.setVisible(true);
-    }
-
-    private void validarPreguntaRecuperacion() {
-        String username = olvideContrasenaView.getUsername().trim();
-        Usuario usuario = usuarioDAO.buscarPorUsername(username);
-        if (usuario == null) {
-            olvideContrasenaView.mostrarMensaje("Usuario no encontrado.");
-            return;
-        }
-        Map<Integer, String> preguntas = usuario.getPreguntasSeguridad();
-        if (preguntas == null || preguntas.isEmpty()) {
-            olvideContrasenaView.mostrarMensaje("Este usuario no tiene preguntas de seguridad registradas.");
-            return;
-        }
-        // Selecciona pregunta aleatoria
-        List<Integer> idPreguntas = new ArrayList<>(preguntas.keySet());
-        Random random = new Random();
-        int idx = random.nextInt(idPreguntas.size());
-        idPreguntaRecuperacion = idPreguntas.get(idx);
-        Pregunta pregunta = preguntaDAO.buscarPorId(idPreguntaRecuperacion);
-        usuarioRecuperacion = usuario;
-        olvideContrasenaView.setPregunta(pregunta != null ? pregunta.getTexto() : "Pregunta desconocida");
-        olvideContrasenaView.mostrarCamposNuevaContrasena(true);
-    }
-
-    private void cambiarContrasenaRecuperacion() {
-        if (usuarioRecuperacion == null || idPreguntaRecuperacion == null)
-            return;
-        String respuestaUser = olvideContrasenaView.getRespuesta().trim();
-        String respuestaCorrecta = usuarioRecuperacion.getPreguntasSeguridad().get(idPreguntaRecuperacion);
-        if (respuestaUser.equalsIgnoreCase(respuestaCorrecta)) {
-            String nuevaContra = olvideContrasenaView.getNuevaContrasena();
-            if (nuevaContra.length() < 4) {
-                olvideContrasenaView.mostrarMensaje("La nueva contraseña debe tener al menos 4 caracteres.");
-                return;
-            }
-            usuarioRecuperacion.setPassword(nuevaContra);
-            usuarioDAO.actualizar(usuarioRecuperacion);
-            olvideContrasenaView.mostrarMensaje("Contraseña cambiada exitosamente.");
-            olvideContrasenaView.setVisible(false);
-        } else {
-            olvideContrasenaView.mostrarMensaje("Respuesta incorrecta. No se cambió la contraseña.");
-        }
-    }
-
-    // =======================================================
 
     public void listarUsuarios() {
         List<Usuario> todosLosUsuarios = usuarioDAO.listarTodos();

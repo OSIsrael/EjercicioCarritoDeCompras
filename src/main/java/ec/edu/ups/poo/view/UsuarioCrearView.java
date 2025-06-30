@@ -17,6 +17,8 @@ public class UsuarioCrearView extends JInternalFrame {
         super("", true, true, true, true);
         setContentPane(panelPrincipal);
         this.setSize(700, 500);
+        btnCrear.setIcon(new ImageIcon(getClass().getResource("/icons/anadir.png")));
+        btnBorrar.setIcon(new ImageIcon(getClass().getResource("/icons/eliminar.png")));
         actualizarTextos();
     }
 

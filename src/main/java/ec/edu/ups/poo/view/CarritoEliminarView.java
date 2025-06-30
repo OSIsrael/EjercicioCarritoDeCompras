@@ -49,7 +49,8 @@ public class CarritoEliminarView extends JInternalFrame {
             }
         };
         tblMostrarDetalleCarrito.setModel(modeloTablaDetalle);
-
+        btnEliminar.setIcon(new ImageIcon(getClass().getResource("/icons/eliminar.png")));
+        btnListar.setIcon(new ImageIcon(getClass().getResource("/icons/listar.png")));
         btnEliminar.setEnabled(false);
 
         // Listener: al seleccionar un carrito, muestra detalles y habilita Eliminar

@@ -26,12 +26,15 @@ public class ProductoAnadirView extends JInternalFrame {
         setClosable(true);
         setIconifiable(true);
         setResizable(true);
+
         btnEliminar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 limpiarCampos();
             }
         });
+        btnGuardar.setIcon(new ImageIcon(getClass().getResource("/icons/guardar.png")));
+        btnEliminar.setIcon(new ImageIcon(getClass().getResource("/icons/eliminar.png")));
         actualizarTextos();
     }
 

@@ -23,6 +23,7 @@ public class RegistrarUsuario extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(500, 400);
         setLocationRelativeTo(null);
+        btnRegistrarse.setIcon(new ImageIcon(getClass().getResource("/icons/entrar.png")));
 
     }
 

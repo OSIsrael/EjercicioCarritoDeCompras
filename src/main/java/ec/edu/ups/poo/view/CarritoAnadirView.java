@@ -130,18 +130,25 @@ public class CarritoAnadirView extends JInternalFrame {
         btnGuardar.setBackground(new Color(46, 125, 50));
         btnGuardar.setForeground(Color.WHITE);
         btnGuardar.setFocusPainted(false);
+        btnGuardar.setIcon(new ImageIcon(getClass().getResource("/icons/guardar.png")));
 
         btnLimpiar.setBackground(new Color(211, 47, 47));
         btnLimpiar.setForeground(Color.WHITE);
         btnLimpiar.setFocusPainted(false);
+        btnLimpiar.setIcon(new ImageIcon(getClass().getResource("/icons/eliminar.png")));
+
 
         btnAnadir.setBackground(new Color(25, 118, 210));
         btnAnadir.setForeground(Color.WHITE);
         btnAnadir.setFocusPainted(false);
+        btnAnadir.setIcon(new ImageIcon(getClass().getResource("/icons/anadir.png")));
+
 
         btnBuscar.setBackground(new Color(255, 152, 0));
         btnBuscar.setForeground(Color.WHITE);
         btnBuscar.setFocusPainted(false);
+        btnBuscar.setIcon(new ImageIcon(getClass().getResource("/icons/buscar.png")));
+
 
         txtSubtotal.setText("0.00");
         txtIva.setText("0.00");

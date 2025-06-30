@@ -41,7 +41,8 @@ public class ProductoEliminar extends JInternalFrame {
                 }
             }
         });
-
+        LISTARButton.setIcon(new ImageIcon(getClass().getResource("/icons/listar.png")));
+        ELIMINARButton.setIcon(new ImageIcon(getClass().getResource("/icons/eliminar.png")));
         actualizarTextos();
     }
 

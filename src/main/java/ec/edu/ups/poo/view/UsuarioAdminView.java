@@ -28,7 +28,11 @@ public class UsuarioAdminView extends JInternalFrame {
         configurarEventos();
         this.setSize(700, 500);
         this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        btnEliminar.setIcon(new ImageIcon(getClass().getResource("/icons/eliminar.png")));
+        btnActualizar.setIcon(new ImageIcon(getClass().getResource("/icons/actualizar.png")));
+
         actualizarTextos();
+
     }
 
     private void inicializarComponentes() {

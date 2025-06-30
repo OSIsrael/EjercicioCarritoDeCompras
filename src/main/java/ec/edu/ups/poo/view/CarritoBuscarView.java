@@ -35,7 +35,10 @@ public class CarritoBuscarView extends JInternalFrame {
         panelBusqueda.add(lblCodigo);
         txtBuscarCarrito = new JTextField(8);
         btnBuscarCarrito = new JButton();
+        btnBuscarCarrito.setIcon(new ImageIcon(getClass().getResource("/icons/buscar.png")));
+
         btnListar = new JButton();
+        btnListar.setIcon(new ImageIcon(getClass().getResource("/icons/listar.png")));
         panelBusqueda.add(txtBuscarCarrito);
         panelBusqueda.add(btnBuscarCarrito);
         panelBusqueda.add(btnListar);

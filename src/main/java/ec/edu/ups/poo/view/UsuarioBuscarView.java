@@ -47,7 +47,8 @@ public class UsuarioBuscarView extends JInternalFrame {
 
         setContentPane(panelPrincipal);
         setSize(700, 500);
-
+        btnBuscar.setIcon(new ImageIcon(getClass().getResource("/icons/buscar.png")));
+        btnListar.setIcon(new ImageIcon(getClass().getResource("/icons/listar.png")));
         actualizarTextos();
     }
 

@@ -17,6 +17,8 @@ public class UsuarioModificarDatosView extends JInternalFrame {
         super("", true, true, true, true);
         setContentPane(panelPrincipal);
         this.setSize(700, 500);
+        btnModificar.setIcon(new ImageIcon(getClass().getResource("/icons/editar.png")));
+        btnBorrar.setIcon(new ImageIcon(getClass().getResource("/icons/eliminar.png")));
         actualizarTextos();
     }
 

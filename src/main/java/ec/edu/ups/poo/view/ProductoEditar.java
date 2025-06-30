@@ -40,7 +40,8 @@ public class ProductoEditar extends JInternalFrame {
                 }
             }
         });
-
+        btnListar1.setIcon(new ImageIcon(getClass().getResource("/icons/listar.png")));
+        btnEditar.setIcon(new ImageIcon(getClass().getResource("/icons/editar.png")));
         actualizarTextos();
     }
 

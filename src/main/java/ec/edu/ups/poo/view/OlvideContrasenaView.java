@@ -17,8 +17,9 @@ public class OlvideContrasenaView extends JDialog {
         setTitle("Recuperar Contraseña");
         setSize(400, 300);
         setLocationRelativeTo(null);
-
         setContentPane(panelPrincipal);
+        btnValidar.setIcon(new ImageIcon(getClass().getResource("/icons/validar.png")));
+        btnCambiar.setIcon(new ImageIcon(getClass().getResource("/icons/cambiar.png")));
     }
 
     public JPanel getPanelPrincipal() {

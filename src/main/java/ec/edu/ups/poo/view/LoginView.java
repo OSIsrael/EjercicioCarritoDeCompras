@@ -19,6 +19,11 @@ public class LoginView extends JFrame{
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(600,400);
         setLocationRelativeTo(null);
+        btnOlvide.setIcon(new ImageIcon(getClass().getResource("/icons/pregunta.png")));
+        btnRegistrarse.setIcon(new ImageIcon(getClass().getResource("/icons/usuario.png")));
+        btnIniciarSesion.setIcon(new ImageIcon(getClass().getResource("/icons/entrar.png")));
+
+
     }
 
     public JPanel getPanelPrincipal() {

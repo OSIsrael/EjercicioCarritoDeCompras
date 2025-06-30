@@ -51,6 +51,8 @@ public class CarritoListarView extends JInternalFrame {
         tblDetallesCarrito = new JTable(modeloDetallesCarrito);
 
         btnListar = new JButton();
+        btnListar.setIcon(new ImageIcon(getClass().getResource("/icons/listar.png")));
+
 
         JPanel panelTablas = new JPanel(new GridLayout(2, 1));
         panelTablas.add(new JScrollPane(tblCarritos));

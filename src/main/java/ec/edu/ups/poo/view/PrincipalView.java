@@ -4,6 +4,7 @@ import ec.edu.ups.poo.util.Idioma;
 import ec.edu.ups.poo.util.MensajeInternacionalizacionHandler;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -34,10 +35,13 @@ public class PrincipalView extends JFrame {
     private JMenuItem menuItemFrances;
 
 
+
     public PrincipalView() {
         // Inicializa el manejador de internacionalización con el idioma por defecto
+        jDesktopPane = new JDesktopPaneConFondo();
         initcomponents();
         actualizarTextos();
+
          // Llama al método para inicializar los componentes de la UI
     }
 
@@ -143,7 +147,7 @@ public class PrincipalView extends JFrame {
      * Inicializa todos los componentes de la interfaz gráfica.
      */
     private void initcomponents() {
-        jDesktopPane = new JDesktopPane();
+
         menuBar = new JMenuBar();
 
         // Menú Producto

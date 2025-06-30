@@ -29,7 +29,8 @@ public class ProductoListaView extends JInternalFrame {
         Object[] columnas = {"", "", ""}; // Internacionalizadas abajo
         modelo.setColumnIdentifiers(columnas);
         tblProductos.setModel(modelo);
-
+        btnListar.setIcon(new ImageIcon(getClass().getResource("/icons/listar.png")));
+        btnBuscar.setIcon(new ImageIcon(getClass().getResource("/icons/buscar.png")));
         actualizarTextos();
     }
 

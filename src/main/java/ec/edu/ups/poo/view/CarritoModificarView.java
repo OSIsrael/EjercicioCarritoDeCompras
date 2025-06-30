@@ -37,6 +37,7 @@ public class CarritoModificarView extends JInternalFrame {
         txtCodigo = new JTextField(10);
         panelSuperior.add(txtCodigo);
         btnBuscar = new JButton();
+        btnBuscar.setIcon(new ImageIcon(getClass().getResource("/icons/buscar.png")));
         panelSuperior.add(btnBuscar);
 
         panelPrincipal.add(panelSuperior, BorderLayout.NORTH);
@@ -71,6 +72,7 @@ public class CarritoModificarView extends JInternalFrame {
         // Panel inferior con el botón modificar
         JPanel panelInferior = new JPanel();
         btnModificar = new JButton();
+        btnModificar.setIcon(new ImageIcon(getClass().getResource("/icons/editar.png")));
         panelInferior.add(btnModificar);
         panelPrincipal.add(panelInferior, BorderLayout.SOUTH);
 

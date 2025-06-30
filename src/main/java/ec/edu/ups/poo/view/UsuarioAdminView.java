@@ -28,8 +28,6 @@ public class UsuarioAdminView extends JInternalFrame {
         configurarEventos();
         this.setSize(700, 500);
         this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        btnEliminar.setIcon(new ImageIcon(getClass().getResource("/icons/eliminar.png")));
-        btnActualizar.setIcon(new ImageIcon(getClass().getResource("/icons/actualizar.png")));
 
         actualizarTextos();
 
@@ -59,6 +57,11 @@ public class UsuarioAdminView extends JInternalFrame {
         btnActualizar = new JButton();
         btnEliminar = new JButton();
         btnRefrescar = new JButton();
+        btnRefrescar.setIcon(new ImageIcon(getClass().getResource("/icons/actualizar.png")));
+        btnActualizar.setIcon(new ImageIcon(getClass().getResource("/icons/actualizar.png")));
+        btnEliminar.setIcon(new ImageIcon(getClass().getResource("/icons/eliminar.png")));
+
+
 
         lblRol = new JLabel();
         lblUsuarioSeleccionado = new JLabel();

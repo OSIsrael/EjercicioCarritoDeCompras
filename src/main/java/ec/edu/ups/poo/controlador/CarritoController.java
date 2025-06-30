@@ -106,7 +106,7 @@ public class CarritoController {
             return;
         }
         carritoDAO.crear(carritoActual);
-        carritoAnadirView.mostrarMensaje("Carrito guardado exitosamente con código: " + carritoActual.getCodigo());
+        carritoAnadirView.mostrarMensajeConParametros("carrito.anadir.msj.guardado", carritoActual.getCodigo());
         limpiarCarritoActual();
     }
 

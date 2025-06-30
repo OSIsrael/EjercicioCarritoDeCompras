@@ -5,6 +5,7 @@ import ec.edu.ups.poo.util.Idioma;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.text.MessageFormat;
 
 public class CarritoAnadirView extends JInternalFrame {
     private JPanel panelPrincipal;
@@ -178,6 +179,10 @@ public class CarritoAnadirView extends JInternalFrame {
     // Métodos de mensajes internacionalizados
     public void mostrarMensaje(String clave) {
         JOptionPane.showMessageDialog(this, Idioma.get(clave), Idioma.get("carrito.info"), JOptionPane.INFORMATION_MESSAGE);
+    }
+    public void mostrarMensajeConParametros(String clave, Object... parametros) {
+        String mensaje = MessageFormat.format(Idioma.get(clave), parametros);
+        JOptionPane.showMessageDialog(this, mensaje, Idioma.get("carrito.info"), JOptionPane.INFORMATION_MESSAGE);
     }
     public void mostrarError(String clave) {
         JOptionPane.showMessageDialog(this, Idioma.get(clave), Idioma.get("carrito.error"), JOptionPane.ERROR_MESSAGE);

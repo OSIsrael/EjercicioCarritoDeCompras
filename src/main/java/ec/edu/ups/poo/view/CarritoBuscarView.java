@@ -7,8 +7,11 @@ import ec.edu.ups.poo.util.Idioma;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class CarritoBuscarView extends JInternalFrame {
     private JPanel panelPrincipal;
@@ -112,14 +115,16 @@ public class CarritoBuscarView extends JInternalFrame {
         modeloTablaCarritos.setRowCount(0);
         modeloTablaDetalle.setRowCount(0);
         ultimoListadoCarritos = carritos;
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        Locale locale=Idioma.getLocale();
+        DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, locale);
+        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(locale);
         for (Carrito carrito : carritos) {
             String nombreUsuario = (carrito.getUsuario() != null) ? carrito.getUsuario().getUsername() : "N/A";
             modeloTablaCarritos.addRow(new Object[]{
                     carrito.getCodigo(),
                     nombreUsuario,
-                    sdf.format(carrito.getFechaCreacion().getTime()),
-                    String.format("%.2f", carrito.calcularTotal())
+                    dateFormat.format(carrito.getFechaCreacion().getTime()),
+                    currencyFormat.format(carrito.calcularTotal())
             });
         }
     }
@@ -128,14 +133,17 @@ public class CarritoBuscarView extends JInternalFrame {
     public void mostrarCarrito(Carrito carrito) {
         modeloTablaCarritos.setRowCount(0);
         modeloTablaDetalle.setRowCount(0);
+        Locale locale = Idioma.getLocale();
+        DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, locale);
+        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(locale);
+
         if (carrito != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
             String nombreUsuario = (carrito.getUsuario() != null) ? carrito.getUsuario().getUsername() : "N/A";
             modeloTablaCarritos.addRow(new Object[]{
                     carrito.getCodigo(),
                     nombreUsuario,
-                    sdf.format(carrito.getFechaCreacion().getTime()),
-                    String.format("%.2f", carrito.calcularTotal())
+                    dateFormat.format(carrito.getFechaCreacion().getTime()),
+                    currencyFormat.format(carrito.calcularTotal())
             });
             mostrarDetalleCarrito(carrito);
             ultimoListadoCarritos = List.of(carrito); // Para permitir click en tabla única
@@ -149,12 +157,14 @@ public class CarritoBuscarView extends JInternalFrame {
     public void mostrarDetalleCarrito(Carrito carrito) {
         modeloTablaDetalle.setRowCount(0);
         if (carrito != null) {
+            Locale locale = Idioma.getLocale();
+            NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(locale);
             for (ItemCarrito item : carrito.obtenerItems()) {
                 modeloTablaDetalle.addRow(new Object[]{
                         item.getProducto().getCodigo(),
                         item.getProducto().getNombre(),
                         item.getCantidad(),
-                        String.format("%.2f", item.getSubtotal())
+                        currencyFormat.format(item.getSubtotal())
                 });
             }
         }

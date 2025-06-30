@@ -2,6 +2,7 @@ package ec.edu.ups.poo.view;
 
 import ec.edu.ups.poo.modelo.Carrito;
 import ec.edu.ups.poo.modelo.ItemCarrito;
+import ec.edu.ups.poo.util.Idioma;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -25,23 +26,24 @@ public class CarritoModificarView extends JInternalFrame {
     private List<Carrito> ultimoListado;
 
     public CarritoModificarView() {
-        super("Modificar Carrito", true, true, true, true);
+        super("", true, true, true, true); // Título internacionalizado
 
         panelPrincipal = new JPanel(new BorderLayout());
 
-        // Panel superior para búsqueda (opcional)
+        // Panel superior para búsqueda
         JPanel panelSuperior = new JPanel();
-        panelSuperior.add(new JLabel("Código de Carrito:"));
+        lblCodigo = new JLabel();
+        panelSuperior.add(lblCodigo);
         txtCodigo = new JTextField(10);
         panelSuperior.add(txtCodigo);
-        btnBuscar = new JButton("Buscar");
+        btnBuscar = new JButton();
         panelSuperior.add(btnBuscar);
 
         panelPrincipal.add(panelSuperior, BorderLayout.NORTH);
 
         // Modelo para la tabla de carritos
         modeloTablaCarritos = new DefaultTableModel(
-                new Object[]{"Código", "Fecha", "N° Items", "Cantidad total", "Usuario"}, 0
+                new Object[]{"", "", "", "", ""}, 0 // Columnas internacionalizadas abajo
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -53,7 +55,7 @@ public class CarritoModificarView extends JInternalFrame {
 
         // Modelo para la tabla de detalles
         modeloTablaDetalle = new DefaultTableModel(
-                new Object[]{"Código Prod.", "Nombre", "Cantidad", "Subtotal"}, 0
+                new Object[]{"", "", "", ""}, 0 // Columnas internacionalizadas abajo
         ) {
             @Override
             public boolean isCellEditable(int row, int column) { return false; }
@@ -68,7 +70,7 @@ public class CarritoModificarView extends JInternalFrame {
 
         // Panel inferior con el botón modificar
         JPanel panelInferior = new JPanel();
-        btnModificar = new JButton("Modificar");
+        btnModificar = new JButton();
         panelInferior.add(btnModificar);
         panelPrincipal.add(panelInferior, BorderLayout.SOUTH);
 
@@ -85,6 +87,35 @@ public class CarritoModificarView extends JInternalFrame {
                 }
             }
         });
+
+        actualizarTextos();
+    }
+
+    public void actualizarTextos() {
+        setTitle(Idioma.get("carrito.modificar.titulo"));
+        lblCodigo.setText(Idioma.get("carrito.modificar.lbl.codigo"));
+        btnBuscar.setText(Idioma.get("carrito.modificar.btn.buscar"));
+        btnModificar.setText(Idioma.get("carrito.modificar.btn.modificar"));
+
+        // Columnas tabla carritos
+        modeloTablaCarritos.setColumnIdentifiers(new Object[]{
+                Idioma.get("carrito.modificar.tbl.codigo"),
+                Idioma.get("carrito.modificar.tbl.fecha"),
+                Idioma.get("carrito.modificar.tbl.numitems"),
+                Idioma.get("carrito.modificar.tbl.canttotal"),
+                Idioma.get("carrito.modificar.tbl.usuario")
+        });
+
+        // Columnas tabla detalles
+        modeloTablaDetalle.setColumnIdentifiers(new Object[]{
+                Idioma.get("carrito.modificar.tbl.codigoProd"),
+                Idioma.get("carrito.modificar.tbl.nombreProd"),
+                Idioma.get("carrito.modificar.tbl.cantidad"),
+                Idioma.get("carrito.modificar.tbl.subtotal")
+        });
+
+        tblModificar.setToolTipText(Idioma.get("carrito.modificar.tbl.tooltip"));
+        tblDetalleCarrito.setToolTipText(Idioma.get("carrito.modificar.tbldetalle.tooltip"));
     }
 
     // Cargar todos los carritos
@@ -145,9 +176,9 @@ public class CarritoModificarView extends JInternalFrame {
             }
             // Fila vacía
             modeloTablaDetalle.addRow(new Object[]{"", "", "", ""});
-            modeloTablaDetalle.addRow(new Object[]{"", "Subtotal", "", String.format("%.2f", carrito.calcularSubtotal())});
-            modeloTablaDetalle.addRow(new Object[]{"", "IVA", "", String.format("%.2f", carrito.calcularIva())});
-            modeloTablaDetalle.addRow(new Object[]{"", "Total", "", String.format("%.2f", carrito.calcularTotal())});
+            modeloTablaDetalle.addRow(new Object[]{"", Idioma.get("carrito.modificar.lbl.subtotal"), "", String.format("%.2f", carrito.calcularSubtotal())});
+            modeloTablaDetalle.addRow(new Object[]{"", Idioma.get("carrito.modificar.lbl.iva"), "", String.format("%.2f", carrito.calcularIva())});
+            modeloTablaDetalle.addRow(new Object[]{"", Idioma.get("carrito.modificar.lbl.total"), "", String.format("%.2f", carrito.calcularTotal())});
         }
     }
 
@@ -157,12 +188,12 @@ public class CarritoModificarView extends JInternalFrame {
         modeloTablaDetalle.setRowCount(0);
     }
 
-    public void mostrarMensaje(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje);
+    public void mostrarMensaje(String mensajeKey) {
+        JOptionPane.showMessageDialog(this, Idioma.get(mensajeKey), Idioma.get("carrito.modificar.msj.info"), JOptionPane.INFORMATION_MESSAGE);
     }
 
-    public void mostrarError(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+    public void mostrarError(String mensajeKey) {
+        JOptionPane.showMessageDialog(this, Idioma.get(mensajeKey), Idioma.get("carrito.modificar.msj.error"), JOptionPane.ERROR_MESSAGE);
     }
 
     // Getters para el controlador

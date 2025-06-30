@@ -2,6 +2,7 @@ package ec.edu.ups.poo.view;
 
 import ec.edu.ups.poo.modelo.Carrito;
 import ec.edu.ups.poo.modelo.ItemCarrito;
+import ec.edu.ups.poo.util.Idioma;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -23,13 +24,13 @@ public class CarritoEliminarView extends JInternalFrame {
     private List<Carrito> ultimoListado; // Mantener referencia para selección
 
     public CarritoEliminarView() {
-        super("Eliminar Carrito", true, true, true, true);
+        super("", true, true, true, true); // Título internacionalizado
         setContentPane(panelPrincipal);
         this.setSize(700, 500);
 
         // Modelo para la tabla de carritos
         modeloTablaCarritos = new DefaultTableModel(
-                new Object[]{"Código", "Usuario", "Fecha", "Total"}, 0
+                new Object[]{"", "", "", ""}, 0 // Columnas internacionalizadas abajo
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -40,7 +41,7 @@ public class CarritoEliminarView extends JInternalFrame {
 
         // Modelo para la tabla de detalles
         modeloTablaDetalle = new DefaultTableModel(
-                new Object[]{"Código Prod.", "Nombre", "Cantidad", "Subtotal"}, 0
+                new Object[]{"", "", "", ""}, 0 // Columnas internacionalizadas abajo
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -60,6 +61,33 @@ public class CarritoEliminarView extends JInternalFrame {
                 }
             }
         });
+
+        actualizarTextos();
+    }
+
+    public void actualizarTextos() {
+        setTitle(Idioma.get("carrito.eliminar.titulo"));
+        btnEliminar.setText(Idioma.get("carrito.eliminar.btn.eliminar"));
+        btnListar.setText(Idioma.get("carrito.eliminar.btn.listar"));
+
+        // Columnas tabla carritos
+        modeloTablaCarritos.setColumnIdentifiers(new Object[] {
+                Idioma.get("carrito.eliminar.tbl.codigo"),
+                Idioma.get("carrito.eliminar.tbl.usuario"),
+                Idioma.get("carrito.eliminar.tbl.fecha"),
+                Idioma.get("carrito.eliminar.tbl.total")
+        });
+
+        // Columnas tabla detalle
+        modeloTablaDetalle.setColumnIdentifiers(new Object[] {
+                Idioma.get("carrito.eliminar.tbl.codigoProd"),
+                Idioma.get("carrito.eliminar.tbl.nombreProd"),
+                Idioma.get("carrito.eliminar.tbl.cantidadProd"),
+                Idioma.get("carrito.eliminar.tbl.subtotalProd")
+        });
+
+        tblEliminarCarrito.setToolTipText(Idioma.get("carrito.eliminar.tbl.tooltip"));
+        tblMostrarDetalleCarrito.setToolTipText(Idioma.get("carrito.eliminar.tblDetalle.tooltip"));
     }
 
     // Mostrar TODOS los carritos en la tabla principal
@@ -108,12 +136,15 @@ public class CarritoEliminarView extends JInternalFrame {
         carritoSeleccionado = null;
     }
 
-    public void mostrarMensaje(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje);
+    public void mostrarMensaje(String mensajeKey) {
+        JOptionPane.showMessageDialog(this, Idioma.get(mensajeKey), Idioma.get("carrito.eliminar.msj.info"), JOptionPane.INFORMATION_MESSAGE);
     }
 
-    public boolean confirmarAccion(String mensaje) {
-        int respuesta = JOptionPane.showConfirmDialog(this, mensaje, "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
+    public boolean confirmarAccion(String mensajeKey) {
+        int respuesta = JOptionPane.showConfirmDialog(this,
+                Idioma.get(mensajeKey),
+                Idioma.get("carrito.eliminar.msj.confirmar"),
+                JOptionPane.YES_NO_OPTION);
         return respuesta == JOptionPane.YES_OPTION;
     }
 

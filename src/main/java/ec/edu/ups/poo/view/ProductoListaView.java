@@ -1,6 +1,7 @@
 package ec.edu.ups.poo.view;
 
 import ec.edu.ups.poo.modelo.Producto;
+import ec.edu.ups.poo.util.Idioma;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -14,22 +15,37 @@ public class ProductoListaView extends JInternalFrame {
     private JButton btnListar;
     private JLabel lblNombre;
     private DefaultTableModel modelo;
+
     public ProductoListaView() {
         setContentPane(panelListarProducto);
-        setTitle("LISTADO DE PRODUCTOS");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(500, 500);
-        //setResizable(false);
         setClosable(true);
         setIconifiable(true);
         setMaximizable(true);
         setResizable(true);
-        //setVisible(true);
-        //pack();
+        setSize(500, 500);
+
         modelo = new DefaultTableModel();
-        Object[] columnas={"ID","NOMBRE","PRECIO"};
+        Object[] columnas = {"", "", ""}; // Internacionalizadas abajo
         modelo.setColumnIdentifiers(columnas);
         tblProductos.setModel(modelo);
+
+        actualizarTextos();
+    }
+
+    public void actualizarTextos() {
+        setTitle(Idioma.get("producto.listar.titulo"));
+        btnBuscar.setText(Idioma.get("producto.listar.btn.buscar"));
+        btnListar.setText(Idioma.get("producto.listar.btn.listar"));
+        lblNombre.setText(Idioma.get("producto.listar.lbl.nombre"));
+
+        modelo.setColumnIdentifiers(new Object[]{
+                Idioma.get("producto.listar.tbl.codigo"),
+                Idioma.get("producto.listar.tbl.nombre"),
+                Idioma.get("producto.listar.tbl.precio")
+        });
+
+        tblProductos.setToolTipText(Idioma.get("producto.listar.tbl.tooltip"));
     }
 
     public JTextField getTxtBuscar() {
@@ -67,10 +83,9 @@ public class ProductoListaView extends JInternalFrame {
     public void cargarDatos(List<Producto> productos) {
         modelo.setNumRows(0);
 
-        for (Producto producto: productos) {
-            Object[] filaProducto={producto.getCodigo(),producto.getNombre(),producto.getPrecio()};
+        for (Producto producto : productos) {
+            Object[] filaProducto = {producto.getCodigo(), producto.getNombre(), producto.getPrecio()};
             modelo.addRow(filaProducto);
         }
-
-   }
+    }
 }

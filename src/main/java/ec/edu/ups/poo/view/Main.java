@@ -15,7 +15,10 @@ import ec.edu.ups.poo.modelo.Rol;
 import ec.edu.ups.poo.modelo.Usuario;
 import ec.edu.ups.poo.dao.PreguntaDAO;
 import ec.edu.ups.poo.dao.impl.PreguntaDAOMemoria;
+import ec.edu.ups.poo.util.Idioma;
+
 import javax.swing.*;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -125,8 +128,9 @@ public class Main {
         configurarEventosProductos(principalView, productoAnadirView, productoListaView, productoEditar, productoEliminar);
         configurarEventosCarrito(principalView, carritoAnadirView, carritoListarView, carritoBuscarView, carritoModificarView, carritoEliminarView, carritoController, usuarioAutenticado);
         configurarEventosUsuarios(principalView, usuarioController, usuarioAdminView, usuarioBuscarView, usuarioCrearView, usuarioModificarDatosView, usuarioAutenticado);
+        configurarEventosIdioma(principalView, carritoAnadirView,carritoBuscarView,carritoEliminarView,carritoListarView,carritoModificarView,productoAnadirView,productoEditar,productoEliminar,productoListaView,usuarioAdminView,usuarioBuscarView,usuarioCrearView,usuarioModificarDatosView);
         configurarEventosCerrarSesion(principalView);
-        configurarEventosIdioma(principalView);
+
 
         principalView.setVisible(true);
     }
@@ -221,10 +225,48 @@ public class Main {
         });
     }
 
-    private static void configurarEventosIdioma(PrincipalView principalView) {
-        principalView.getMenuItemEspañol().addActionListener(e -> principalView.cambiarIdiomas("es", "EC"));
-        principalView.getMenuItemFrances().addActionListener(e -> principalView.cambiarIdiomas("fr", "FR"));
-        principalView.getMenuItemIngles().addActionListener(e -> principalView.cambiarIdiomas("en", "US"));
+    private static void configurarEventosIdioma(
+            PrincipalView principalView,
+            CarritoAnadirView carritoAnadirView,
+            CarritoBuscarView carritoBuscarView,
+            CarritoEliminarView carritoEliminarView,
+            CarritoListarView carritoListarView,
+            CarritoModificarView carritoModificarView,
+            ProductoAnadirView productoAnadirView,
+            ProductoEditar productoEditar,
+            ProductoEliminar productoEliminar,
+            ProductoListaView productoListaView,
+            UsuarioAdminView usuarioAdminView,
+            UsuarioBuscarView usuarioBuscarView,
+            UsuarioCrearView usuarioCrearView,
+            UsuarioModificarDatosView usuarioModificarDatosView
+    ) {
+        ActionListener cambiarIdiomaListener = e -> {
+            String lang = "es", country = "EC";
+            if (e.getSource() == principalView.getMenuItemIngles()) {
+                lang = "en"; country = "US";
+            } else if (e.getSource() == principalView.getMenuItemFrances()) {
+                lang = "fr"; country = "FR";
+            }
+            Idioma.setIdioma(lang, country);
+            principalView.actualizarTextos();
+            carritoAnadirView.actualizarTextos();
+            carritoBuscarView.actualizarTextos();
+            carritoEliminarView.actualizarTextos();
+            carritoListarView.actualizarTextos();
+            carritoModificarView.actualizarTextos();
+            productoAnadirView.actualizarTextos();
+            productoEditar.actualizarTextos();
+            productoEliminar.actualizarTextos();
+            productoListaView.actualizarTextos();
+            usuarioAdminView.actualizarTextos();
+            usuarioBuscarView.actualizarTextos();
+            usuarioCrearView.actualizarTextos();
+            usuarioModificarDatosView.actualizarTextos();
+        };
+        principalView.getMenuItemEspañol().addActionListener(cambiarIdiomaListener);
+        principalView.getMenuItemFrances().addActionListener(cambiarIdiomaListener);
+        principalView.getMenuItemIngles().addActionListener(cambiarIdiomaListener);
     }
 
     private static void mostrarVentana(PrincipalView principal, JInternalFrame ventana) {

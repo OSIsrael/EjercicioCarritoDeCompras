@@ -1,5 +1,7 @@
 package ec.edu.ups.poo.view;
 
+import ec.edu.ups.poo.util.Idioma;
+
 import javax.swing.*;
 
 public class UsuarioCrearView extends JInternalFrame {
@@ -12,9 +14,18 @@ public class UsuarioCrearView extends JInternalFrame {
     private JLabel lblContrasena;
 
     public UsuarioCrearView() {
-        super("Crear Usuario",true,true,true,true);
+        super("", true, true, true, true);
         setContentPane(panelPrincipal);
-        this.setSize(700,500);
+        this.setSize(700, 500);
+        actualizarTextos();
+    }
+
+    public void actualizarTextos() {
+        setTitle(Idioma.get("usuario.crear.titulo"));
+        lblUsuario.setText(Idioma.get("usuario.crear.lbl.usuario"));
+        lblContrasena.setText(Idioma.get("usuario.crear.lbl.contrasena"));
+        btnCrear.setText(Idioma.get("usuario.crear.btn.crear"));
+        btnBorrar.setText(Idioma.get("usuario.crear.btn.borrar"));
     }
 
     public JPanel getPanelPrincipal() {
@@ -56,7 +67,8 @@ public class UsuarioCrearView extends JInternalFrame {
     public void setBtnBorrar(JButton btnBorrar) {
         this.btnBorrar = btnBorrar;
     }
-    public void mostrarMensaje(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje);
+
+    public void mostrarMensaje(String mensajeKey) {
+        JOptionPane.showMessageDialog(this, Idioma.get(mensajeKey), Idioma.get("usuario.crear.msj.info"), JOptionPane.INFORMATION_MESSAGE);
     }
 }

@@ -1,5 +1,6 @@
 package ec.edu.ups.poo.view;
 
+import ec.edu.ups.poo.util.Idioma;
 import ec.edu.ups.poo.util.MensajeInternacionalizacionHandler;
 
 import javax.swing.*;
@@ -7,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class PrincipalView extends JFrame {
-    private MensajeInternacionalizacionHandler mensajeInternacionalizacionHandler;
     private JMenuBar menuBar;
     private JMenu menuProducto;
     private JMenuItem menuItemCrearProducto;
@@ -36,8 +36,9 @@ public class PrincipalView extends JFrame {
 
     public PrincipalView() {
         // Inicializa el manejador de internacionalización con el idioma por defecto
-        mensajeInternacionalizacionHandler = new MensajeInternacionalizacionHandler("es", "EC");
-        initcomponents(); // Llama al método para inicializar los componentes de la UI
+        initcomponents();
+        actualizarTextos();
+         // Llama al método para inicializar los componentes de la UI
     }
 
     // --- Getters para los JMenuItems ---
@@ -146,11 +147,11 @@ public class PrincipalView extends JFrame {
         menuBar = new JMenuBar();
 
         // Menú Producto
-        menuProducto = new JMenu(mensajeInternacionalizacionHandler.get("menu.producto"));
-        menuItemCrearProducto = new JMenuItem(mensajeInternacionalizacionHandler.get("menu.producto.crear"));
-        menuItemEditarProducto = new JMenuItem(mensajeInternacionalizacionHandler.get("menu.producto.editar"));
-        menuItemEliminarProducto = new JMenuItem(mensajeInternacionalizacionHandler.get("menu.producto.eliminar"));
-        menuItemBuscarProducto = new JMenuItem(mensajeInternacionalizacionHandler.get("menu.producto.buscar"));
+        menuProducto = new JMenu();
+        menuItemCrearProducto = new JMenuItem();
+        menuItemEditarProducto = new JMenuItem();
+        menuItemEliminarProducto = new JMenuItem();
+        menuItemBuscarProducto = new JMenuItem();
         menuProducto.add(menuItemCrearProducto);
         menuProducto.add(menuItemEditarProducto);
         menuProducto.add(menuItemEliminarProducto);
@@ -158,12 +159,12 @@ public class PrincipalView extends JFrame {
         menuBar.add(menuProducto);
 
         // Menú Carrito
-        menuCarrito = new JMenu(mensajeInternacionalizacionHandler.get("menu.carrito"));
-        menuItemCarrito = new JMenuItem(mensajeInternacionalizacionHandler.get("menu.carrito.anadir"));
-        menuItemCarritoListar = new JMenuItem(mensajeInternacionalizacionHandler.get("menu.carrito.listar"));
-        menuItemCarritoBuscar = new JMenuItem(mensajeInternacionalizacionHandler.get("menu.carrito.buscar"));
-        menuItemCarritoModificar = new JMenuItem(mensajeInternacionalizacionHandler.get("menu.carrito.modificar"));
-        menuItemCarritoEliminar = new JMenuItem(mensajeInternacionalizacionHandler.get("menu.carrito.eliminar"));
+        menuCarrito = new JMenu();
+        menuItemCarrito = new JMenuItem();
+        menuItemCarritoListar = new JMenuItem();
+        menuItemCarritoBuscar = new JMenuItem();
+        menuItemCarritoModificar = new JMenuItem();
+        menuItemCarritoEliminar = new JMenuItem();
         menuCarrito.add(menuItemCarrito);
         menuCarrito.add(menuItemCarritoListar);
         menuCarrito.add(menuItemCarritoBuscar);
@@ -172,32 +173,32 @@ public class PrincipalView extends JFrame {
         menuBar.add(menuCarrito);
 
         // Menú Administración
-        menuAdmin = new JMenu(mensajeInternacionalizacionHandler.get("menu.administrador"));
-        menuItemGestionarUsuarios = new JMenuItem(mensajeInternacionalizacionHandler.get("menu.administrador.gestionar"));
-        menuItemBuscarUsuario = new JMenuItem(mensajeInternacionalizacionHandler.get("menu.administrador.buscar"));
-        menuItemCrearUsuario = new JMenuItem(mensajeInternacionalizacionHandler.get("menu.administrador.crear"));
+        menuAdmin = new JMenu();
+        menuItemGestionarUsuarios = new JMenuItem();
+        menuItemBuscarUsuario = new JMenuItem();
+        menuItemCrearUsuario = new JMenuItem();
         menuAdmin.add(menuItemGestionarUsuarios);
         menuAdmin.add(menuItemBuscarUsuario);
         menuAdmin.add(menuItemCrearUsuario);
         menuBar.add(menuAdmin);
 
         // Menú Usuario
-        menuUser = new JMenu(mensajeInternacionalizacionHandler.get("menu.usuario"));
-        menuItemUser = new JMenuItem(mensajeInternacionalizacionHandler.get("menu.usuario.usuario"));
+        menuUser = new JMenu();
+        menuItemUser = new JMenuItem();
         menuUser.add(menuItemUser);
         menuBar.add(menuUser);
 
 
         // Opción Cerrar Sesión (directamente en la barra de menú, con un espaciador)
-        menuItemCerrarSesion = new JMenuItem(mensajeInternacionalizacionHandler.get("menu.cerrarSesion.cerrar"));
+        menuItemCerrarSesion = new JMenuItem();
         menuBar.add(Box.createHorizontalGlue()); // Empuja el siguiente componente a la derecha
         menuBar.add(menuItemCerrarSesion);
 
         // Menú Idiomas
-        menuIdiomas = new JMenu(mensajeInternacionalizacionHandler.get("menu.idiomas"));
-        menuItemIngles = new JMenuItem(mensajeInternacionalizacionHandler.get("menu.idiomas.ingles"));
-        menuItemEspañol = new JMenuItem(mensajeInternacionalizacionHandler.get("menu.idiomas.español"));
-        menuItemFrances = new JMenuItem(mensajeInternacionalizacionHandler.get("menu.idiomas.frances"));
+        menuIdiomas = new JMenu();
+        menuItemIngles = new JMenuItem();
+        menuItemEspañol = new JMenuItem();
+        menuItemFrances = new JMenuItem();
         menuIdiomas.add(menuItemIngles);
         menuIdiomas.add(menuItemEspañol);
         menuIdiomas.add(menuItemFrances);
@@ -207,37 +208,46 @@ public class PrincipalView extends JFrame {
         setJMenuBar(menuBar);
         setContentPane(jDesktopPane);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setTitle(mensajeInternacionalizacionHandler.get("titulo"));
+        setTitle(Idioma.get("titulo"));
         setSize(800, 600); // Tamaño inicial
         setLocationRelativeTo(null); // Centrar en pantalla
         setExtendedState(JFrame.MAXIMIZED_BOTH); // Inicia maximizada
     }
 
-    /**
-     * Cambia el idioma de la interfaz de usuario.
-     * @param lenguaje El código de lenguaje (ej. "es", "en", "fr").
-     * @param pais El código de país (ej. "EC", "US", "FR").
-     */
-    public void cambiarIdiomas(String lenguaje, String pais) {
-        mensajeInternacionalizacionHandler.setLenguaje(lenguaje, pais);
-        setTitle(mensajeInternacionalizacionHandler.get("titulo"));
-        menuProducto.setText(mensajeInternacionalizacionHandler.get("menu.producto"));
-        menuItemCrearProducto.setText(mensajeInternacionalizacionHandler.get("menu.producto.crear"));
-        menuItemEditarProducto.setText(mensajeInternacionalizacionHandler.get("menu.producto.editar"));
-        menuItemEliminarProducto.setText(mensajeInternacionalizacionHandler.get("menu.producto.eliminar"));
-        menuItemBuscarProducto.setText(mensajeInternacionalizacionHandler.get("menu.producto.buscar"));
-        menuCarrito.setText(mensajeInternacionalizacionHandler.get("menu.carrito"));
-        menuItemCarrito.setText(mensajeInternacionalizacionHandler.get("menu.carrito.anadir"));
-        menuItemCarritoListar.setText(mensajeInternacionalizacionHandler.get("menu.carrito.listar"));
-        menuItemCarritoBuscar.setText(mensajeInternacionalizacionHandler.get("menu.carrito.buscar"));
-        menuItemCarritoModificar.setText(mensajeInternacionalizacionHandler.get("menu.carrito.modificar"));
-        menuItemCarritoEliminar.setText(mensajeInternacionalizacionHandler.get("menu.carrito.eliminar"));
-        menuAdmin.setText(mensajeInternacionalizacionHandler.get("menu.administrador"));
-        menuItemGestionarUsuarios.setText(mensajeInternacionalizacionHandler.get("menu.administrador.gestionar"));
-        menuItemCerrarSesion.setText(mensajeInternacionalizacionHandler.get("menu.cerrarSesion.cerrar"));
-        menuIdiomas.setText(mensajeInternacionalizacionHandler.get("menu.idiomas"));
-        menuItemIngles.setText(mensajeInternacionalizacionHandler.get("menu.idiomas.ingles"));
-        menuItemEspañol.setText(mensajeInternacionalizacionHandler.get("menu.idiomas.español"));
-        menuItemFrances.setText(mensajeInternacionalizacionHandler.get("menu.idiomas.frances"));
+
+    public void actualizarTextos() {
+        setTitle(Idioma.get("titulo"));
+        menuProducto.setText(Idioma.get("menu.producto"));
+        menuItemCrearProducto.setText(Idioma.get("menu.producto.crear"));
+        menuItemEditarProducto.setText(Idioma.get("menu.producto.editar"));
+        menuItemEliminarProducto.setText(Idioma.get("menu.producto.eliminar"));
+        menuItemBuscarProducto.setText(Idioma.get("menu.producto.buscar"));
+
+        menuCarrito.setText(Idioma.get("menu.carrito"));
+        menuItemCarrito.setText(Idioma.get("menu.carrito.anadir"));
+        menuItemCarritoListar.setText(Idioma.get("menu.carrito.listar"));
+        menuItemCarritoBuscar.setText(Idioma.get("menu.carrito.buscar"));
+        menuItemCarritoModificar.setText(Idioma.get("menu.carrito.modificar"));
+        menuItemCarritoEliminar.setText(Idioma.get("menu.carrito.eliminar"));
+
+        menuAdmin.setText(Idioma.get("menu.administrador"));
+        menuItemGestionarUsuarios.setText(Idioma.get("menu.administrador.gestionar"));
+        menuItemBuscarUsuario.setText(Idioma.get("menu.administrador.buscar"));
+        menuItemCrearUsuario.setText(Idioma.get("menu.administrador.crear"));
+
+        menuUser.setText(Idioma.get("menu.usuario"));
+        menuItemUser.setText(Idioma.get("menu.usuario.usuario"));
+
+        menuItemCerrarSesion.setText(Idioma.get("menu.cerrarSesion.cerrar"));
+
+        menuIdiomas.setText(Idioma.get("menu.idiomas"));
+        menuItemIngles.setText(Idioma.get("menu.idiomas.ingles"));
+        menuItemEspañol.setText(Idioma.get("menu.idiomas.español"));
+        menuItemFrances.setText(Idioma.get("menu.idiomas.frances"));
+    }
+
+    public void cambiarIdiomas(String lang, String country) {
+        Idioma.setIdioma(lang, country);
+        actualizarTextos();
     }
 }

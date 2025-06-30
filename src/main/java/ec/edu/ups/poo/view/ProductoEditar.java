@@ -1,11 +1,10 @@
 package ec.edu.ups.poo.view;
 
 import ec.edu.ups.poo.modelo.Producto;
+import ec.edu.ups.poo.util.Idioma;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 
 public class ProductoEditar extends JInternalFrame {
@@ -19,20 +18,18 @@ public class ProductoEditar extends JInternalFrame {
 
     public ProductoEditar() {
         setContentPane(panelEditarProducto);
-        setTitle("EDITAR PRODUCTOS");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(600, 500);
         setClosable(true);
         setIconifiable(true);
         setResizable(true);
         setMaximizable(true);
+        setSize(600, 500);
         //setVisible(true);
 
         modelo = new DefaultTableModel();
-        Object[] columnas = {"CÓDIGO", "NOMBRE", "PRECIO"};
+        Object[] columnas = {"", "", ""}; // Internacionalizadas abajo
         modelo.setColumnIdentifiers(columnas);
         tblEditarProducto.setModel(modelo);
-
 
         tblEditarProducto.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
@@ -43,6 +40,23 @@ public class ProductoEditar extends JInternalFrame {
                 }
             }
         });
+
+        actualizarTextos();
+    }
+
+    public void actualizarTextos() {
+        setTitle(Idioma.get("producto.editar.titulo"));
+        lblNombre.setText(Idioma.get("producto.editar.lbl.nombre"));
+        btnListar1.setText(Idioma.get("producto.editar.btn.listar"));
+        btnEditar.setText(Idioma.get("producto.editar.btn.editar"));
+
+        modelo.setColumnIdentifiers(new Object[]{
+                Idioma.get("producto.editar.tbl.codigo"),
+                Idioma.get("producto.editar.tbl.nombre"),
+                Idioma.get("producto.editar.tbl.precio")
+        });
+
+        tblEditarProducto.setToolTipText(Idioma.get("producto.editar.tbl.tooltip"));
     }
 
     public JPanel getPanelEditarProducto() {
@@ -82,7 +96,7 @@ public class ProductoEditar extends JInternalFrame {
         tblEditarProducto.clearSelection();
     }
 
-    public void mostrarMensaje(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje);
+    public void mostrarMensaje(String mensajeKey) {
+        JOptionPane.showMessageDialog(this, Idioma.get(mensajeKey), Idioma.get("producto.editar.msj.info"), JOptionPane.INFORMATION_MESSAGE);
     }
 }

@@ -2,6 +2,7 @@ package ec.edu.ups.poo.view;
 
 import ec.edu.ups.poo.modelo.Carrito;
 import ec.edu.ups.poo.modelo.ItemCarrito;
+import ec.edu.ups.poo.util.Idioma;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -23,13 +24,13 @@ public class CarritoListarView extends JInternalFrame {
     private List<Carrito> ultimoListado;
 
     public CarritoListarView() {
-        super("Listado de Carritos", true, true, true, true);
+        super("", true, true, true, true); // Título internacionalizado
 
         panelPrincipal = new JPanel(new BorderLayout());
 
         // Modelo de la tabla de carritos
         modeloTablaCarritos = new DefaultTableModel(
-                new Object[]{"Código", "Fecha de Creación", "N° Items", "Cantidad Total", "Usuario"}, 0
+                new Object[]{"", "", "", "", ""}, 0 // Columnas internacionalizadas abajo
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -40,7 +41,7 @@ public class CarritoListarView extends JInternalFrame {
 
         // Modelo de la tabla de detalles
         modeloDetallesCarrito = new DefaultTableModel(
-                new Object[]{"Código Prod.", "Nombre", "Cantidad", "Subtotal"}, 0
+                new Object[]{"", "", "", ""}, 0 // Columnas internacionalizadas abajo
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -49,7 +50,7 @@ public class CarritoListarView extends JInternalFrame {
         };
         tblDetallesCarrito = new JTable(modeloDetallesCarrito);
 
-        btnListar = new JButton("Listar");
+        btnListar = new JButton();
 
         JPanel panelTablas = new JPanel(new GridLayout(2, 1));
         panelTablas.add(new JScrollPane(tblCarritos));
@@ -74,6 +75,33 @@ public class CarritoListarView extends JInternalFrame {
                 }
             }
         });
+
+        actualizarTextos();
+    }
+
+    public void actualizarTextos() {
+        setTitle(Idioma.get("carrito.listar.titulo"));
+        btnListar.setText(Idioma.get("carrito.listar.btn.listar"));
+
+        // Columnas tabla carritos
+        modeloTablaCarritos.setColumnIdentifiers(new Object[]{
+                Idioma.get("carrito.listar.tbl.codigo"),
+                Idioma.get("carrito.listar.tbl.fecha"),
+                Idioma.get("carrito.listar.tbl.numitems"),
+                Idioma.get("carrito.listar.tbl.canttotal"),
+                Idioma.get("carrito.listar.tbl.usuario")
+        });
+
+        // Columnas tabla detalles
+        modeloDetallesCarrito.setColumnIdentifiers(new Object[]{
+                Idioma.get("carrito.listar.tbl.codigoProd"),
+                Idioma.get("carrito.listar.tbl.nombreProd"),
+                Idioma.get("carrito.listar.tbl.cantidad"),
+                Idioma.get("carrito.listar.tbl.subtotal")
+        });
+
+        tblCarritos.setToolTipText(Idioma.get("carrito.listar.tbl.tooltip"));
+        tblDetallesCarrito.setToolTipText(Idioma.get("carrito.listar.tbldetalle.tooltip"));
     }
 
     /**
@@ -118,10 +146,10 @@ public class CarritoListarView extends JInternalFrame {
             }
             // Fila vacía
             modeloDetallesCarrito.addRow(new Object[]{"", "", "", ""});
-            // Subtotal, IVA y Total
-            modeloDetallesCarrito.addRow(new Object[]{"", "Subtotal", "", String.format("%.2f", carrito.calcularSubtotal())});
-            modeloDetallesCarrito.addRow(new Object[]{"", "IVA", "", String.format("%.2f", carrito.calcularIva())});
-            modeloDetallesCarrito.addRow(new Object[]{"", "Total", "", String.format("%.2f", carrito.calcularTotal())});
+            // Subtotal, IVA y Total (internacionalizados)
+            modeloDetallesCarrito.addRow(new Object[]{"", Idioma.get("carrito.listar.lbl.subtotal"), "", String.format("%.2f", carrito.calcularSubtotal())});
+            modeloDetallesCarrito.addRow(new Object[]{"", Idioma.get("carrito.listar.lbl.iva"), "", String.format("%.2f", carrito.calcularIva())});
+            modeloDetallesCarrito.addRow(new Object[]{"", Idioma.get("carrito.listar.lbl.total"), "", String.format("%.2f", carrito.calcularTotal())});
         }
     }
 

@@ -2,6 +2,7 @@ package ec.edu.ups.poo.view;
 
 import ec.edu.ups.poo.modelo.Rol;
 import ec.edu.ups.poo.modelo.Usuario;
+import ec.edu.ups.poo.util.Idioma;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -16,24 +17,23 @@ public class UsuarioAdminView extends JInternalFrame {
     private JButton btnEliminar;
     private JButton btnRefrescar;
     private JPanel panelPrincipal;
-    private JLabel lblSeleccione;
     private JLabel lblRol;
     private JLabel lblUsuarioSeleccionado;
+    private JLabel lblSeleccione;
 
     public UsuarioAdminView() {
-        super("Gestión de Usuarios", true, true, true, true);
+        super("", true, true, true, true);
         inicializarComponentes();
         configurarLayout();
         configurarEventos();
         this.setSize(700, 500);
         this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        actualizarTextos();
     }
 
     private void inicializarComponentes() {
-        // Panel principal
         panelPrincipal = new JPanel(new BorderLayout());
 
-        // Configurar tabla
         modeloTabla = new DefaultTableModel() {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -41,65 +41,54 @@ public class UsuarioAdminView extends JInternalFrame {
                 return column == 0;
             }
         };
-        modeloTabla.addColumn("Username");
-        modeloTabla.addColumn("Rol");
+        modeloTabla.addColumn(""); // username
+        modeloTabla.addColumn(""); // rol
 
         tblUsuarios = new JTable(modeloTabla);
         tblUsuarios.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblUsuarios.getTableHeader().setReorderingAllowed(false);
 
-        // ComboBox para roles
         cbxRol = new JComboBox<>();
         cbxRol.addItem(Rol.ADMINISTRADOR);
         cbxRol.addItem(Rol.USUARIO);
 
-        // Botones
-        btnActualizar = new JButton("Actualizar");
-        btnEliminar = new JButton("Eliminar Usuario");
-        btnRefrescar = new JButton("Refrescar Lista");
+        btnActualizar = new JButton();
+        btnEliminar = new JButton();
+        btnRefrescar = new JButton();
 
-        // Labels
-        lblRol = new JLabel("Nuevo Rol:");
-        lblUsuarioSeleccionado = new JLabel("Seleccione un usuario de la tabla");
+        lblRol = new JLabel();
+        lblUsuarioSeleccionado = new JLabel();
         lblUsuarioSeleccionado.setFont(new Font("Arial", Font.ITALIC, 12));
         lblUsuarioSeleccionado.setForeground(Color.GRAY);
     }
 
     private void configurarLayout() {
-        // Panel superior con información
         JPanel panelInfo = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panelInfo.add(new JLabel("Gestión de Usuarios del Sistema"));
+        panelInfo.add(new JLabel(Idioma.get("usuario.admin.titulo")));
         panelInfo.setBorder(BorderFactory.createEtchedBorder());
 
-        // Panel central con la tabla
         JScrollPane scrollPane = new JScrollPane(tblUsuarios);
-        scrollPane.setBorder(BorderFactory.createTitledBorder("Lista de Usuarios"));
+        scrollPane.setBorder(BorderFactory.createTitledBorder(Idioma.get("usuario.admin.tbl.titulo")));
 
-        // Panel inferior con controles
         JPanel panelControles = new JPanel(new BorderLayout());
 
-        // Subpanel para información del usuario seleccionado
         JPanel panelSeleccion = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelSeleccion.add(lblUsuarioSeleccionado);
 
-        // Subpanel para cambio de rol
         JPanel panelRol = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelRol.add(lblRol);
         panelRol.add(cbxRol);
         panelRol.add(btnActualizar);
 
-        // Subpanel para botones de acción
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         panelBotones.add(btnRefrescar);
         panelBotones.add(btnEliminar);
 
-        // Organizar panel de controles
         panelControles.add(panelSeleccion, BorderLayout.NORTH);
         panelControles.add(panelRol, BorderLayout.CENTER);
         panelControles.add(panelBotones, BorderLayout.SOUTH);
-        panelControles.setBorder(BorderFactory.createTitledBorder("Acciones"));
+        panelControles.setBorder(BorderFactory.createTitledBorder(Idioma.get("usuario.admin.acciones")));
 
-        // Agregar todo al panel principal
         panelPrincipal.add(panelInfo, BorderLayout.NORTH);
         panelPrincipal.add(scrollPane, BorderLayout.CENTER);
         panelPrincipal.add(panelControles, BorderLayout.SOUTH);
@@ -108,35 +97,44 @@ public class UsuarioAdminView extends JInternalFrame {
     }
 
     private void configurarEventos() {
-        // Listener para selección en la tabla
         tblUsuarios.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && tblUsuarios.getSelectedRow() != -1) {
                 int selectedRow = tblUsuarios.getSelectedRow();
                 String username = (String) modeloTabla.getValueAt(selectedRow, 0);
                 Rol currentRol = (Rol) modeloTabla.getValueAt(selectedRow, 1);
 
-                // Actualizar información mostrada
-                lblUsuarioSeleccionado.setText("Usuario seleccionado: " + username);
+                lblUsuarioSeleccionado.setText(Idioma.get("usuario.admin.lbl.seleccionado") + ": " + username);
                 cbxRol.setSelectedItem(currentRol);
 
-                // Habilitar botones
                 btnActualizar.setEnabled(true);
                 btnEliminar.setEnabled(true);
             } else {
-                // Deshabilitar botones si no hay selección
-                lblUsuarioSeleccionado.setText("Seleccione un usuario de la tabla");
+                lblUsuarioSeleccionado.setText(Idioma.get("usuario.admin.lbl.seleccione"));
                 btnActualizar.setEnabled(false);
                 btnEliminar.setEnabled(false);
             }
         });
 
-        // Inicialmente deshabilitar botones
         btnActualizar.setEnabled(false);
         btnEliminar.setEnabled(false);
     }
 
+    public void actualizarTextos() {
+        setTitle(Idioma.get("usuario.admin.titulo.ventana"));
+        modeloTabla.setColumnIdentifiers(new Object[]{
+                Idioma.get("usuario.admin.tbl.col.username"),
+                Idioma.get("usuario.admin.tbl.col.rol")
+        });
+        btnActualizar.setText(Idioma.get("usuario.admin.btn.actualizar"));
+        btnEliminar.setText(Idioma.get("usuario.admin.btn.eliminar"));
+        btnRefrescar.setText(Idioma.get("usuario.admin.btn.refrescar"));
+        lblRol.setText(Idioma.get("usuario.admin.lbl.rol"));
+        lblUsuarioSeleccionado.setText(Idioma.get("usuario.admin.lbl.seleccione"));
+        tblUsuarios.setToolTipText(Idioma.get("usuario.admin.tbl.tooltip"));
+    }
+
     public void cargarUsuarios(List<Usuario> usuarios) {
-        modeloTabla.setRowCount(0); // Limpiar tabla
+        modeloTabla.setRowCount(0);
 
         for (Usuario usuario : usuarios) {
             Object[] fila = {
@@ -146,19 +144,17 @@ public class UsuarioAdminView extends JInternalFrame {
             modeloTabla.addRow(fila);
         }
 
-        // Limpiar selección
         tblUsuarios.clearSelection();
-        lblUsuarioSeleccionado.setText("Usuarios cargados: " + usuarios.size());
+        lblUsuarioSeleccionado.setText(Idioma.get("usuario.admin.lbl.cargados") + ": " + usuarios.size());
     }
 
     public void limpiarSeleccion() {
         tblUsuarios.clearSelection();
-        lblUsuarioSeleccionado.setText("Seleccione un usuario de la tabla");
+        lblUsuarioSeleccionado.setText(Idioma.get("usuario.admin.lbl.seleccione"));
         btnActualizar.setEnabled(false);
         btnEliminar.setEnabled(false);
     }
 
-    // Getters para el controlador
     public JTable getTblUsuarios() {
         return tblUsuarios;
     }
@@ -183,19 +179,19 @@ public class UsuarioAdminView extends JInternalFrame {
         return btnRefrescar;
     }
 
-    public void mostrarMensaje(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje, "Información", JOptionPane.INFORMATION_MESSAGE);
+    public void mostrarMensaje(String mensajeKey) {
+        JOptionPane.showMessageDialog(this, Idioma.get(mensajeKey), Idioma.get("usuario.admin.msj.info"), JOptionPane.INFORMATION_MESSAGE);
     }
 
-    public void mostrarError(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+    public void mostrarError(String mensajeKey) {
+        JOptionPane.showMessageDialog(this, Idioma.get(mensajeKey), Idioma.get("usuario.admin.msj.error"), JOptionPane.ERROR_MESSAGE);
     }
 
-    public boolean confirmarAccion(String mensaje) {
+    public boolean confirmarAccion(String mensajeKey) {
         int opcion = JOptionPane.showConfirmDialog(
                 this,
-                mensaje,
-                "Confirmar Acción",
+                Idioma.get(mensajeKey),
+                Idioma.get("usuario.admin.msj.confirmar"),
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE
         );

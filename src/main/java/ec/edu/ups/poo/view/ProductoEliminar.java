@@ -1,6 +1,7 @@
 package ec.edu.ups.poo.view;
 
 import ec.edu.ups.poo.modelo.Producto;
+import ec.edu.ups.poo.util.Idioma;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -17,18 +18,16 @@ public class ProductoEliminar extends JInternalFrame {
 
     public ProductoEliminar() {
         setContentPane(panelEliminarProducto);
-        setTitle("ELIMINAR PRODUCTOS");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(600, 500);
         setResizable(true);
         setClosable(true);
         setIconifiable(true);
         setMaximizable(true);
-        //setVisible(true);
+        setSize(600, 500);
 
         // Inicializar el modelo de la tabla
         modelo = new DefaultTableModel();
-        Object[] columnas = {"CÓDIGO", "NOMBRE", "PRECIO"};
+        Object[] columnas = {"", "", ""}; // Internacionalizadas abajo
         modelo.setColumnIdentifiers(columnas);
         tblEliminarProducto.setModel(modelo);
 
@@ -42,6 +41,23 @@ public class ProductoEliminar extends JInternalFrame {
                 }
             }
         });
+
+        actualizarTextos();
+    }
+
+    public void actualizarTextos() {
+        setTitle(Idioma.get("producto.eliminar.titulo"));
+        lblNombre.setText(Idioma.get("producto.eliminar.lbl.nombre"));
+        LISTARButton.setText(Idioma.get("producto.eliminar.btn.listar"));
+        ELIMINARButton.setText(Idioma.get("producto.eliminar.btn.eliminar"));
+
+        modelo.setColumnIdentifiers(new Object[]{
+                Idioma.get("producto.eliminar.tbl.codigo"),
+                Idioma.get("producto.eliminar.tbl.nombre"),
+                Idioma.get("producto.eliminar.tbl.precio")
+        });
+
+        tblEliminarProducto.setToolTipText(Idioma.get("producto.eliminar.tbl.tooltip"));
     }
 
     public JPanel getPanelEliminarProducto() {
@@ -81,7 +97,7 @@ public class ProductoEliminar extends JInternalFrame {
         tblEliminarProducto.clearSelection();
     }
 
-    public void mostrarMensaje(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje);
+    public void mostrarMensaje(String mensajeKey) {
+        JOptionPane.showMessageDialog(this, Idioma.get(mensajeKey), Idioma.get("producto.eliminar.msj.info"), JOptionPane.INFORMATION_MESSAGE);
     }
 }

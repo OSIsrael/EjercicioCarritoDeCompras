@@ -2,6 +2,7 @@ package ec.edu.ups.poo.view;
 
 import ec.edu.ups.poo.modelo.Carrito;
 import ec.edu.ups.poo.modelo.ItemCarrito;
+import ec.edu.ups.poo.util.Idioma;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -24,29 +25,30 @@ public class CarritoBuscarView extends JInternalFrame {
     private List<Carrito> ultimoListadoCarritos; // Para referencia rápida en selección
 
     public CarritoBuscarView() {
-        super("Buscar Carrito", true, true, true, true);
+        super("", true, true, true, true); // Título será internacionalizado
 
         // Inicialización de componentes
         panelPrincipal = new JPanel(new BorderLayout());
 
         JPanel panelBusqueda = new JPanel();
-        panelBusqueda.add(new JLabel("Código de Carrito:"));
+        lblCodigo = new JLabel(); // Internacionalizado después
+        panelBusqueda.add(lblCodigo);
         txtBuscarCarrito = new JTextField(8);
-        btnBuscarCarrito = new JButton("Buscar");
-        btnListar = new JButton("Listar");
+        btnBuscarCarrito = new JButton();
+        btnListar = new JButton();
         panelBusqueda.add(txtBuscarCarrito);
         panelBusqueda.add(btnBuscarCarrito);
         panelBusqueda.add(btnListar);
 
         modeloTablaCarritos = new DefaultTableModel(
-                new Object[]{"Código", "Usuario", "Fecha", "Total"}, 0
+                new Object[]{"", "", "", ""}, 0 // Columnas internacionalizadas después
         ) {
             public boolean isCellEditable(int r, int c) { return false; }
         };
         tblBuscarCarrito = new JTable(modeloTablaCarritos);
 
         modeloTablaDetalle = new DefaultTableModel(
-                new Object[]{"Código Prod.", "Nombre", "Cantidad", "Subtotal"}, 0
+                new Object[]{"", "", "", ""}, 0 // Columnas internacionalizadas después
         ) {
             public boolean isCellEditable(int r, int c) { return false; }
         };
@@ -71,6 +73,35 @@ public class CarritoBuscarView extends JInternalFrame {
                 }
             }
         });
+
+        actualizarTextos();
+    }
+
+    public void actualizarTextos() {
+        setTitle(Idioma.get("carrito.buscar.titulo"));
+
+        lblCodigo.setText(Idioma.get("carrito.buscar.lbl.codigo"));
+        btnBuscarCarrito.setText(Idioma.get("carrito.buscar.btn.buscar"));
+        btnListar.setText(Idioma.get("carrito.buscar.btn.listar"));
+
+        // Columnas tabla carritos
+        modeloTablaCarritos.setColumnIdentifiers(new Object[]{
+                Idioma.get("carrito.buscar.tbl.codigo"),
+                Idioma.get("carrito.buscar.tbl.usuario"),
+                Idioma.get("carrito.buscar.tbl.fecha"),
+                Idioma.get("carrito.buscar.tbl.total")
+        });
+
+        // Columnas tabla detalle
+        modeloTablaDetalle.setColumnIdentifiers(new Object[]{
+                Idioma.get("carrito.buscar.tbl.codigoProd"),
+                Idioma.get("carrito.buscar.tbl.nombreProd"),
+                Idioma.get("carrito.buscar.tbl.cantidadProd"),
+                Idioma.get("carrito.buscar.tbl.subtotalProd")
+        });
+
+        tblBuscarCarrito.setToolTipText(Idioma.get("carrito.buscar.tbl.tooltip"));
+        tblDetalleCarrito.setToolTipText(Idioma.get("carrito.buscar.tblDetalle.tooltip"));
     }
 
     // Muestra todos los carritos en la tabla principal
@@ -106,7 +137,7 @@ public class CarritoBuscarView extends JInternalFrame {
             mostrarDetalleCarrito(carrito);
             ultimoListadoCarritos = List.of(carrito); // Para permitir click en tabla única
         } else {
-            mostrarMensaje("Carrito no encontrado o no tiene permisos.");
+            mostrarMensaje(Idioma.get("carrito.buscar.msj.noencontrado"));
             ultimoListadoCarritos = null;
         }
     }
@@ -134,7 +165,7 @@ public class CarritoBuscarView extends JInternalFrame {
     }
 
     public void mostrarMensaje(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje);
+        JOptionPane.showMessageDialog(this, mensaje, Idioma.get("carrito.buscar.msj.info"), JOptionPane.INFORMATION_MESSAGE);
     }
 
     // Getters para el controlador

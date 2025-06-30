@@ -1,6 +1,7 @@
 package ec.edu.ups.poo.view;
 
 import ec.edu.ups.poo.modelo.Usuario;
+import ec.edu.ups.poo.util.Idioma;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -19,21 +20,23 @@ public class UsuarioBuscarView extends JInternalFrame {
     private List<Usuario> ultimoListadoUsuarios;
 
     public UsuarioBuscarView()  {
-        super("Buscar Usuarios", true, true, true, true);
+        super("", true, true, true, true);
 
         // Inicialización manual de componentes
         panelPrincipal = new JPanel(new BorderLayout());
         JPanel panelSuperior = new JPanel();
-        panelSuperior.add(new JLabel("Usuario:"));
+
+        lblUsuario = new JLabel();
+        panelSuperior.add(lblUsuario);
         txtUsername = new JTextField(12);
-        btnBuscar = new JButton("Buscar");
-        btnListar = new JButton("Listar");
+        btnBuscar = new JButton();
+        btnListar = new JButton();
         panelSuperior.add(txtUsername);
         panelSuperior.add(btnBuscar);
         panelSuperior.add(btnListar);
 
         modeloTablaUsuarios = new DefaultTableModel(
-                new Object[]{"Username", "Rol"}, 0
+                new Object[]{"", ""}, 0 // Internacionalizadas abajo
         ) {
             public boolean isCellEditable(int row, int col) { return false; }
         };
@@ -44,6 +47,21 @@ public class UsuarioBuscarView extends JInternalFrame {
 
         setContentPane(panelPrincipal);
         setSize(700, 500);
+
+        actualizarTextos();
+    }
+
+    public void actualizarTextos() {
+        setTitle(Idioma.get("usuario.buscar.titulo"));
+        lblUsuario.setText(Idioma.get("usuario.buscar.lbl.usuario"));
+        btnBuscar.setText(Idioma.get("usuario.buscar.btn.buscar"));
+        btnListar.setText(Idioma.get("usuario.buscar.btn.listar"));
+
+        modeloTablaUsuarios.setColumnIdentifiers(new Object[]{
+                Idioma.get("usuario.buscar.tbl.username"),
+                Idioma.get("usuario.buscar.tbl.rol")
+        });
+        tblUsuarios.setToolTipText(Idioma.get("usuario.buscar.tbl.tooltip"));
     }
 
     // Mostrar todos los usuarios
@@ -63,7 +81,7 @@ public class UsuarioBuscarView extends JInternalFrame {
         if (usuario != null) {
             modeloTablaUsuarios.addRow(new Object[]{usuario.getUsername(), usuario.getRol()});
         } else {
-            mostrarMensaje("Usuario no encontrado.");
+            mostrarMensaje(Idioma.get("usuario.buscar.msj.noencontrado"));
         }
     }
 
@@ -74,7 +92,7 @@ public class UsuarioBuscarView extends JInternalFrame {
     }
 
     public void mostrarMensaje(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje);
+        JOptionPane.showMessageDialog(this, mensaje, Idioma.get("usuario.buscar.msj.info"), JOptionPane.INFORMATION_MESSAGE);
     }
 
     // Getters

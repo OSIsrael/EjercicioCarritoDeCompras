@@ -1,6 +1,7 @@
 package ec.edu.ups.poo.view;
 
 import ec.edu.ups.poo.modelo.Producto;
+import ec.edu.ups.poo.util.Idioma;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,12 +21,8 @@ public class ProductoAnadirView extends JInternalFrame {
 
     public ProductoAnadirView() {
         setContentPane(panelPrincipal);
-        setTitle("Datos del Producto");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(500, 500);
-        //setResizable(false);
-        //setVisible(true);
-        //pack();
         setClosable(true);
         setIconifiable(true);
         setResizable(true);
@@ -35,7 +32,21 @@ public class ProductoAnadirView extends JInternalFrame {
                 limpiarCampos();
             }
         });
+        actualizarTextos();
     }
+
+    public void actualizarTextos() {
+        setTitle(Idioma.get("producto.anadir.titulo"));
+        lblAgregar.setText(Idioma.get("producto.anadir.lbl.agregar"));
+        lblCodigo.setText(Idioma.get("producto.anadir.lbl.codigo"));
+        lblNombre.setText(Idioma.get("producto.anadir.lbl.nombre"));
+        lblPrecio.setText(Idioma.get("producto.anadir.lbl.precio"));
+        btnGuardar.setText(Idioma.get("producto.anadir.btn.guardar"));
+        btnEliminar.setText(Idioma.get("producto.anadir.btn.limpiar"));
+        btnGuardar.setToolTipText(Idioma.get("producto.anadir.tooltip.guardar"));
+        btnEliminar.setToolTipText(Idioma.get("producto.anadir.tooltip.limpiar"));
+    }
+
     public void limpiarCampos() {
         txtCodigo.setText("");
         txtNombre.setText("");
@@ -47,7 +58,6 @@ public class ProductoAnadirView extends JInternalFrame {
             System.out.println(producto);
         }
     }
-
 
     public JPanel getPanelPrincipal() {
         return panelPrincipal;
@@ -128,6 +138,7 @@ public class ProductoAnadirView extends JInternalFrame {
     public void setBtnEliminar(JButton btnEliminar) {
         this.btnEliminar = btnEliminar;
     }
+
     public void mostrarMensaje(String mensaje) {
         JOptionPane.showMessageDialog(this, mensaje);
     }

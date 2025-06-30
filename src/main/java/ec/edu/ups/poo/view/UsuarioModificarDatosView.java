@@ -2,6 +2,7 @@ package ec.edu.ups.poo.view;
 
 import javax.swing.*;
 import ec.edu.ups.poo.modelo.Usuario;
+import ec.edu.ups.poo.util.Idioma;
 
 public class UsuarioModificarDatosView extends JInternalFrame {
     private JPanel panelPrincipal;
@@ -13,9 +14,18 @@ public class UsuarioModificarDatosView extends JInternalFrame {
     private JLabel lblContrasena;
 
     public UsuarioModificarDatosView() {
-        super("Modificar Datos", true, true, true, true);
+        super("", true, true, true, true);
         setContentPane(panelPrincipal);
         this.setSize(700, 500);
+        actualizarTextos();
+    }
+
+    public void actualizarTextos() {
+        setTitle(Idioma.get("usuario.modificar.titulo"));
+        lblUsuario.setText(Idioma.get("usuario.modificar.lbl.usuario"));
+        lblContrasena.setText(Idioma.get("usuario.modificar.lbl.contrasena"));
+        btnModificar.setText(Idioma.get("usuario.modificar.btn.modificar"));
+        btnBorrar.setText(Idioma.get("usuario.modificar.btn.borrar"));
     }
 
     public void mostrarDatosUsuario(Usuario usuario) {
@@ -68,5 +78,9 @@ public class UsuarioModificarDatosView extends JInternalFrame {
 
     public void setTxtContra(JPasswordField txtContra) {
         this.txtContra = txtContra;
+    }
+
+    public void mostrarMensaje(String mensajeKey) {
+        JOptionPane.showMessageDialog(this, Idioma.get(mensajeKey), Idioma.get("usuario.modificar.msj.info"), JOptionPane.INFORMATION_MESSAGE);
     }
 }

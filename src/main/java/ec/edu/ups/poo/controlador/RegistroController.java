@@ -4,7 +4,7 @@ import ec.edu.ups.poo.dao.UsuarioDAO;
 import ec.edu.ups.poo.modelo.Rol;
 import ec.edu.ups.poo.modelo.Usuario;
 import ec.edu.ups.poo.view.RegistrarUsuario;
-
+import ec.edu.ups.poo.modelo.Genero;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -46,15 +46,14 @@ public class RegistroController {
             return;
         }
 
-
         Usuario usuarioExistente = usuarioDAO.buscarPorUsername(username);
         if (usuarioExistente != null) {
             registrarUsuario.mostrarMensaje("El usuario ya existe. Elija otro nombre de usuario");
             return;
         }
 
-
-        Usuario nuevoUsuario = new Usuario(username, password, Rol.USUARIO);
+        // Usa el constructor largo
+        Usuario nuevoUsuario = new Usuario(username, password, Rol.USUARIO, Genero.OTROS, "", "", "", 0);
         usuarioDAO.crear(nuevoUsuario);
 
         registrarUsuario.mostrarMensaje("Usuario registrado exitosamente");

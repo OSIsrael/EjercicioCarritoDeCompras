@@ -16,7 +16,7 @@ import ec.edu.ups.poo.modelo.Usuario;
 import ec.edu.ups.poo.dao.PreguntaDAO;
 import ec.edu.ups.poo.dao.impl.PreguntaDAOMemoria;
 import ec.edu.ups.poo.util.Idioma;
-
+import ec.edu.ups.poo.modelo.Genero;
 import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -53,11 +53,12 @@ public class Main {
 
 
         // Cargar datos iniciales si no existen
+        // Cargar datos iniciales si no existen
         if (usuarioDAO.buscarPorUsername("admin") == null) {
-            usuarioDAO.crear(new Usuario("admin", "admin", Rol.ADMINISTRADOR));
+            usuarioDAO.crear(new Usuario("admin", "admin", Rol.ADMINISTRADOR, Genero.MASCULINO, "Admin", "Principal", "000000000", 30));
         }
         if (usuarioDAO.buscarPorUsername("user") == null) {
-            usuarioDAO.crear(new Usuario("user", "user", Rol.USUARIO));
+            usuarioDAO.crear(new Usuario("user", "user", Rol.USUARIO, Genero.OTROS, "User", "Demo", "111111111", 18));
         }
         productoDAO.crear(new Producto(1, "Laptop Gamer", 1200.00));
         productoDAO.crear(new Producto(2, "Teclado Mecánico", 85.50));

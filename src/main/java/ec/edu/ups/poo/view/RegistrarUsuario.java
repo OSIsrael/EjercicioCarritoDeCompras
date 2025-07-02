@@ -2,6 +2,7 @@ package ec.edu.ups.poo.view;
 
 import javax.swing.*;
 
+import ec.edu.ups.poo.modelo.Genero;
 import ec.edu.ups.poo.modelo.Pregunta;
 
 public class RegistrarUsuario extends JFrame {
@@ -14,17 +15,60 @@ public class RegistrarUsuario extends JFrame {
     private JComboBox<Pregunta> cbxPregunta2;
     private JTextField txtRespuesta1;
     private JTextField txtRespuesta2;
-
+    private JTextField txtNombre;
+    private JTextField txtApellido;
+    private JTextField txtTelefono;
+    private JTextField txtEdad;
+    private JComboBox<Genero> cbxGenero;
 
 
     public RegistrarUsuario() {
         setContentPane(panel1);
         setTitle("Registrar Usuario");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(500, 400);
+        setSize(900, 900);
         setLocationRelativeTo(null);
+        if (cbxGenero == null) {
+            cbxGenero = new JComboBox<>();
+        }
+        cbxGenero.removeAllItems();
+        cbxGenero.addItem(Genero.MASCULINO);
+        cbxGenero.addItem(Genero.FEMININO);
+        cbxGenero.addItem(Genero.OTROS);
         btnRegistrarse.setIcon(new ImageIcon(getClass().getResource("/icons/entrar.png")));
 
+    }
+
+    public JTextField getTxtNombre() {
+        return txtNombre;
+    }
+
+    public void setTxtNombre(JTextField txtNombre) {
+        this.txtNombre = txtNombre;
+    }
+
+    public JTextField getTxtApellido() {
+        return txtApellido;
+    }
+
+    public void setTxtApellido(JTextField txtApellido) {
+        this.txtApellido = txtApellido;
+    }
+
+    public JTextField getTxtTelefono() {
+        return txtTelefono;
+    }
+
+    public void setTxtTelefono(JTextField txtTelefono) {
+        this.txtTelefono = txtTelefono;
+    }
+
+    public JTextField getTxtEdad() {
+        return txtEdad;
+    }
+
+    public void setTxtEdad(JTextField txtEdad) {
+        this.txtEdad = txtEdad;
     }
 
     public JPanel getPanel1() {
@@ -99,6 +143,14 @@ public class RegistrarUsuario extends JFrame {
         this.txtRespuesta2 = txtRespuesta2;
     }
 
+    public JComboBox getCbxGenero() {
+        return cbxGenero;
+    }
+
+    public void setCbxGenero(JComboBox cbxGenero) {
+        this.cbxGenero = cbxGenero;
+    }
+
     public void mostrarMensaje(String mensaje) {
         JOptionPane.showMessageDialog(this, mensaje);
     }
@@ -106,11 +158,17 @@ public class RegistrarUsuario extends JFrame {
     public void limpiarCampos() {
         txtUsuarioRe.setText("");
         txtContraRe.setText("");
+        txtNombre.setText("");
+        txtApellido.setText("");
+        txtTelefono.setText("");
+        txtEdad.setText("");
         txtRespuesta1.setText("");
         txtRespuesta2.setText("");
-        if (cbxPregunta1.getItemCount() > 0) cbxPregunta1.setSelectedIndex(0);
-        if (cbxPregunta2.getItemCount() > 0) cbxPregunta2.setSelectedIndex(0);
+        if (cbxPregunta1 != null && cbxPregunta1.getItemCount() > 0) cbxPregunta1.setSelectedIndex(0);
+        if (cbxPregunta2 != null && cbxPregunta2.getItemCount() > 0) cbxPregunta2.setSelectedIndex(0);
+        if (cbxGenero != null && cbxGenero.getItemCount() > 0) cbxGenero.setSelectedIndex(0);
     }
+
 
 
 }

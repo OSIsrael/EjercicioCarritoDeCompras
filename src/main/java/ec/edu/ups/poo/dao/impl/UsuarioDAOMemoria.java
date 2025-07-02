@@ -1,6 +1,7 @@
 package ec.edu.ups.poo.dao.impl;
 
 import ec.edu.ups.poo.dao.UsuarioDAO;
+import ec.edu.ups.poo.modelo.Genero;
 import ec.edu.ups.poo.modelo.Rol;
 import ec.edu.ups.poo.modelo.Usuario;
 
@@ -19,21 +20,21 @@ public class UsuarioDAOMemoria implements UsuarioDAO {
 
     private void inicializarUsuariosPorDefecto() {
         // Crear usuario administrador por defecto
-        Usuario admin = new Usuario("admin", "12345", Rol.ADMINISTRADOR);
+        Usuario admin = new Usuario("admin", "12345", Rol.ADMINISTRADOR, Genero.MASCULINO, "Admin", "Principal", "000000000", 30);
         usuarios.add(admin);
 
         // Crear usuario normal por defecto
-        Usuario usuarioNormal = new Usuario("usuario", "12345", Rol.USUARIO);
+        Usuario usuarioNormal = new Usuario("usuario", "12345", Rol.USUARIO,Genero.FEMININO, "Usuario", "Principal", "099324321", 20);
         usuarios.add(usuarioNormal);
 
         // Crear algunos usuarios adicionales para pruebas
-        Usuario usuario2 = new Usuario("juan", "1234", Rol.USUARIO);
+        Usuario usuario2 = new Usuario("juan", "1234", Rol.USUARIO,Genero.MASCULINO, "Juan", "Perez", "03232432434", 18);
         usuarios.add(usuario2);
 
-        Usuario usuario3 = new Usuario("maria", "1234", Rol.USUARIO);
+        Usuario usuario3 = new Usuario("maria", "1234", Rol.USUARIO,Genero.FEMININO, "Maria", "Perez", "03232432434", 16);
         usuarios.add(usuario3);
 
-        Usuario admin2 = new Usuario("supervisor", "admin", Rol.ADMINISTRADOR);
+        Usuario admin2 = new Usuario("supervisor", "admin", Rol.ADMINISTRADOR,Genero.MASCULINO, "Supervisor", "Principal", "03232432434", 20);
         usuarios.add(admin2);
 
         System.out.println("Usuarios inicializados: " + usuarios.size());

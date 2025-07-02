@@ -7,6 +7,7 @@ import ec.edu.ups.poo.modelo.Rol;
 import ec.edu.ups.poo.modelo.Usuario;
 import ec.edu.ups.poo.util.Idioma;
 import ec.edu.ups.poo.view.*;
+import ec.edu.ups.poo.modelo.Genero;
 
 import javax.swing.*;
 import java.util.*;
@@ -163,12 +164,32 @@ public class UsuarioController {
     private void registrarUsuario() {
         String username = registrarUsuarioView.getTxtUsuarioRe().getText().trim();
         String password = new String(registrarUsuarioView.getTxtContraRe().getPassword());
+        String nombre = registrarUsuarioView.getTxtNombre().getText().trim();
+        String apellido = registrarUsuarioView.getTxtApellido().getText().trim();
+        String telefono = registrarUsuarioView.getTxtTelefono().getText().trim();
+        String edadStr = registrarUsuarioView.getTxtEdad().getText().trim();
+        Genero genero = null;
+        Object itemGenero = registrarUsuarioView.getCbxGenero().getSelectedItem();
+        if (itemGenero instanceof Genero) {
+            genero = (Genero) itemGenero;
+        } else if (itemGenero != null) {
+            try {
+                genero = Genero.valueOf(itemGenero.toString().toUpperCase());
+            } catch (Exception ignore) {
+                genero = Genero.OTROS;
+            }
+        } else {
+            genero = Genero.OTROS;
+        }
+
         Pregunta pregunta1 = (Pregunta) registrarUsuarioView.getCbxPregunta1().getSelectedItem();
         Pregunta pregunta2 = (Pregunta) registrarUsuarioView.getCbxPregunta2().getSelectedItem();
         String respuesta1 = registrarUsuarioView.getTxtRespuesta1().getText().trim();
         String respuesta2 = registrarUsuarioView.getTxtRespuesta2().getText().trim();
 
-        if (username.isEmpty() || password.isEmpty() || pregunta1 == null || pregunta2 == null ||
+        // Validaciones
+        if (username.isEmpty() || password.isEmpty() || nombre.isEmpty() || apellido.isEmpty() ||
+                telefono.isEmpty() || edadStr.isEmpty() || pregunta1 == null || pregunta2 == null ||
                 respuesta1.isEmpty() || respuesta2.isEmpty() || pregunta1.getId() == pregunta2.getId()) {
             registrarUsuarioView.mostrarMensaje("Debe llenar todos los campos y seleccionar preguntas distintas.");
             return;
@@ -177,17 +198,27 @@ public class UsuarioController {
             registrarUsuarioView.mostrarMensaje("El usuario ya existe.");
             return;
         }
-        Usuario nuevo = new Usuario(username, password, Rol.USUARIO);
+        int edad;
+        try {
+            edad = Integer.parseInt(edadStr);
+            if (edad < 0) throw new NumberFormatException();
+        } catch (NumberFormatException ex) {
+            registrarUsuarioView.mostrarMensaje("Edad inválida.");
+            return;
+        }
+
+        Usuario nuevo = new Usuario(username, password, Rol.USUARIO, genero, nombre, apellido, telefono, edad);
+
         Map<Integer, String> preguntasSeguridad = new HashMap<>();
         preguntasSeguridad.put(pregunta1.getId(), respuesta1);
         preguntasSeguridad.put(pregunta2.getId(), respuesta2);
         nuevo.setPreguntasSeguridad(preguntasSeguridad);
+
         usuarioDAO.crear(nuevo);
         registrarUsuarioView.mostrarMensaje("Usuario registrado exitosamente.");
         registrarUsuarioView.limpiarCampos();
         registrarUsuarioView.dispose();
     }
-
 
     public void listarUsuarios() {
         List<Usuario> todosLosUsuarios = usuarioDAO.listarTodos();
@@ -314,7 +345,7 @@ public class UsuarioController {
             usuarioCrearView.mostrarMensaje(Idioma.get("usuario.controller.extiste"));
             return;
         }
-        Usuario nuevo = new Usuario(username, password, Rol.USUARIO);
+        Usuario nuevo = new Usuario(username, password, Rol.USUARIO, Genero.OTROS, "", "", "", 0);
         usuarioDAO.crear(nuevo);
         usuarioCrearView.mostrarMensaje(Idioma.get("usuario.controller.msj.creado"));
         usuarioCrearView.getTxtUsuario().setText("");
@@ -326,6 +357,18 @@ public class UsuarioController {
     private void modificarDatosUsuario() {
         String nuevoUsername = usuarioModificarDatosView.getTxtUsuario().getText().trim();
         String nuevaContra = new String(usuarioModificarDatosView.getTxtContra().getPassword());
+        String nuevoNombre = usuarioModificarDatosView.getTxtNombre().getText().trim();
+        String nuevoApellido = usuarioModificarDatosView.getTxtApellido().getText().trim();
+        String nuevoTelefono = usuarioModificarDatosView.getTxtTelefono().getText().trim();
+        String edadTexto = usuarioModificarDatosView.getTxtEdad().getText().trim();
+        int nuevaEdad = 0;
+        try {
+            nuevaEdad = Integer.parseInt(edadTexto);
+        } catch (Exception ex) {
+            mostrarMensaje("La edad debe ser un número válido");
+            return;
+        }
+        Genero nuevoGenero = (Genero) usuarioModificarDatosView.getCbxGenero().getSelectedItem();
 
         if (nuevoUsername.isEmpty() || nuevaContra.isEmpty()) {
             mostrarMensaje(Idioma.get("usuario.controller.msj.nousuariopass"));
@@ -335,8 +378,15 @@ public class UsuarioController {
             mostrarMensaje(Idioma.get("usuario.controller.msj.usoyaenuso"));
             return;
         }
+
         usuarioAutenticado.setUsername(nuevoUsername);
         usuarioAutenticado.setPassword(nuevaContra);
+        usuarioAutenticado.setNombre(nuevoNombre);
+        usuarioAutenticado.setApellido(nuevoApellido);
+        usuarioAutenticado.setTelefono(nuevoTelefono);
+        usuarioAutenticado.setEdad(nuevaEdad);
+        usuarioAutenticado.setGenero(nuevoGenero);
+
         usuarioDAO.actualizar(usuarioAutenticado);
 
         mostrarMensaje(Idioma.get("usuario.controller.msj.actualizadodatos"));
@@ -351,4 +401,5 @@ public class UsuarioController {
             JOptionPane.showMessageDialog(usuarioModificarDatosView, mensaje);
         }
     }
+
 }

@@ -4,6 +4,7 @@ import ec.edu.ups.poo.dao.ProductoDAO;
 import ec.edu.ups.poo.modelo.Carrito;
 import ec.edu.ups.poo.modelo.ItemCarrito;
 import ec.edu.ups.poo.modelo.Producto;
+import ec.edu.ups.poo.util.Idioma;
 import ec.edu.ups.poo.view.*;
 
 import javax.swing.*;
@@ -66,7 +67,7 @@ public class ProductoController {
             int codigo = Integer.parseInt(carritoAnadirView.getTxtCodigo().getText());
             Producto producto = productoDAO.buscarPorCodigo(codigo);
             if (producto == null) {
-                carritoAnadirView.mostrarMensaje("Producto no encontrado");
+                carritoAnadirView.mostrarMensaje(Idioma.get("producto.controller.msj.encontrado"));
                 carritoAnadirView.getTxtNombre().setText("");
                 carritoAnadirView.getTxtPrecio().setText("");
             } else {
@@ -76,7 +77,7 @@ public class ProductoController {
     }
 
     private void actualizarTablaCarrito() {
-        String[] columnas = {"Código", "Nombre", "Precio Unitario", "Cantidad", "Subtotal"};
+        String[] columnas = {Idioma.get("carrito.tbl.codigo"), Idioma.get("carrito.tbl.nombre"), Idioma.get("carrito.tbl.precio"), Idioma.get("carrito.tbl.cantidad"), Idioma.get("carrito.tbl.subtotal")};
         List<ItemCarrito> items = carrito.getItems();
         Object[][] datos = new Object[items.size()][5];
 
@@ -110,7 +111,7 @@ public class ProductoController {
         double precio = Double.parseDouble(productoAnadirView.getTxtPrecio().getText());
 
         productoDAO.crear(new Producto(codigo, nombre, precio));
-        productoAnadirView.mostrarMensaje("Producto guardado correctamente");
+        productoAnadirView.mostrarMensaje(Idioma.get("producto.controller.msj.guardado"));
         productoAnadirView.limpiarCampos();
         productoAnadirView.mostrarProductos(productoDAO.listarTodos());
     }
@@ -140,17 +141,17 @@ public class ProductoController {
                 if (producto != null) {
                     producto.setNombre(nuevoNombre);
                     productoDAO.actualizar(producto);
-                    productoEditarView.mostrarMensaje("Producto actualizado correctamente");
+                    productoEditarView.mostrarMensaje(Idioma.get("producto.controller.msj.actualizado"));
                     productoEditarView.limpiarCampos();
                     listarProductosParaEditar();
                 } else {
-                    productoEditarView.mostrarMensaje("Producto no encontrado");
+                    productoEditarView.mostrarMensaje(Idioma.get("producto.controller.msj.encontrado"));
                 }
             } else {
-                productoEditarView.mostrarMensaje("Ingrese un nombre válido");
+                productoEditarView.mostrarMensaje(Idioma.get("producto.controller.msj.valido"));
             }
         } else {
-            productoEditarView.mostrarMensaje("Seleccione un producto de la tabla");
+            productoEditarView.mostrarMensaje(Idioma.get("producto.controller.msj.selectable"));
         }
     }
 
@@ -165,15 +166,15 @@ public class ProductoController {
         int filaSeleccionada = productoEliminarView.getTblEliminarProducto().getSelectedRow();
 
         if (filaSeleccionada < 0) {
-            productoEliminarView.mostrarMensaje("Por favor, seleccione un producto de la tabla para eliminar.");
+            productoEliminarView.mostrarMensaje(Idioma.get("producto.controller.msj.please"));
             return;
         }
 
         // Pedir confirmación al usuario
         int confirmacion = JOptionPane.showConfirmDialog(
                 productoEliminarView,
-                "¿Está seguro de que desea eliminar este producto?",
-                "Confirmar eliminación",
+                Idioma.get("producto.controller.msj.seguro"),
+                Idioma.get("producto.controller.msj.confirmar"),
                 JOptionPane.YES_NO_OPTION
         );
 
@@ -185,7 +186,7 @@ public class ProductoController {
             productoDAO.eliminar(codigo);
 
             // Mostrar mensaje de éxito
-            productoEliminarView.mostrarMensaje("Producto eliminado correctamente.");
+            productoEliminarView.mostrarMensaje(Idioma.get("producto.controller.msj.eliminado"));
 
             // Refrescar la lista de productos en la tabla
             listarProductosParaEliminar();

@@ -17,9 +17,13 @@ public class UsuarioAdminView extends JInternalFrame {
     private JButton btnEliminar;
     private JButton btnRefrescar;
     private JPanel panelPrincipal;
+    private JTable table1;
+    private JComboBox comboBox1;
+    private JButton actualizarButton;
+    private JButton refrescarListaButton;
+    private JButton eliminarUsuarioButton;
     private JLabel lblRol;
     private JLabel lblUsuarioSeleccionado;
-    private JLabel lblSeleccione;
 
     public UsuarioAdminView() {
         super("", true, true, true, true);

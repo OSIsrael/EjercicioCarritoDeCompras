@@ -1,5 +1,6 @@
 package ec.edu.ups.poo.controlador;
 
+import com.sun.source.tree.IfTree;
 import ec.edu.ups.poo.dao.CarritoDAO;
 import ec.edu.ups.poo.dao.ProductoDAO;
 import ec.edu.ups.poo.modelo.Carrito;
@@ -7,6 +8,7 @@ import ec.edu.ups.poo.modelo.ItemCarrito;
 import ec.edu.ups.poo.modelo.Producto;
 import ec.edu.ups.poo.modelo.Usuario;
 import ec.edu.ups.poo.modelo.Rol;
+import ec.edu.ups.poo.util.Idioma;
 import ec.edu.ups.poo.view.*;
 
 import javax.swing.*;
@@ -77,20 +79,20 @@ public class CarritoController {
         String codigoStr = carritoAnadirView.getTxtCodigo().getText();
 
         if (!esNumeroEntero(codigoStr)) {
-            carritoAnadirView.mostrarMensaje("El código del producto debe ser un número.");
+            carritoAnadirView.mostrarMensaje(Idioma.get("carrito.controller.msj.numentero"));
             return;
         }
         int codigo = Integer.parseInt(codigoStr);
         Producto producto = productoDAO.buscarPorCodigo(codigo);
 
         if (producto == null) {
-            carritoAnadirView.mostrarMensaje("Producto no encontrado.");
+            carritoAnadirView.mostrarMensaje(Idioma.get("carrito.controller.msj.pnoe"));
             return;
         }
 
         Object cantidadObj = carritoAnadirView.getCbxCanridad().getSelectedItem();
         if (cantidadObj == null || !esNumeroEntero(cantidadObj.toString())) {
-            carritoAnadirView.mostrarMensaje("La cantidad seleccionada no es válida.");
+            carritoAnadirView.mostrarMensaje(Idioma.get("carrito.controller.msj.cantsele"));
             return;
         }
         int cantidad = Integer.parseInt(cantidadObj.toString());
@@ -102,7 +104,7 @@ public class CarritoController {
 
     private void guardarCarrito() {
         if (carritoActual.estaVacio()) {
-            carritoAnadirView.mostrarMensaje("El carrito está vacío.");
+            carritoAnadirView.mostrarMensaje("carrito.controller.msj.carvac");
             return;
         }
         carritoDAO.crear(carritoActual);
@@ -169,14 +171,14 @@ public class CarritoController {
     private void buscarCarritoParaVer() {
         String codigoStr = carritoBuscarView.getTxtBuscarCarrito().getText().trim();
         if (!esNumeroEntero(codigoStr)) {
-            carritoBuscarView.mostrarMensaje("El código debe ser un número válido.");
+            carritoBuscarView.mostrarMensaje(Idioma.get("carrito.controller.msj.numin"));
             carritoBuscarView.mostrarCarrito(null);
             return;
         }
         int codigo = Integer.parseInt(codigoStr);
         Carrito carrito = carritoDAO.buscar(codigo);
         if (carrito == null || !tienePermiso(carrito)) {
-            carritoBuscarView.mostrarMensaje("No tiene permisos para ver este carrito o no existe.");
+            carritoBuscarView.mostrarMensaje(Idioma.get("carrito.controller.msj.noper"));
             carritoBuscarView.mostrarCarrito(null);
             return;
         }
@@ -203,14 +205,14 @@ public class CarritoController {
     private void eliminarCarritoConfirmado() {
         Carrito carrito = carritoEliminarView.getCarritoSeleccionado();
         if (carrito == null) {
-            carritoEliminarView.mostrarMensaje("Seleccione un carrito para eliminar.");
+            carritoEliminarView.mostrarMensaje(Idioma.get("carrito.controller.msj.selecar"));
             return;
         }
-        boolean confirmar = carritoEliminarView.confirmarAccion("¿Está seguro de eliminar este carrito?");
+        boolean confirmar = carritoEliminarView.confirmarAccion(Idioma.get("carrito.controller.msj.estaseguro"));
         if (!confirmar) return;
 
         carritoDAO.eliminar(carrito.getCodigo());
-        carritoEliminarView.mostrarMensaje("Carrito eliminado exitosamente.");
+        carritoEliminarView.mostrarMensaje(Idioma.get("carrito.controller.msj.eliminado"));
         mostrarCarritosUsuarioParaEliminar(); // Refresca la lista
     }
 
@@ -223,14 +225,14 @@ public class CarritoController {
     private void buscarCarritoParaModificar() {
         String codigoStr = carritoModificarView.getTxtCodigo().getText().trim();
         if (!esNumeroEntero(codigoStr)) {
-            carritoModificarView.mostrarError("El código debe ser un número válido.");
+            carritoModificarView.mostrarError(Idioma.get("carrito.controller.msj.numin"));
             carritoModificarView.cargarCarrito(null);
             return;
         }
         int codigo = Integer.parseInt(codigoStr);
         Carrito carrito = carritoDAO.buscar(codigo);
         if (carrito == null || !tienePermiso(carrito)) {
-            carritoModificarView.mostrarError("No tiene permisos para modificar este carrito o no existe.");
+            carritoModificarView.mostrarError(Idioma.get("carrito.controller.msj.noper"));
             carritoModificarView.cargarCarrito(null);
             return;
         }
@@ -240,31 +242,31 @@ public class CarritoController {
     private void guardarCambiosCarrito() {
         int fila = carritoModificarView.getTblModificar().getSelectedRow();
         if (fila == -1) {
-            carritoModificarView.mostrarError("Seleccione un carrito para modificar.");
+            carritoModificarView.mostrarError(Idioma.get("carrito.controller.msj.modificarno"));
             return;
         }
         int codigoCarrito = (int) carritoModificarView.getTblModificar().getValueAt(fila, 0);
         Carrito carrito = carritoDAO.buscar(codigoCarrito);
 
         if (carrito == null) {
-            carritoModificarView.mostrarError("Carrito no encontrado.");
+            carritoModificarView.mostrarError(Idioma.get("carrito.controller.mjs.noencontrado"));
             return;
         }
         int nuevaCantidadTotal;
         try {
             nuevaCantidadTotal = Integer.parseInt(carritoModificarView.getTblModificar().getValueAt(fila, 3).toString());
         } catch (NumberFormatException e) {
-            carritoModificarView.mostrarError("Cantidad inválida.");
+            carritoModificarView.mostrarError(Idioma.get("carrito.controller.msj.invalida"));
             return;
         }
 
         int cantidadOriginal = carrito.obtenerItems().stream().mapToInt(ItemCarrito::getCantidad).sum();
         if (cantidadOriginal == 0) {
-            carritoModificarView.mostrarError("El carrito no tiene productos.");
+            carritoModificarView.mostrarError(Idioma.get("carrito.controller.msj.noproductos"));
             return;
         }
 
-        int confirm = JOptionPane.showConfirmDialog(carritoModificarView, "¿Está seguro de modificar la cantidad total?", "Confirmar", JOptionPane.YES_NO_OPTION);
+        int confirm = JOptionPane.showConfirmDialog(carritoModificarView, Idioma.get("carrito.controller.msj.seguromod"), Idioma.get("carrito.controller.msj.confirmar"), JOptionPane.YES_NO_OPTION);
         if (confirm != JOptionPane.YES_OPTION) {
             return;
         }
@@ -289,7 +291,7 @@ public class CarritoController {
         }
 
         carritoDAO.actualizar(carrito);
-        carritoModificarView.mostrarMensaje("Carrito modificado exitosamente.");
+        carritoModificarView.mostrarMensaje(Idioma.get("carrito.controller.msj.exitoso"));
         mostrarCarritosUsuarioParaModificar(); // refresca la lista
     }
 

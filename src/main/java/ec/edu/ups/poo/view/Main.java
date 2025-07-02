@@ -39,6 +39,18 @@ public class Main {
         preguntaDAO.crear(new Pregunta(1, "¿Nombre de tu primera mascota?"));
         preguntaDAO.crear(new Pregunta(2, "¿Ciudad de nacimiento?"));
         preguntaDAO.crear(new Pregunta(3, "¿Comida favorita?"));
+        preguntaDAO.crear(new Pregunta(4, "¿Animal favorito?"));
+        preguntaDAO.crear(new Pregunta(5, "¿Nombre de tu mejor amigo de la infancia?"));
+        preguntaDAO.crear(new Pregunta(6, "¿Comó se llama tu escuela primaria?"));
+        preguntaDAO.crear(new Pregunta(7,"¿Cuál es el segundo nombre de tu padre?"));
+        preguntaDAO.crear(new Pregunta(8,"¿Cuál fue tu primer empleo?"));
+        preguntaDAO.crear(new Pregunta(9,"¿Cómo se llama tu película favorita?"));
+        preguntaDAO.crear(new Pregunta(10,"¿Cuál es el nombre de tu primer profeso(a)? "));
+
+
+
+
+
 
         // Cargar datos iniciales si no existen
         if (usuarioDAO.buscarPorUsername("admin") == null) {
@@ -217,7 +229,7 @@ public class Main {
 
     private static void configurarEventosCerrarSesion(PrincipalView principalView) {
         principalView.getMenuItemCerrarSesion().addActionListener(e -> {
-            int opcion = JOptionPane.showConfirmDialog(principalView, "¿Está seguro de que desea cerrar sesión?", "Cerrar Sesión", JOptionPane.YES_NO_OPTION);
+            int opcion = JOptionPane.showConfirmDialog(principalView, Idioma.get("menu.cerrar"), Idioma.get("menu.cerrarse"), JOptionPane.YES_NO_OPTION);
             if (opcion == JOptionPane.YES_OPTION) {
                 principalView.dispose();
                 mostrarLogin();

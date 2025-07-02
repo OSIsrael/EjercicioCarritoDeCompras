@@ -178,7 +178,7 @@ public class CarritoBuscarView extends JInternalFrame {
     }
 
     public void mostrarMensaje(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje, Idioma.get("carrito.buscar.msj.info"), JOptionPane.INFORMATION_MESSAGE);
+       JOptionPane.showMessageDialog(this, mensaje, "carrito.buscar.msj.info", JOptionPane.INFORMATION_MESSAGE);
     }
 
     // Getters para el controlador

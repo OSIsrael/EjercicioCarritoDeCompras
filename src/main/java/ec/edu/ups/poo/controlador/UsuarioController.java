@@ -5,6 +5,7 @@ import ec.edu.ups.poo.dao.UsuarioDAO;
 import ec.edu.ups.poo.modelo.Pregunta;
 import ec.edu.ups.poo.modelo.Rol;
 import ec.edu.ups.poo.modelo.Usuario;
+import ec.edu.ups.poo.util.Idioma;
 import ec.edu.ups.poo.view.*;
 
 import javax.swing.*;
@@ -202,7 +203,7 @@ public class UsuarioController {
         int fila = usuarioAdminView.getTblUsuarios().getSelectedRow();
 
         if (fila < 0) {
-            usuarioAdminView.mostrarError("Seleccione un usuario de la tabla.");
+            usuarioAdminView.mostrarError(Idioma.get("usuario.controller.msj.seletable"));
             return;
         }
 
@@ -212,24 +213,24 @@ public class UsuarioController {
 
         // Verificar si hay cambios
         if (rolActual == nuevoRol && nuevoUsername.equals(usuarioDAO.buscarPorUsername(nuevoUsername).getUsername())) {
-            usuarioAdminView.mostrarMensaje("No hay cambios en el usuario seleccionado.");
+            usuarioAdminView.mostrarMensaje(Idioma.get("usuario.controller.msj.sincambios"));
             return;
         }
 
         Usuario usuarioBuscado = usuarioDAO.buscarPorUsername(nuevoUsername);
         if (usuarioBuscado != null && !usuarioAdminView.getTblUsuarios().getValueAt(fila, 0).equals(usuarioBuscado.getUsername())) {
-            usuarioAdminView.mostrarError("El nombre de usuario ya está en uso.");
+            usuarioAdminView.mostrarError(Idioma.get("usuario.controller.msj.uso"));
             return;
         }
 
         Usuario usuario = usuarioDAO.buscarPorUsername((String) usuarioAdminView.getTblUsuarios().getValueAt(fila, 0));
         if (usuario == null) {
-            usuarioAdminView.mostrarError("Usuario no encontrado.");
+            usuarioAdminView.mostrarError(Idioma.get("usuario.controller.msj.encontrado"));
             return;
         }
 
-        String mensaje = "¿Está seguro de modificar el usuario a '" + nuevoUsername +
-                "' y rol " + nuevoRol + "?";
+        String mensaje = Idioma.get("usuario.controller.msj.seguro") + nuevoUsername +
+                Idioma.get("usuario.controller.msj.rol") + nuevoRol + "?";
 
         if (!usuarioAdminView.confirmarAccion(mensaje)) {
             return;
@@ -240,32 +241,32 @@ public class UsuarioController {
         usuarioDAO.actualizar(usuario);
 
         listarUsuarios();
-        usuarioAdminView.mostrarMensaje("Usuario actualizado exitosamente.");
+        usuarioAdminView.mostrarMensaje(Idioma.get("usuario.controller.msj.actualizado"));
     }
 
     private void eliminarUsuario() {
         int fila = usuarioAdminView.getTblUsuarios().getSelectedRow();
 
         if (fila < 0) {
-            usuarioAdminView.mostrarError("Seleccione un usuario para eliminar.");
+            usuarioAdminView.mostrarError(Idioma.get("usuario.controller.msj.seleliminado"));
             return;
         }
 
         String username = (String) usuarioAdminView.getTblUsuarios().getValueAt(fila, 0);
 
         if (usuarioAutenticado.getUsername().equals(username)) {
-            usuarioAdminView.mostrarError("No puede eliminarse a sí mismo.");
+            usuarioAdminView.mostrarError(Idioma.get("usuario.controller.msj.noautoelim"));
             return;
         }
 
         Usuario usuario = usuarioDAO.buscarPorUsername(username);
         if (usuario == null) {
-            usuarioAdminView.mostrarError("Usuario no encontrado.");
+            usuarioAdminView.mostrarError(Idioma.get("usuario.controller.msj.encontrado"));
             return;
         }
 
-        String mensaje = "¿Está seguro de eliminar al usuario '" + username + "'?\n" +
-                "Esta acción no se puede deshacer.";
+        String mensaje = Idioma.get("usuario.controller.msj.seguroelim") + username + "'?\n" +
+               Idioma.get("usuario.controller.msj.noundo");
 
         if (!usuarioAdminView.confirmarAccion(mensaje)) {
             return;
@@ -275,7 +276,7 @@ public class UsuarioController {
 
         listarUsuarios();
         usuarioAdminView.limpiarSeleccion();
-        usuarioAdminView.mostrarMensaje("Usuario eliminado exitosamente.");
+        usuarioAdminView.mostrarMensaje(Idioma.get("usuario.controller.msj.eliminado"));
     }
 
     public void cerrarSesion() {
@@ -285,7 +286,7 @@ public class UsuarioController {
     private void buscarUsuarioAction() {
         String username = usuarioBuscarView.getTxtUsername().getText().trim();
         if (username.isEmpty()) {
-            usuarioBuscarView.mostrarMensaje("Ingrese un nombre de usuario.");
+            usuarioBuscarView.mostrarMensaje(Idioma.get("usuario.controller.msj.ingreseusuario"));
             return;
         }
         Usuario usuario = usuarioDAO.buscarPorUsername(username);
@@ -302,20 +303,20 @@ public class UsuarioController {
         String password = new String(usuarioCrearView.getTxtContrasena().getPassword());
 
         if (username.isEmpty()) {
-            usuarioCrearView.mostrarMensaje("El nombre de usuario no puede estar vacío.");
+            usuarioCrearView.mostrarMensaje(Idioma.get("usuario.controller.msj.nousuario"));
             return;
         }
         if (password.isEmpty()) {
-            usuarioCrearView.mostrarMensaje("La contraseña no puede estar vacía.");
+            usuarioCrearView.mostrarMensaje(Idioma.get("usuario.controller.msj.nopass"));
             return;
         }
         if (usuarioDAO.buscarPorUsername(username) != null) {
-            usuarioCrearView.mostrarMensaje("El usuario ya existe.");
+            usuarioCrearView.mostrarMensaje(Idioma.get("usuario.controller.extiste"));
             return;
         }
         Usuario nuevo = new Usuario(username, password, Rol.USUARIO);
         usuarioDAO.crear(nuevo);
-        usuarioCrearView.mostrarMensaje("Usuario creado exitosamente.");
+        usuarioCrearView.mostrarMensaje(Idioma.get("usuario.controller.msj.creado"));
         usuarioCrearView.getTxtUsuario().setText("");
         usuarioCrearView.getTxtContrasena().setText("");
         if (usuarioAdminView != null) listarUsuarios();
@@ -327,18 +328,18 @@ public class UsuarioController {
         String nuevaContra = new String(usuarioModificarDatosView.getTxtContra().getPassword());
 
         if (nuevoUsername.isEmpty() || nuevaContra.isEmpty()) {
-            mostrarMensaje("Usuario y contraseña no pueden estar vacíos.");
+            mostrarMensaje(Idioma.get("usuario.controller.msj.nousuariopass"));
             return;
         }
         if (!nuevoUsername.equals(usuarioAutenticado.getUsername()) && usuarioDAO.buscarPorUsername(nuevoUsername) != null) {
-            mostrarMensaje("El nombre de usuario ya está en uso.");
+            mostrarMensaje(Idioma.get("usuario.controller.msj.usoyaenuso"));
             return;
         }
         usuarioAutenticado.setUsername(nuevoUsername);
         usuarioAutenticado.setPassword(nuevaContra);
         usuarioDAO.actualizar(usuarioAutenticado);
 
-        mostrarMensaje("Datos actualizados correctamente.");
+        mostrarMensaje(Idioma.get("usuario.controller.msj.actualizadodatos"));
         usuarioModificarDatosView.mostrarDatosUsuario(usuarioAutenticado);
 
         if (usuarioAdminView != null) listarUsuarios();

@@ -9,7 +9,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.text.SimpleDateFormat;
+import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.util.List;
 
 public class CarritoListarView extends JInternalFrame {
@@ -22,6 +23,9 @@ public class CarritoListarView extends JInternalFrame {
     private DefaultTableModel modeloDetallesCarrito;
 
     private List<Carrito> ultimoListado;
+
+    private DateFormat dateFormat;
+    private NumberFormat currencyFormat;
 
     public CarritoListarView() {
         super("", true, true, true, true); // Título internacionalizado
@@ -77,11 +81,16 @@ public class CarritoListarView extends JInternalFrame {
                 }
             }
         });
-
+        actualizarFormatos();
         actualizarTextos();
+    }
+    private void actualizarFormatos() {
+        dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Idioma.getLocale());
+        currencyFormat = NumberFormat.getCurrencyInstance(Idioma.getLocale());
     }
 
     public void actualizarTextos() {
+        actualizarFormatos();
         setTitle(Idioma.get("carrito.listar.titulo"));
         btnListar.setText(Idioma.get("carrito.listar.btn.listar"));
 
@@ -104,6 +113,9 @@ public class CarritoListarView extends JInternalFrame {
 
         tblCarritos.setToolTipText(Idioma.get("carrito.listar.tbl.tooltip"));
         tblDetallesCarrito.setToolTipText(Idioma.get("carrito.listar.tbldetalle.tooltip"));
+        if (ultimoListado != null) {
+            cargarCarritos(ultimoListado);
+        }
     }
 
     /**
@@ -113,7 +125,6 @@ public class CarritoListarView extends JInternalFrame {
     public void cargarCarritos(List<Carrito> carritos) {
         modeloTablaCarritos.setRowCount(0);
         ultimoListado = carritos;
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         if (carritos != null) {
             for (Carrito carrito : carritos) {
                 int cantidadItems = carrito.getItems().size();
@@ -121,7 +132,7 @@ public class CarritoListarView extends JInternalFrame {
                 String nombreUsuario = (carrito.getUsuario() != null) ? carrito.getUsuario().getUsername() : "N/A";
                 modeloTablaCarritos.addRow(new Object[]{
                         carrito.getCodigo(),
-                        sdf.format(carrito.getFechaCreacion().getTime()),
+                        dateFormat.format(carrito.getFechaCreacion().getTime()),
                         cantidadItems,
                         cantidadTotal,
                         nombreUsuario

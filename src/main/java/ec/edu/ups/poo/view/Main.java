@@ -48,11 +48,6 @@ public class Main {
         preguntaDAO.crear(new Pregunta(10,"¿Cuál es el nombre de tu primer profeso(a)? "));
 
 
-
-
-
-
-        // Cargar datos iniciales si no existen
         // Cargar datos iniciales si no existen
         if (usuarioDAO.buscarPorUsername("admin") == null) {
             usuarioDAO.crear(new Usuario("admin", "admin", Rol.ADMINISTRADOR, Genero.MASCULINO, "Admin", "Principal", "000000000", 30));

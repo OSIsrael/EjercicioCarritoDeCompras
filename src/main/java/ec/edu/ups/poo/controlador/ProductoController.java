@@ -63,11 +63,15 @@ public class ProductoController {
     }
 
     private void buscarProductoCarrito() {
+            String codigo1=carritoAnadirView.getTxtCodigo().getText();
+            if (codigo1.equals("")) {
+                carritoAnadirView.mostrarMensaje("carrito.info.noproducto");
+            }
+            int codigo = Integer.parseInt(codigo1);
 
-            int codigo = Integer.parseInt(carritoAnadirView.getTxtCodigo().getText());
             Producto producto = productoDAO.buscarPorCodigo(codigo);
             if (producto == null) {
-                carritoAnadirView.mostrarMensaje(Idioma.get("producto.controller.msj.encontrado"));
+                carritoAnadirView.mostrarMensaje("producto.controller.msj.encontrado");
                 carritoAnadirView.getTxtNombre().setText("");
                 carritoAnadirView.getTxtPrecio().setText("");
             } else {
@@ -106,7 +110,11 @@ public class ProductoController {
     }
 
     private void guardarProducto() {
-        int codigo = Integer.parseInt(productoAnadirView.getTxtCodigo().getText());
+        String codigo1=carritoAnadirView.getTxtCodigo().getText();
+        if (codigo1.equals("")) {
+            carritoAnadirView.mostrarMensaje("producto.info.noproducto");
+        }
+        int codigo = Integer.parseInt(codigo1);
         String nombre = productoAnadirView.getTxtNombre().getText();
         double precio = Double.parseDouble(productoAnadirView.getTxtPrecio().getText());
 
@@ -141,7 +149,7 @@ public class ProductoController {
                 if (producto != null) {
                     producto.setNombre(nuevoNombre);
                     productoDAO.actualizar(producto);
-                    productoEditarView.mostrarMensaje(Idioma.get("producto.controller.msj.actualizado"));
+                    productoEditarView.mostrarMensaje("producto.controller.msj.actualizado");
                     productoEditarView.limpiarCampos();
                     listarProductosParaEditar();
                 } else {
@@ -166,7 +174,7 @@ public class ProductoController {
         int filaSeleccionada = productoEliminarView.getTblEliminarProducto().getSelectedRow();
 
         if (filaSeleccionada < 0) {
-            productoEliminarView.mostrarMensaje(Idioma.get("producto.controller.msj.please"));
+            productoEliminarView.mostrarMensaje("producto.controller.msj.please");
             return;
         }
 

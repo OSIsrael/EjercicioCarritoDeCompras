@@ -79,14 +79,14 @@ public class CarritoController {
         String codigoStr = carritoAnadirView.getTxtCodigo().getText();
 
         if (!esNumeroEntero(codigoStr)) {
-            carritoAnadirView.mostrarMensaje(Idioma.get("carrito.controller.msj.numentero"));
+            carritoAnadirView.mostrarMensaje("carrito.controller.msj.numentero");
             return;
         }
         int codigo = Integer.parseInt(codigoStr);
         Producto producto = productoDAO.buscarPorCodigo(codigo);
 
         if (producto == null) {
-            carritoAnadirView.mostrarMensaje(Idioma.get("carrito.controller.msj.pnoe"));
+            carritoAnadirView.mostrarMensaje("carrito.controller.msj.pnoe");
             return;
         }
 
@@ -208,12 +208,12 @@ public class CarritoController {
             carritoEliminarView.mostrarMensaje(Idioma.get("carrito.controller.msj.selecar"));
             return;
         }
-        boolean confirmar = carritoEliminarView.confirmarAccion(Idioma.get("carrito.controller.msj.estaseguro"));
+        boolean confirmar = carritoEliminarView.confirmarAccion("carrito.controller.msj.estaseguro");
         if (!confirmar) return;
 
         carritoDAO.eliminar(carrito.getCodigo());
-        carritoEliminarView.mostrarMensaje(Idioma.get("carrito.controller.msj.eliminado"));
-        mostrarCarritosUsuarioParaEliminar(); // Refresca la lista
+        carritoEliminarView.mostrarMensaje("carrito.controller.msj.eliminado");
+        mostrarCarritosUsuarioParaEliminar();
     }
 
     // --- Lógica de CarritoModificarView ---
@@ -232,7 +232,7 @@ public class CarritoController {
         int codigo = Integer.parseInt(codigoStr);
         Carrito carrito = carritoDAO.buscar(codigo);
         if (carrito == null || !tienePermiso(carrito)) {
-            carritoModificarView.mostrarError(Idioma.get("carrito.controller.msj.noper"));
+            carritoModificarView.mostrarError("carrito.controller.msj.noper");
             carritoModificarView.cargarCarrito(null);
             return;
         }
@@ -291,7 +291,7 @@ public class CarritoController {
         }
 
         carritoDAO.actualizar(carrito);
-        carritoModificarView.mostrarMensaje(Idioma.get("carrito.controller.msj.exitoso"));
+        carritoModificarView.mostrarMensaje("carrito.controller.msj.exitoso");
         mostrarCarritosUsuarioParaModificar(); // refresca la lista
     }
 

@@ -10,6 +10,7 @@ import ec.edu.ups.poo.view.*;
 import ec.edu.ups.poo.modelo.Genero;
 
 import javax.swing.*;
+import java.text.MessageFormat;
 import java.util.*;
 
 public class UsuarioController {
@@ -244,26 +245,24 @@ public class UsuarioController {
 
         // Verificar si hay cambios
         if (rolActual == nuevoRol && nuevoUsername.equals(usuarioDAO.buscarPorUsername(nuevoUsername).getUsername())) {
-            usuarioAdminView.mostrarMensaje(Idioma.get("usuario.controller.msj.sincambios"));
+            usuarioAdminView.mostrarMensaje("usuario.controller.msj.sincambios");
             return;
         }
 
         Usuario usuarioBuscado = usuarioDAO.buscarPorUsername(nuevoUsername);
         if (usuarioBuscado != null && !usuarioAdminView.getTblUsuarios().getValueAt(fila, 0).equals(usuarioBuscado.getUsername())) {
-            usuarioAdminView.mostrarError(Idioma.get("usuario.controller.msj.uso"));
+            usuarioAdminView.mostrarError("usuario.controller.msj.uso");
             return;
         }
 
         Usuario usuario = usuarioDAO.buscarPorUsername((String) usuarioAdminView.getTblUsuarios().getValueAt(fila, 0));
         if (usuario == null) {
-            usuarioAdminView.mostrarError(Idioma.get("usuario.controller.msj.encontrado"));
+            usuarioAdminView.mostrarError("usuario.controller.msj.encontrado");
             return;
         }
 
-        String mensaje = Idioma.get("usuario.controller.msj.seguro") + nuevoUsername +
-                Idioma.get("usuario.controller.msj.rol") + nuevoRol + "?";
 
-        if (!usuarioAdminView.confirmarAccion(mensaje)) {
+        if (!usuarioAdminView.confirmarAccion("usuario.controller.msj.seguro", nuevoUsername, nuevoRol)) {
             return;
         }
 
@@ -272,42 +271,41 @@ public class UsuarioController {
         usuarioDAO.actualizar(usuario);
 
         listarUsuarios();
-        usuarioAdminView.mostrarMensaje(Idioma.get("usuario.controller.msj.actualizado"));
+        usuarioAdminView.mostrarMensaje("usuario.controller.msj.actualizado");
     }
 
     private void eliminarUsuario() {
         int fila = usuarioAdminView.getTblUsuarios().getSelectedRow();
 
         if (fila < 0) {
-            usuarioAdminView.mostrarError(Idioma.get("usuario.controller.msj.seleliminado"));
+            usuarioAdminView.mostrarError("usuario.controller.msj.seleliminado");
             return;
         }
 
         String username = (String) usuarioAdminView.getTblUsuarios().getValueAt(fila, 0);
 
-        if (usuarioAutenticado.getUsername().equals(username)) {
-            usuarioAdminView.mostrarError(Idioma.get("usuario.controller.msj.noautoelim"));
+        if (!usuarioAdminView.confirmarAccion("usuario.controller.msj.seguroelimar", username)) {
             return;
         }
 
         Usuario usuario = usuarioDAO.buscarPorUsername(username);
         if (usuario == null) {
-            usuarioAdminView.mostrarError(Idioma.get("usuario.controller.msj.encontrado"));
+            usuarioAdminView.mostrarError("usuario.controller.msj.encontrado");
             return;
         }
 
-        String mensaje = Idioma.get("usuario.controller.msj.seguroelim") + username + "'?\n" +
-               Idioma.get("usuario.controller.msj.noundo");
+        String mensaje = MessageFormat.format(
+                Idioma.get("usuario.controller.msj.seguroelimar"),
+                username
+        );
 
-        if (!usuarioAdminView.confirmarAccion(mensaje)) {
-            return;
-        }
+
 
         usuarioDAO.eliminar(username);
 
         listarUsuarios();
         usuarioAdminView.limpiarSeleccion();
-        usuarioAdminView.mostrarMensaje(Idioma.get("usuario.controller.msj.eliminado"));
+        usuarioAdminView.mostrarMensaje("usuario.controller.msj.eliminado");
     }
 
     public void cerrarSesion() {
@@ -334,20 +332,20 @@ public class UsuarioController {
         String password = new String(usuarioCrearView.getTxtContrasena().getPassword());
 
         if (username.isEmpty()) {
-            usuarioCrearView.mostrarMensaje(Idioma.get("usuario.controller.msj.nousuario"));
+            usuarioCrearView.mostrarMensaje("usuario.controller.msj.nousuario");
             return;
         }
         if (password.isEmpty()) {
-            usuarioCrearView.mostrarMensaje(Idioma.get("usuario.controller.msj.nopass"));
+            usuarioCrearView.mostrarMensaje("usuario.controller.msj.nopass");
             return;
         }
         if (usuarioDAO.buscarPorUsername(username) != null) {
-            usuarioCrearView.mostrarMensaje(Idioma.get("usuario.controller.extiste"));
+            usuarioCrearView.mostrarMensaje("usuario.controller.extiste");
             return;
         }
         Usuario nuevo = new Usuario(username, password, Rol.USUARIO, Genero.OTROS, "", "", "", 0);
         usuarioDAO.crear(nuevo);
-        usuarioCrearView.mostrarMensaje(Idioma.get("usuario.controller.msj.creado"));
+        usuarioCrearView.mostrarMensaje("usuario.controller.msj.creado");
         usuarioCrearView.getTxtUsuario().setText("");
         usuarioCrearView.getTxtContrasena().setText("");
         if (usuarioAdminView != null) listarUsuarios();

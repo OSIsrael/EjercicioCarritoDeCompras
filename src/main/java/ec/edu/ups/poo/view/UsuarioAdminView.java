@@ -198,10 +198,11 @@ public class UsuarioAdminView extends JInternalFrame {
         JOptionPane.showMessageDialog(this, Idioma.get(mensajeKey), Idioma.get("usuario.admin.msj.error"), JOptionPane.ERROR_MESSAGE);
     }
 
-    public boolean confirmarAccion(String mensajeKey) {
+    public boolean confirmarAccion(String mensajeKey, Object... params) {
+        String mensaje = java.text.MessageFormat.format(Idioma.get(mensajeKey), params);
         int opcion = JOptionPane.showConfirmDialog(
                 this,
-                Idioma.get(mensajeKey),
+                mensaje,
                 Idioma.get("usuario.admin.msj.confirmar"),
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE

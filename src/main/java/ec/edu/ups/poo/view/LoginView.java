@@ -1,5 +1,7 @@
 package ec.edu.ups.poo.view;
 
+import ec.edu.ups.poo.util.Idioma;
+
 import javax.swing.*;
 
 public class LoginView extends JFrame{
@@ -13,6 +15,12 @@ public class LoginView extends JFrame{
     private JLabel lblContrasena;
     private JButton btnOlvide;
 
+    private JMenuBar menuBar;
+    private JMenu menuIdiomas;
+    private JMenuItem menuItemEspañol;
+    private JMenuItem menuItemIngles;
+    private JMenuItem menuItemFrances;
+
     public LoginView(){
         setContentPane(panelPrincipal);
         setTitle("Iniciar Sesion");
@@ -22,8 +30,36 @@ public class LoginView extends JFrame{
         btnOlvide.setIcon(new ImageIcon(getClass().getResource("/icons/pregunta.png")));
         btnRegistrarse.setIcon(new ImageIcon(getClass().getResource("/icons/usuario.png")));
         btnIniciarSesion.setIcon(new ImageIcon(getClass().getResource("/icons/entrar.png")));
+        crearMenu();
+        actualizarTextos();
 
+    }
+    private void crearMenu() {
+        menuBar = new JMenuBar();
+        menuIdiomas = new JMenu(); // El texto se establece en actualizarTextos
+        menuItemEspañol = new JMenuItem();
+        menuItemIngles = new JMenuItem();
+        menuItemFrances = new JMenuItem();
 
+        menuIdiomas.add(menuItemEspañol);
+        menuIdiomas.add(menuItemIngles);
+        menuIdiomas.add(menuItemFrances);
+        menuBar.add(menuIdiomas);
+        setJMenuBar(menuBar);
+    }
+    public void actualizarTextos() {
+        setTitle(Idioma.get("login.titulo"));
+        lblUsuario.setText(Idioma.get("login.lbl.usuario"));
+        lblContrasena.setText(Idioma.get("login.lbl.contrasena"));
+        btnIniciarSesion.setText(Idioma.get("login.btn.iniciar"));
+        btnRegistrarse.setText(Idioma.get("login.btn.registrar"));
+        btnOlvide.setText(Idioma.get("login.btn.olvide"));
+
+        // Actualizar menú
+        menuIdiomas.setText(Idioma.get("menu.idiomas"));
+        menuItemEspañol.setText(Idioma.get("menu.idiomas.español"));
+        menuItemIngles.setText(Idioma.get("menu.idiomas.ingles"));
+        menuItemFrances.setText(Idioma.get("menu.idiomas.frances"));
     }
 
     public JPanel getPanelPrincipal() {
@@ -82,7 +118,31 @@ public class LoginView extends JFrame{
         this.btnOlvide = btnOlvide;
     }
 
+    public JMenuItem getMenuItemEspañol() {
+        return menuItemEspañol;
+    }
+
+    public void setMenuItemEspañol(JMenuItem menuItemEspañol) {
+        this.menuItemEspañol = menuItemEspañol;
+    }
+
+    public JMenuItem getMenuItemIngles() {
+        return menuItemIngles;
+    }
+
+    public void setMenuItemIngles(JMenuItem menuItemIngles) {
+        this.menuItemIngles = menuItemIngles;
+    }
+
+    public JMenuItem getMenuItemFrances() {
+        return menuItemFrances;
+    }
+
+    public void setMenuItemFrances(JMenuItem menuItemFrances) {
+        this.menuItemFrances = menuItemFrances;
+    }
+
     public void mostrar (String mensaje){
-        JOptionPane.showMessageDialog(this, mensaje);
+        JOptionPane.showMessageDialog(this, Idioma.get(mensaje));
     }
 }

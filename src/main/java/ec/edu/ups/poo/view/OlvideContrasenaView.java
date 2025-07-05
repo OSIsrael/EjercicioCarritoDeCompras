@@ -1,5 +1,7 @@
 package ec.edu.ups.poo.view;
 
+import ec.edu.ups.poo.util.Idioma;
+
 import javax.swing.*;
 
 public class OlvideContrasenaView extends JDialog {
@@ -13,13 +15,50 @@ public class OlvideContrasenaView extends JDialog {
     private JPasswordField txtNuevaContrasena;
     private JButton btnCambiar;
 
+    private JMenuBar menuBar;
+    private JMenu menuIdiomas;
+    private JMenuItem menuItemEspañol;
+    private JMenuItem menuItemIngles;
+    private JMenuItem menuItemFrances;
+
     public OlvideContrasenaView() {
         setTitle("Recuperar Contraseña");
-        setSize(400, 300);
+        setSize(700, 500);
         setLocationRelativeTo(null);
         setContentPane(panelPrincipal);
         btnValidar.setIcon(new ImageIcon(getClass().getResource("/icons/validar.png")));
         btnCambiar.setIcon(new ImageIcon(getClass().getResource("/icons/cambiar.png")));
+        crearMenu();
+        actualizarTextos();
+    }
+    private void crearMenu() {
+        menuBar = new JMenuBar();
+        menuIdiomas = new JMenu();
+        menuItemEspañol = new JMenuItem();
+        menuItemIngles = new JMenuItem();
+        menuItemFrances = new JMenuItem();
+
+        menuIdiomas.add(menuItemEspañol);
+        menuIdiomas.add(menuItemIngles);
+        menuIdiomas.add(menuItemFrances);
+        menuBar.add(menuIdiomas);
+        setJMenuBar(menuBar);
+    }
+
+    public void actualizarTextos() {
+        setTitle(Idioma.get("olvide.titulo"));
+        lblUsuario.setText(Idioma.get("olvide.lbl.usuario"));
+        // lblPregunta se actualiza dinámicamente, pero podemos poner un placeholder
+        // lblPregunta.setText(Idioma.get("olvide.lbl.pregunta"));
+        lblNuevaContrasena.setText(Idioma.get("olvide.lbl.nuevacontra"));
+        btnValidar.setText(Idioma.get("olvide.btn.validar"));
+        btnCambiar.setText(Idioma.get("olvide.btn.cambiar"));
+
+        // Actualizar menú
+        menuIdiomas.setText(Idioma.get("menu.idiomas"));
+        menuItemEspañol.setText(Idioma.get("menu.idiomas.español"));
+        menuItemIngles.setText(Idioma.get("menu.idiomas.ingles"));
+        menuItemFrances.setText(Idioma.get("menu.idiomas.frances"));
     }
 
     public JPanel getPanelPrincipal() {
@@ -84,6 +123,30 @@ public class OlvideContrasenaView extends JDialog {
 
     public void setTxtNuevaContrasena(JPasswordField txtNuevaContrasena) {
         this.txtNuevaContrasena = txtNuevaContrasena;
+    }
+
+    public JMenuItem getMenuItemEspañol() {
+        return menuItemEspañol;
+    }
+
+    public void setMenuItemEspañol(JMenuItem menuItemEspañol) {
+        this.menuItemEspañol = menuItemEspañol;
+    }
+
+    public JMenuItem getMenuItemIngles() {
+        return menuItemIngles;
+    }
+
+    public void setMenuItemIngles(JMenuItem menuItemIngles) {
+        this.menuItemIngles = menuItemIngles;
+    }
+
+    public JMenuItem getMenuItemFrances() {
+        return menuItemFrances;
+    }
+
+    public void setMenuItemFrances(JMenuItem menuItemFrances) {
+        this.menuItemFrances = menuItemFrances;
     }
 
     public JButton getBtnCambiar() {

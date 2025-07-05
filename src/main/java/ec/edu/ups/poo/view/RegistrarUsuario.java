@@ -4,7 +4,9 @@ import javax.swing.*;
 
 import ec.edu.ups.poo.modelo.Genero;
 import ec.edu.ups.poo.modelo.Pregunta;
+import ec.edu.ups.poo.util.Idioma;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,8 +28,21 @@ public class RegistrarUsuario extends JFrame {
 
     private JButton btnAgregarPregunta;
     private JLabel lblPreguntasContador;
+    private JLabel lblUsuario;
+    private JLabel lblContra;
+    private JLabel lblNombre;
+    private JLabel lblApellido;
+    private JLabel lblTelefono;
+    private JLabel lblEdad;
+    private JLabel lblGenero;
     private final Map<Pregunta, String> preguntasRespondidas;
     private List<Pregunta> todasLasPreguntas;
+
+    private JMenuBar menuBar;
+    private JMenu menuIdiomas;
+    private JMenuItem menuItemEspañol;
+    private JMenuItem menuItemIngles;
+    private JMenuItem menuItemFrances;
 
 
 
@@ -50,9 +65,47 @@ public class RegistrarUsuario extends JFrame {
         cbxGenero.addItem(Genero.OTROS);
         btnRegistrarse.setIcon(new ImageIcon(getClass().getResource("/icons/entrar.png")));
         btnAgregarPregunta.setIcon(new ImageIcon(getClass().getResource("/icons/anadir.png")));
+        crearMenu();
+        actualizarTextos();
         btnAgregarPregunta.addActionListener(e -> agregarPreguntaRespondida());
 
     }
+    private void crearMenu() {
+        menuBar = new JMenuBar();
+        menuIdiomas = new JMenu();
+        menuItemEspañol = new JMenuItem();
+        menuItemIngles = new JMenuItem();
+        menuItemFrances = new JMenuItem();
+
+        menuIdiomas.add(menuItemEspañol);
+        menuIdiomas.add(menuItemIngles);
+        menuIdiomas.add(menuItemFrances);
+        menuBar.add(menuIdiomas);
+        setJMenuBar(menuBar);
+    }
+    public void actualizarTextos() {
+        setTitle(Idioma.get("registro.titulo"));
+        lblUsuario.setText(Idioma.get("registro.lbl.usuario"));
+        lblContra.setText(Idioma.get("registro.lbl.contrasena"));
+        lblNombre.setText(Idioma.get("registro.lbl.nombre"));
+        lblApellido.setText(Idioma.get("registro.lbl.apellido"));
+        lblTelefono.setText(Idioma.get("registro.lbl.telefono"));
+        lblEdad.setText(Idioma.get("registro.lbl.edad"));
+        lblGenero.setText(Idioma.get("registro.lbl.genero"));
+
+
+        btnRegistrarse.setText(Idioma.get("registro.btn.registrar"));
+        btnAgregarPregunta.setText(Idioma.get("registro.btn.agregar"));
+
+    // Actualizar menú
+        menuIdiomas.setText(Idioma.get("menu.idiomas"));
+        menuItemEspañol.setText(Idioma.get("menu.idiomas.español"));
+        menuItemIngles.setText(Idioma.get("menu.idiomas.ingles"));
+        menuItemFrances.setText(Idioma.get("menu.idiomas.frances"));
+
+    // Actualizar contador con el idioma actual
+        lblPreguntasContador.setText(MessageFormat.format(Idioma.get("registro.lbl.contador"), preguntasRespondidas.size()));
+}
     public void setPreguntasDisponibles(List<Pregunta> preguntas) {
         this.todasLasPreguntas = new ArrayList<>(preguntas);
         actualizarComboBox();
@@ -73,11 +126,11 @@ public class RegistrarUsuario extends JFrame {
 
         // Validaciones
         if (preguntaSeleccionada == null) {
-            mostrarMensaje("Por favor, seleccione una pregunta.");
+            mostrarMensaje("registro.seleccione");
             return;
         }
         if (respuesta.isEmpty()) {
-            mostrarMensaje("Por favor, ingrese una respuesta.");
+            mostrarMensaje("registro.inres");
             return;
         }
         preguntasRespondidas.put(preguntaSeleccionada, respuesta);
@@ -85,9 +138,10 @@ public class RegistrarUsuario extends JFrame {
         // Actualizar UI
         actualizarComboBox(); // Esto quitará la pregunta recién respondida de la lista
         txtRespuesta1.setText(""); // Limpiar para la siguiente
-        lblPreguntasContador.setText("Preguntas respondidas: " + preguntasRespondidas.size());
-
-        mostrarMensaje("Pregunta añadida. Faltan " + (3 - preguntasRespondidas.size()) + " para poder registrarse.");
+        lblPreguntasContador.setText(MessageFormat.format(Idioma.get("registro.lbl.contador"), preguntasRespondidas.size()));
+        int faltan = 3 - preguntasRespondidas.size();
+        String mensajeFormateado = MessageFormat.format(Idioma.get("registro.msj.pregunta.anadida"), faltan);
+        JOptionPane.showMessageDialog(this, mensajeFormateado);
     }
     public Map<Pregunta, String> getPreguntasYRespuestas() {
         return this.preguntasRespondidas;
@@ -200,9 +254,32 @@ public class RegistrarUsuario extends JFrame {
         this.cbxGenero = cbxGenero;
     }
 
+    public JMenuItem getMenuItemEspañol() {
+        return menuItemEspañol;
+    }
+
+    public void setMenuItemEspañol(JMenuItem menuItemEspañol) {
+        this.menuItemEspañol = menuItemEspañol;
+    }
+
+    public JMenuItem getMenuItemIngles() {
+        return menuItemIngles;
+    }
+
+    public void setMenuItemIngles(JMenuItem menuItemIngles) {
+        this.menuItemIngles = menuItemIngles;
+    }
+
+    public JMenuItem getMenuItemFrances() {
+        return menuItemFrances;
+    }
+
+    public void setMenuItemFrances(JMenuItem menuItemFrances) {
+        this.menuItemFrances = menuItemFrances;
+    }
 
     public void mostrarMensaje(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje);
+        JOptionPane.showMessageDialog(this, Idioma.get(mensaje));
     }
 
 
@@ -216,7 +293,7 @@ public class RegistrarUsuario extends JFrame {
         txtRespuesta1.setText("");
         preguntasRespondidas.clear();
         actualizarComboBox();
-        lblPreguntasContador.setText("Preguntas respondidas: 0");
+        lblPreguntasContador.setText(Idioma.get("registro.lbl.contador"));
         if (cbxPregunta1 != null && cbxPregunta1.getItemCount() > 0) cbxPregunta1.setSelectedIndex(0);
         if (cbxGenero != null && cbxGenero.getItemCount() > 0) cbxGenero.setSelectedIndex(0);
     }

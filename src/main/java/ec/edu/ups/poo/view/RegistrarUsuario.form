@@ -16,7 +16,7 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="11cd6" class="javax.swing.JLabel">
+          <component id="11cd6" class="javax.swing.JLabel" binding="lblUsuario">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -24,7 +24,7 @@
               <text value="Usuario:"/>
             </properties>
           </component>
-          <component id="f2428" class="javax.swing.JLabel">
+          <component id="f2428" class="javax.swing.JLabel" binding="lblContra">
             <constraints>
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -70,7 +70,7 @@
             </constraints>
             <properties/>
           </component>
-          <component id="cba19" class="javax.swing.JLabel">
+          <component id="cba19" class="javax.swing.JLabel" binding="lblNombre">
             <constraints>
               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -78,7 +78,7 @@
               <text value="Nombre:"/>
             </properties>
           </component>
-          <component id="e85ab" class="javax.swing.JLabel">
+          <component id="e85ab" class="javax.swing.JLabel" binding="lblApellido">
             <constraints>
               <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -86,7 +86,7 @@
               <text value="Apellido:"/>
             </properties>
           </component>
-          <component id="298dd" class="javax.swing.JLabel">
+          <component id="298dd" class="javax.swing.JLabel" binding="lblTelefono">
             <constraints>
               <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -94,7 +94,7 @@
               <text value="Telefono:"/>
             </properties>
           </component>
-          <component id="52cc0" class="javax.swing.JLabel">
+          <component id="52cc0" class="javax.swing.JLabel" binding="lblEdad">
             <constraints>
               <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -134,7 +134,7 @@
             </constraints>
             <properties/>
           </component>
-          <component id="f2188" class="javax.swing.JLabel">
+          <component id="f2188" class="javax.swing.JLabel" binding="lblGenero">
             <constraints>
               <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>

@@ -10,6 +10,7 @@ import ec.edu.ups.poo.view.*;
 import ec.edu.ups.poo.modelo.Genero;
 
 import javax.swing.*;
+import java.awt.event.ActionListener;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -43,8 +44,48 @@ public class UsuarioController {
         this.usuarioCrearView = usuarioCrearView;
         this.usuarioModificarDatosView = usuarioModificarDatosView;
         this.olvideContrasenaView = new OlvideContrasenaView();
+        configurarEventosIdioma();
         configurarEventos();
     }
+    private void configurarEventosIdioma() {
+        // Se crea un único ActionListener para todos los menús de idioma.
+        ActionListener cambiarIdiomaListener = e -> {
+            String lang = "es", country = "EC"; // Por defecto
+
+            // Determina qué idioma se seleccionó
+            if (e.getSource() instanceof JMenuItem) {
+                JMenuItem sourceItem = (JMenuItem) e.getSource();
+                if (sourceItem.getText().equals(Idioma.get("menu.idiomas.ingles"))) {
+                    lang = "en"; country = "US";
+                } else if (sourceItem.getText().equals(Idioma.get("menu.idiomas.frances"))) {
+                    lang = "fr"; country = "FR";
+                }
+            }
+            Idioma.setIdioma(lang, country);
+
+            // Ordena a todas las vistas relevantes que actualicen sus textos
+            loginView.actualizarTextos();
+            registrarUsuarioView.actualizarTextos();
+            olvideContrasenaView.actualizarTextos();
+        };
+
+        // Asigna el listener a todos los JMenuItems de las tres ventanas
+        // LoginView
+        loginView.getMenuItemEspañol().addActionListener(cambiarIdiomaListener);
+        loginView.getMenuItemIngles().addActionListener(cambiarIdiomaListener);
+        loginView.getMenuItemFrances().addActionListener(cambiarIdiomaListener);
+
+        // RegistrarUsuario
+        registrarUsuarioView.getMenuItemEspañol().addActionListener(cambiarIdiomaListener);
+        registrarUsuarioView.getMenuItemIngles().addActionListener(cambiarIdiomaListener);
+        registrarUsuarioView.getMenuItemFrances().addActionListener(cambiarIdiomaListener);
+
+        // OlvideContrasenaView
+        olvideContrasenaView.getMenuItemEspañol().addActionListener(cambiarIdiomaListener);
+        olvideContrasenaView.getMenuItemIngles().addActionListener(cambiarIdiomaListener);
+        olvideContrasenaView.getMenuItemFrances().addActionListener(cambiarIdiomaListener);
+    }
+
 
     private void configurarEventos() {
         // Eventos de LoginView
@@ -92,13 +133,13 @@ public class UsuarioController {
         String username = olvideContrasenaView.getTxtUsername().getText().trim();
         Usuario usuario = usuarioDAO.buscarPorUsername(username);
         if (usuario == null) {
-            JOptionPane.showMessageDialog(olvideContrasenaView, "Usuario no encontrado.");
+            JOptionPane.showMessageDialog(olvideContrasenaView, Idioma.get("usuario.controller.msj.noecontrado"));
             return;
         }
         usuarioRecuperacion = usuario;
         List<Integer> idsPreguntas = new ArrayList<>(usuario.getPreguntasSeguridad().keySet());
         if (idsPreguntas.isEmpty()) {
-            JOptionPane.showMessageDialog(olvideContrasenaView, "No hay preguntas de seguridad para este usuario.");
+            JOptionPane.showMessageDialog(olvideContrasenaView, Idioma.get("usuario.controller.nopreguntas"));
             return;
         }
         // Selecciona una pregunta al azar
@@ -118,17 +159,17 @@ public class UsuarioController {
         String respuesta = olvideContrasenaView.getTxtRespuesta().getText().trim();
         String respuestaCorrecta = usuarioRecuperacion.getPreguntasSeguridad().get(idPreguntaRecuperacion);
         if (!respuesta.equals(respuestaCorrecta)) {
-            JOptionPane.showMessageDialog(olvideContrasenaView, "Respuesta incorrecta.");
+            JOptionPane.showMessageDialog(olvideContrasenaView, Idioma.get("usuario.controller.incorrecta"));
             return;
         }
         String nuevaContra = new String(olvideContrasenaView.getTxtNuevaContrasena().getPassword());
         if (nuevaContra.isEmpty()) {
-            JOptionPane.showMessageDialog(olvideContrasenaView, "Ingrese una nueva contraseña.");
+            JOptionPane.showMessageDialog(olvideContrasenaView, Idioma.get("usuario.controller.nuevacontra"));
             return;
         }
         usuarioRecuperacion.setPassword(nuevaContra);
         usuarioDAO.actualizar(usuarioRecuperacion);
-        JOptionPane.showMessageDialog(olvideContrasenaView, "Contraseña actualizada correctamente.");
+        JOptionPane.showMessageDialog(olvideContrasenaView, Idioma.get("usuario.controller.msj.cambiado"));
         olvideContrasenaView.dispose();
     }
     private void login() {
@@ -136,17 +177,17 @@ public class UsuarioController {
         String password = new String(loginView.getTxtPassword().getPassword());
 
         if (username.isEmpty() || password.isEmpty()) {
-            loginView.mostrar("Por favor, ingrese usuario y contraseña.");
+            loginView.mostrar("usuario.controller.msj.porfavor");
             return;
         }
 
         Usuario usuario = usuarioDAO.buscarPorUsername(username);
         if (usuario == null) {
-            loginView.mostrar("Usuario no encontrado.");
+            loginView.mostrar("usuario.controller.msj.noecontrado");
             return;
         }
         if (!usuario.getPassword().equals(password)) {
-            loginView.mostrar("Contraseña incorrecta.");
+            loginView.mostrar("usuario.controller.msj.contrasena");
             return;
         }
         this.usuarioAutenticado = usuario;
@@ -189,11 +230,11 @@ public class UsuarioController {
         // Validaciones de campos básicos
         if (username.isEmpty() || password.isEmpty() || nombre.isEmpty() || apellido.isEmpty() ||
                 telefono.isEmpty() || edadStr.isEmpty()) {
-            registrarUsuarioView.mostrarMensaje("Debe llenar todos los campos principales.");
+            registrarUsuarioView.mostrarMensaje("registro.msj.camposprincipales.vacios");
             return;
         }
         if (usuarioDAO.buscarPorUsername(username) != null) {
-            registrarUsuarioView.mostrarMensaje("El usuario ya existe.");
+            registrarUsuarioView.mostrarMensaje("registro.msj.yaextite");
             return;
         }
         int edad;
@@ -201,14 +242,14 @@ public class UsuarioController {
             edad = Integer.parseInt(edadStr);
             if (edad < 0) throw new NumberFormatException();
         } catch (NumberFormatException ex) {
-            registrarUsuarioView.mostrarMensaje("Edad inválida.");
+            registrarUsuarioView.mostrarMensaje("registro.msj.edadinvalida");
             return;
         }
 
         // Validación: Al menos 3 preguntas distintas respondidas
         Map<Pregunta, String> preguntasRespondidas = registrarUsuarioView.getPreguntasYRespuestas();
         if (preguntasRespondidas.size() < 3) {
-            registrarUsuarioView.mostrarMensaje("Debe responder al menos 3 preguntas de seguridad.");
+            registrarUsuarioView.mostrarMensaje("registro.msj.minpreguntas");
             return;
         }
 
@@ -221,7 +262,7 @@ public class UsuarioController {
         nuevo.setPreguntasSeguridad(preguntasParaGuardar);
 
         usuarioDAO.crear(nuevo);
-        registrarUsuarioView.mostrarMensaje("Usuario registrado exitosamente.");
+        registrarUsuarioView.mostrarMensaje("registro.msj.registrado");
         registrarUsuarioView.limpiarCampos();
         registrarUsuarioView.dispose();
     }

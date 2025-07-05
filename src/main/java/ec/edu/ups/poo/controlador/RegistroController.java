@@ -52,6 +52,7 @@ public class RegistroController {
             return;
         }
 
+
         // Usa el constructor largo
         Usuario nuevoUsuario = new Usuario(username, password, Rol.USUARIO, Genero.OTROS, "", "", "", 0);
         usuarioDAO.crear(nuevoUsuario);

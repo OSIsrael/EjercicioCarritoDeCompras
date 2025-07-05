@@ -158,6 +158,8 @@ public class UsuarioController {
     }
 
     private void abrirVentanaRegistro() {
+        List<Pregunta> preguntas = preguntaDAO.listarTodas();
+        registrarUsuarioView.setPreguntasDisponibles(preguntas);
         registrarUsuarioView.limpiarCampos();
         registrarUsuarioView.setVisible(true);
     }
@@ -169,6 +171,7 @@ public class UsuarioController {
         String apellido = registrarUsuarioView.getTxtApellido().getText().trim();
         String telefono = registrarUsuarioView.getTxtTelefono().getText().trim();
         String edadStr = registrarUsuarioView.getTxtEdad().getText().trim();
+
         Genero genero = null;
         Object itemGenero = registrarUsuarioView.getCbxGenero().getSelectedItem();
         if (itemGenero instanceof Genero) {
@@ -183,16 +186,10 @@ public class UsuarioController {
             genero = Genero.OTROS;
         }
 
-        Pregunta pregunta1 = (Pregunta) registrarUsuarioView.getCbxPregunta1().getSelectedItem();
-        Pregunta pregunta2 = (Pregunta) registrarUsuarioView.getCbxPregunta2().getSelectedItem();
-        String respuesta1 = registrarUsuarioView.getTxtRespuesta1().getText().trim();
-        String respuesta2 = registrarUsuarioView.getTxtRespuesta2().getText().trim();
-
-        // Validaciones
+        // Validaciones de campos básicos
         if (username.isEmpty() || password.isEmpty() || nombre.isEmpty() || apellido.isEmpty() ||
-                telefono.isEmpty() || edadStr.isEmpty() || pregunta1 == null || pregunta2 == null ||
-                respuesta1.isEmpty() || respuesta2.isEmpty() || pregunta1.getId() == pregunta2.getId()) {
-            registrarUsuarioView.mostrarMensaje("Debe llenar todos los campos y seleccionar preguntas distintas.");
+                telefono.isEmpty() || edadStr.isEmpty()) {
+            registrarUsuarioView.mostrarMensaje("Debe llenar todos los campos principales.");
             return;
         }
         if (usuarioDAO.buscarPorUsername(username) != null) {
@@ -208,19 +205,26 @@ public class UsuarioController {
             return;
         }
 
-        Usuario nuevo = new Usuario(username, password, Rol.USUARIO, genero, nombre, apellido, telefono, edad);
+        // Validación: Al menos 3 preguntas distintas respondidas
+        Map<Pregunta, String> preguntasRespondidas = registrarUsuarioView.getPreguntasYRespuestas();
+        if (preguntasRespondidas.size() < 3) {
+            registrarUsuarioView.mostrarMensaje("Debe responder al menos 3 preguntas de seguridad.");
+            return;
+        }
 
-        Map<Integer, String> preguntasSeguridad = new HashMap<>();
-        preguntasSeguridad.put(pregunta1.getId(), respuesta1);
-        preguntasSeguridad.put(pregunta2.getId(), respuesta2);
-        nuevo.setPreguntasSeguridad(preguntasSeguridad);
+        // Crear usuario y guardar preguntas de seguridad
+        Usuario nuevo = new Usuario(username, password, Rol.USUARIO, genero, nombre, apellido, telefono, edad);
+        Map<Integer, String> preguntasParaGuardar = new HashMap<>();
+        for (Map.Entry<Pregunta, String> entry : preguntasRespondidas.entrySet()) {
+            preguntasParaGuardar.put(entry.getKey().getId(), entry.getValue());
+        }
+        nuevo.setPreguntasSeguridad(preguntasParaGuardar);
 
         usuarioDAO.crear(nuevo);
         registrarUsuarioView.mostrarMensaje("Usuario registrado exitosamente.");
         registrarUsuarioView.limpiarCampos();
         registrarUsuarioView.dispose();
     }
-
     public void listarUsuarios() {
         List<Usuario> todosLosUsuarios = usuarioDAO.listarTodos();
         usuarioAdminView.cargarUsuarios(todosLosUsuarios);

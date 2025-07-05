@@ -72,7 +72,6 @@ public class Main {
         UsuarioModificarDatosView usuarioModificarDatosView = new UsuarioModificarDatosView();
         for (Pregunta pregunta: preguntaDAO.listarTodas()) {
             registrarUsuarioView.getCbxPregunta1().addItem(pregunta);
-            registrarUsuarioView.getCbxPregunta2().addItem(pregunta);
         }
 
         UsuarioController usuarioController = new UsuarioController(

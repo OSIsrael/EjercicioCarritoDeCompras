@@ -5,6 +5,11 @@ import javax.swing.*;
 import ec.edu.ups.poo.modelo.Genero;
 import ec.edu.ups.poo.modelo.Pregunta;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class RegistrarUsuario extends JFrame {
     private JPanel panel1;
     private JPanel panelPrincipal;
@@ -12,22 +17,30 @@ public class RegistrarUsuario extends JFrame {
     private JPasswordField txtContraRe;
     private JButton btnRegistrarse;
     private JComboBox<Pregunta> cbxPregunta1;
-    private JComboBox<Pregunta> cbxPregunta2;
     private JTextField txtRespuesta1;
-    private JTextField txtRespuesta2;
     private JTextField txtNombre;
     private JTextField txtApellido;
     private JTextField txtTelefono;
     private JTextField txtEdad;
     private JComboBox<Genero> cbxGenero;
 
+    private JButton btnAgregarPregunta;
+    private JLabel lblPreguntasContador;
+    private final Map<Pregunta, String> preguntasRespondidas;
+    private List<Pregunta> todasLasPreguntas;
+
+
 
     public RegistrarUsuario() {
+        this.preguntasRespondidas=new HashMap<>();
+        this.todasLasPreguntas=new ArrayList<>();
+
         setContentPane(panel1);
         setTitle("Registrar Usuario");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(900, 900);
         setLocationRelativeTo(null);
+
         if (cbxGenero == null) {
             cbxGenero = new JComboBox<>();
         }
@@ -36,8 +49,51 @@ public class RegistrarUsuario extends JFrame {
         cbxGenero.addItem(Genero.FEMININO);
         cbxGenero.addItem(Genero.OTROS);
         btnRegistrarse.setIcon(new ImageIcon(getClass().getResource("/icons/entrar.png")));
+        btnAgregarPregunta.setIcon(new ImageIcon(getClass().getResource("/icons/anadir.png")));
+        btnAgregarPregunta.addActionListener(e -> agregarPreguntaRespondida());
 
     }
+    public void setPreguntasDisponibles(List<Pregunta> preguntas) {
+        this.todasLasPreguntas = new ArrayList<>(preguntas);
+        actualizarComboBox();
+    }
+    private void actualizarComboBox() {
+        if (cbxPregunta1 == null) return;
+        cbxPregunta1.removeAllItems();
+        for (Pregunta p : todasLasPreguntas) {
+            // Solo añade las preguntas que aún no han sido respondidas
+            if (!preguntasRespondidas.containsKey(p)) {
+                cbxPregunta1.addItem(p);
+            }
+        }
+    }
+    private void agregarPreguntaRespondida() {
+        Pregunta preguntaSeleccionada = (Pregunta) cbxPregunta1.getSelectedItem();
+        String respuesta = txtRespuesta1.getText().trim();
+
+        // Validaciones
+        if (preguntaSeleccionada == null) {
+            mostrarMensaje("Por favor, seleccione una pregunta.");
+            return;
+        }
+        if (respuesta.isEmpty()) {
+            mostrarMensaje("Por favor, ingrese una respuesta.");
+            return;
+        }
+        preguntasRespondidas.put(preguntaSeleccionada, respuesta);
+
+        // Actualizar UI
+        actualizarComboBox(); // Esto quitará la pregunta recién respondida de la lista
+        txtRespuesta1.setText(""); // Limpiar para la siguiente
+        lblPreguntasContador.setText("Preguntas respondidas: " + preguntasRespondidas.size());
+
+        mostrarMensaje("Pregunta añadida. Faltan " + (3 - preguntasRespondidas.size()) + " para poder registrarse.");
+    }
+    public Map<Pregunta, String> getPreguntasYRespuestas() {
+        return this.preguntasRespondidas;
+    }
+
+
 
     public JTextField getTxtNombre() {
         return txtNombre;
@@ -119,13 +175,8 @@ public class RegistrarUsuario extends JFrame {
         this.cbxPregunta1 = cbxPregunta1;
     }
 
-    public JComboBox<Pregunta> getCbxPregunta2() {
-        return cbxPregunta2;
-    }
 
-    public void setCbxPregunta2(JComboBox<Pregunta> cbxPregunta2) {
-        this.cbxPregunta2 = cbxPregunta2;
-    }
+
 
     public JTextField getTxtRespuesta1() {
         return txtRespuesta1;
@@ -135,25 +186,25 @@ public class RegistrarUsuario extends JFrame {
         this.txtRespuesta1 = txtRespuesta1;
     }
 
-    public JTextField getTxtRespuesta2() {
-        return txtRespuesta2;
-    }
 
-    public void setTxtRespuesta2(JTextField txtRespuesta2) {
-        this.txtRespuesta2 = txtRespuesta2;
-    }
 
     public JComboBox getCbxGenero() {
         return cbxGenero;
     }
 
-    public void setCbxGenero(JComboBox cbxGenero) {
+    public JButton getBtnAgregarPregunta() {
+        return btnAgregarPregunta;
+    }
+
+    public void setCbxGenero(JComboBox<Genero> cbxGenero) {
         this.cbxGenero = cbxGenero;
     }
+
 
     public void mostrarMensaje(String mensaje) {
         JOptionPane.showMessageDialog(this, mensaje);
     }
+
 
     public void limpiarCampos() {
         txtUsuarioRe.setText("");
@@ -163,9 +214,10 @@ public class RegistrarUsuario extends JFrame {
         txtTelefono.setText("");
         txtEdad.setText("");
         txtRespuesta1.setText("");
-        txtRespuesta2.setText("");
+        preguntasRespondidas.clear();
+        actualizarComboBox();
+        lblPreguntasContador.setText("Preguntas respondidas: 0");
         if (cbxPregunta1 != null && cbxPregunta1.getItemCount() > 0) cbxPregunta1.setSelectedIndex(0);
-        if (cbxPregunta2 != null && cbxPregunta2.getItemCount() > 0) cbxPregunta2.setSelectedIndex(0);
         if (cbxGenero != null && cbxGenero.getItemCount() > 0) cbxGenero.setSelectedIndex(0);
     }
 

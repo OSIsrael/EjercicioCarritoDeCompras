@@ -97,13 +97,12 @@ public class RegistrarUsuario extends JFrame {
         btnRegistrarse.setText(Idioma.get("registro.btn.registrar"));
         btnAgregarPregunta.setText(Idioma.get("registro.btn.agregar"));
 
-    // Actualizar menú
+
         menuIdiomas.setText(Idioma.get("menu.idiomas"));
         menuItemEspañol.setText(Idioma.get("menu.idiomas.español"));
         menuItemIngles.setText(Idioma.get("menu.idiomas.ingles"));
         menuItemFrances.setText(Idioma.get("menu.idiomas.frances"));
 
-    // Actualizar contador con el idioma actual
         lblPreguntasContador.setText(MessageFormat.format(Idioma.get("registro.lbl.contador"), preguntasRespondidas.size()));
 }
     public void setPreguntasDisponibles(List<Pregunta> preguntas) {
@@ -114,7 +113,7 @@ public class RegistrarUsuario extends JFrame {
         if (cbxPregunta1 == null) return;
         cbxPregunta1.removeAllItems();
         for (Pregunta p : todasLasPreguntas) {
-            // Solo añade las preguntas que aún no han sido respondidas
+
             if (!preguntasRespondidas.containsKey(p)) {
                 cbxPregunta1.addItem(p);
             }
@@ -124,7 +123,7 @@ public class RegistrarUsuario extends JFrame {
         Pregunta preguntaSeleccionada = (Pregunta) cbxPregunta1.getSelectedItem();
         String respuesta = txtRespuesta1.getText().trim();
 
-        // Validaciones
+
         if (preguntaSeleccionada == null) {
             mostrarMensaje("registro.seleccione");
             return;
@@ -135,9 +134,9 @@ public class RegistrarUsuario extends JFrame {
         }
         preguntasRespondidas.put(preguntaSeleccionada, respuesta);
 
-        // Actualizar UI
-        actualizarComboBox(); // Esto quitará la pregunta recién respondida de la lista
-        txtRespuesta1.setText(""); // Limpiar para la siguiente
+
+        actualizarComboBox();
+        txtRespuesta1.setText("");
         lblPreguntasContador.setText(MessageFormat.format(Idioma.get("registro.lbl.contador"), preguntasRespondidas.size()));
         int faltan = 3 - preguntasRespondidas.size();
         String mensajeFormateado = MessageFormat.format(Idioma.get("registro.msj.pregunta.anadida"), faltan);

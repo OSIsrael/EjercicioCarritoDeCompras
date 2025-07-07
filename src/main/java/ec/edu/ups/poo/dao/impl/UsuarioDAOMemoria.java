@@ -14,20 +14,16 @@ public class UsuarioDAOMemoria implements UsuarioDAO {
 
     public UsuarioDAOMemoria() {
         this.usuarios = new ArrayList<>();
-        // Crear usuarios por defecto
         inicializarUsuariosPorDefecto();
     }
 
     private void inicializarUsuariosPorDefecto() {
-        // Crear usuario administrador por defecto
         Usuario admin = new Usuario("admin", "12345", Rol.ADMINISTRADOR, Genero.MASCULINO, "Admin", "Principal", "000000000", 30);
         usuarios.add(admin);
 
-        // Crear usuario normal por defecto
         Usuario usuarioNormal = new Usuario("usuario", "12345", Rol.USUARIO,Genero.FEMININO, "Usuario", "Principal", "099324321", 20);
         usuarios.add(usuarioNormal);
 
-        // Crear algunos usuarios adicionales para pruebas
         Usuario usuario2 = new Usuario("juan", "1234", Rol.USUARIO,Genero.MASCULINO, "Juan", "Perez", "03232432434", 18);
         usuarios.add(usuario2);
 
@@ -157,7 +153,6 @@ public class UsuarioDAOMemoria implements UsuarioDAO {
         return usuariosFiltrados;
     }
 
-    // Método auxiliar para debugging
     private void imprimirUsuarios() {
         System.out.println("=== Lista de usuarios ===");
         for (int i = 0; i < usuarios.size(); i++) {
@@ -167,12 +162,4 @@ public class UsuarioDAOMemoria implements UsuarioDAO {
         System.out.println("========================");
     }
 
-    // Método para obtener estadísticas
-    public void mostrarEstadisticas() {
-        System.out.println("=== Estadísticas de usuarios ===");
-        System.out.println("Total de usuarios: " + usuarios.size());
-        System.out.println("Administradores: " + listarPorRol(Rol.ADMINISTRADOR).size());
-        System.out.println("Usuarios normales: " + listarPorRol(Rol.USUARIO).size());
-        System.out.println("===============================");
-    }
 }

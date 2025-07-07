@@ -167,10 +167,9 @@ public class ProductoController {
         productoEliminarView.cargarDatos(productoDAO.listarTodos());
     }
 
-    // En: ec.edu.ups.poo.controlador.ProductoController.java
 
     private void eliminarProducto() {
-        // Obtener la fila seleccionada de la tabla en la vista de eliminación
+
         int filaSeleccionada = productoEliminarView.getTblEliminarProducto().getSelectedRow();
 
         if (filaSeleccionada < 0) {
@@ -178,7 +177,7 @@ public class ProductoController {
             return;
         }
 
-        // Pedir confirmación al usuario
+
         int confirmacion = JOptionPane.showConfirmDialog(
                 productoEliminarView,
                 Idioma.get("producto.controller.msj.seguro"),
@@ -187,16 +186,16 @@ public class ProductoController {
         );
 
         if (confirmacion == JOptionPane.YES_OPTION) {
-            // Obtener el código del producto de la columna 0 de la fila seleccionada
+
             int codigo = (int) productoEliminarView.getTblEliminarProducto().getValueAt(filaSeleccionada, 0);
 
-            // Llamar al DAO para eliminar
+
             productoDAO.eliminar(codigo);
 
-            // Mostrar mensaje de éxito
+
             productoEliminarView.mostrarMensaje(Idioma.get("producto.controller.msj.eliminado"));
 
-            // Refrescar la lista de productos en la tabla
+
             listarProductosParaEliminar();
         }
     }

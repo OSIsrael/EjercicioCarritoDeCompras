@@ -25,13 +25,13 @@ public class ProductoEliminar extends JInternalFrame {
         setMaximizable(true);
         setSize(600, 500);
 
-        // Inicializar el modelo de la tabla
+
         modelo = new DefaultTableModel();
-        Object[] columnas = {"", "", ""}; // Internacionalizadas abajo
+        Object[] columnas = {"", "", ""};
         modelo.setColumnIdentifiers(columnas);
         tblEliminarProducto.setModel(modelo);
 
-        // Configurar selección de fila para mostrar información
+
         tblEliminarProducto.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 int filaSeleccionada = tblEliminarProducto.getSelectedRow();

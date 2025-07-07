@@ -26,7 +26,7 @@ public class UsuarioController {
     private UsuarioModificarDatosView usuarioModificarDatosView;
     private OlvideContrasenaView olvideContrasenaView;
 
-    // Variables para el flujo de recuperación
+
     private Usuario usuarioRecuperacion;
     private Integer idPreguntaRecuperacion;
 
@@ -48,11 +48,11 @@ public class UsuarioController {
         configurarEventos();
     }
     private void configurarEventosIdioma() {
-        // Se crea un único ActionListener para todos los menús de idioma.
-        ActionListener cambiarIdiomaListener = e -> {
-            String lang = "es", country = "EC"; // Por defecto
 
-            // Determina qué idioma se seleccionó
+        ActionListener cambiarIdiomaListener = e -> {
+            String lang = "es", country = "EC";
+
+
             if (e.getSource() instanceof JMenuItem) {
                 JMenuItem sourceItem = (JMenuItem) e.getSource();
                 if (sourceItem.getText().equals(Idioma.get("menu.idiomas.ingles"))) {
@@ -63,24 +63,23 @@ public class UsuarioController {
             }
             Idioma.setIdioma(lang, country);
 
-            // Ordena a todas las vistas relevantes que actualicen sus textos
+
             loginView.actualizarTextos();
             registrarUsuarioView.actualizarTextos();
             olvideContrasenaView.actualizarTextos();
         };
 
-        // Asigna el listener a todos los JMenuItems de las tres ventanas
-        // LoginView
+
         loginView.getMenuItemEspañol().addActionListener(cambiarIdiomaListener);
         loginView.getMenuItemIngles().addActionListener(cambiarIdiomaListener);
         loginView.getMenuItemFrances().addActionListener(cambiarIdiomaListener);
 
-        // RegistrarUsuario
+
         registrarUsuarioView.getMenuItemEspañol().addActionListener(cambiarIdiomaListener);
         registrarUsuarioView.getMenuItemIngles().addActionListener(cambiarIdiomaListener);
         registrarUsuarioView.getMenuItemFrances().addActionListener(cambiarIdiomaListener);
 
-        // OlvideContrasenaView
+
         olvideContrasenaView.getMenuItemEspañol().addActionListener(cambiarIdiomaListener);
         olvideContrasenaView.getMenuItemIngles().addActionListener(cambiarIdiomaListener);
         olvideContrasenaView.getMenuItemFrances().addActionListener(cambiarIdiomaListener);
@@ -88,24 +87,22 @@ public class UsuarioController {
 
 
     private void configurarEventos() {
-        // Eventos de LoginView
+
         this.loginView.getBtnIniciarSesion().addActionListener(e -> login());
         this.loginView.getBtnOlvide().addActionListener(e ->  abrirOlvideContrasena());
         this.loginView.getBtnRegistrarse().addActionListener(e -> abrirVentanaRegistro());
 
-        // Eventos de RegistrarUsuario
+
         this.registrarUsuarioView.getBtnRegistrarse().addActionListener(e -> registrarUsuario());
 
-        // Eventos de OlvideContrasenaView
 
         olvideContrasenaView.getBtnValidar().addActionListener(e -> validarUsuarioYMostrarPregunta());
         olvideContrasenaView.getBtnCambiar().addActionListener(e -> cambiarContrasena());
-        // Eventos de UsuarioAdminView
+
         this.usuarioAdminView.getBtnActualizar().addActionListener(e -> actualizarUsuario());
         this.usuarioAdminView.getBtnEliminar().addActionListener(e -> eliminarUsuario());
         this.usuarioAdminView.getBtnRefrescar().addActionListener(e -> listarUsuarios());
 
-        //Eventos UsuarioBuscarView
         if (usuarioBuscarView != null) {
             usuarioBuscarView.getBtnBuscar().addActionListener(e -> buscarUsuarioAction());
             usuarioBuscarView.getBtnListar().addActionListener(e -> listarTodosAction());
@@ -142,7 +139,7 @@ public class UsuarioController {
             JOptionPane.showMessageDialog(olvideContrasenaView, Idioma.get("usuario.controller.nopreguntas"));
             return;
         }
-        // Selecciona una pregunta al azar
+
         idPreguntaRecuperacion = idsPreguntas.get(new Random().nextInt(idsPreguntas.size()));
         Pregunta pregunta = preguntaDAO.buscarPorId(idPreguntaRecuperacion);
         if (pregunta != null) {
@@ -150,7 +147,7 @@ public class UsuarioController {
         } else {
             olvideContrasenaView.getLblPregunta().setText("Pregunta no encontrada.");
         }
-        // Hacer visibles los campos de respuesta y demás
+
         olvideContrasenaView.getLblNuevaContrasena().setVisible(true);
         olvideContrasenaView.getTxtNuevaContrasena().setVisible(true);
         olvideContrasenaView.getBtnCambiar().setVisible(true);
@@ -227,7 +224,7 @@ public class UsuarioController {
             genero = Genero.OTROS;
         }
 
-        // Validaciones de campos básicos
+
         if (username.isEmpty() || password.isEmpty() || nombre.isEmpty() || apellido.isEmpty() ||
                 telefono.isEmpty() || edadStr.isEmpty()) {
             registrarUsuarioView.mostrarMensaje("registro.msj.camposprincipales.vacios");
@@ -246,14 +243,14 @@ public class UsuarioController {
             return;
         }
 
-        // Validación: Al menos 3 preguntas distintas respondidas
+
         Map<Pregunta, String> preguntasRespondidas = registrarUsuarioView.getPreguntasYRespuestas();
         if (preguntasRespondidas.size() < 3) {
             registrarUsuarioView.mostrarMensaje("registro.msj.minpreguntas");
             return;
         }
 
-        // Crear usuario y guardar preguntas de seguridad
+
         Usuario nuevo = new Usuario(username, password, Rol.USUARIO, genero, nombre, apellido, telefono, edad);
         Map<Integer, String> preguntasParaGuardar = new HashMap<>();
         for (Map.Entry<Pregunta, String> entry : preguntasRespondidas.entrySet()) {
@@ -288,7 +285,7 @@ public class UsuarioController {
         Rol rolActual = (Rol) usuarioAdminView.getTblUsuarios().getValueAt(fila, 1);
         Rol nuevoRol = (Rol) usuarioAdminView.getCbxRol().getSelectedItem();
 
-        // Verificar si hay cambios
+
         if (rolActual == nuevoRol && nuevoUsername.equals(usuarioDAO.buscarPorUsername(nuevoUsername).getUsername())) {
             usuarioAdminView.mostrarMensaje("usuario.controller.msj.sincambios");
             return;

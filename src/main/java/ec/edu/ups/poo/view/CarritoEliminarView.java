@@ -11,7 +11,7 @@ import java.text.NumberFormat;
 import java.util.List;
 
 public class CarritoEliminarView extends JInternalFrame {
-    // Variables de instancia que coinciden con el diseño
+
     private JPanel panelPrincipal;
     private JButton btnEliminar;
     private JButton btnListar;
@@ -25,16 +25,16 @@ public class CarritoEliminarView extends JInternalFrame {
     private List<Carrito> ultimoListado;
 
     private DateFormat dateFormat;
-    private NumberFormat currencyFormat;// Mantener referencia para selección
+    private NumberFormat currencyFormat;
 
     public CarritoEliminarView() {
-        super("", true, true, true, true); // Título internacionalizado
+        super("", true, true, true, true);
         setContentPane(panelPrincipal);
         this.setSize(700, 500);
 
-        // Modelo para la tabla de carritos
+
         modeloTablaCarritos = new DefaultTableModel(
-                new Object[]{"", "", "", ""}, 0 // Columnas internacionalizadas abajo
+                new Object[]{"", "", "", ""}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -43,9 +43,9 @@ public class CarritoEliminarView extends JInternalFrame {
         };
         tblEliminarCarrito.setModel(modeloTablaCarritos);
 
-        // Modelo para la tabla de detalles
+
         modeloTablaDetalle = new DefaultTableModel(
-                new Object[]{"", "", "", ""}, 0 // Columnas internacionalizadas abajo
+                new Object[]{"", "", "", ""}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -57,7 +57,7 @@ public class CarritoEliminarView extends JInternalFrame {
         btnListar.setIcon(new ImageIcon(getClass().getResource("/icons/listar.png")));
         btnEliminar.setEnabled(false);
 
-        // Listener: al seleccionar un carrito, muestra detalles y habilita Eliminar
+
         tblEliminarCarrito.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && tblEliminarCarrito.getSelectedRow() != -1 && ultimoListado != null) {
                 int fila = tblEliminarCarrito.getSelectedRow();
@@ -80,7 +80,7 @@ public class CarritoEliminarView extends JInternalFrame {
         btnEliminar.setText(Idioma.get("carrito.eliminar.btn.eliminar"));
         btnListar.setText(Idioma.get("carrito.eliminar.btn.listar"));
 
-        // Columnas tabla carritos
+
         modeloTablaCarritos.setColumnIdentifiers(new Object[] {
                 Idioma.get("carrito.eliminar.tbl.codigo"),
                 Idioma.get("carrito.eliminar.tbl.usuario"),
@@ -88,7 +88,7 @@ public class CarritoEliminarView extends JInternalFrame {
                 Idioma.get("carrito.eliminar.tbl.total")
         });
 
-        // Columnas tabla detalle
+
         modeloTablaDetalle.setColumnIdentifiers(new Object[] {
                 Idioma.get("carrito.eliminar.tbl.codigoProd"),
                 Idioma.get("carrito.eliminar.tbl.nombreProd"),
@@ -103,7 +103,7 @@ public class CarritoEliminarView extends JInternalFrame {
         }
     }
 
-    // Mostrar TODOS los carritos en la tabla principal
+
     public void cargarCarritosUsuario(List<Carrito> carritos) {
         modeloTablaCarritos.setRowCount(0);
         modeloTablaDetalle.setRowCount(0);
@@ -121,7 +121,7 @@ public class CarritoEliminarView extends JInternalFrame {
         carritoSeleccionado = null;
     }
 
-    // Mostrar detalle de carrito seleccionado
+
     public void mostrarCarrito(Carrito carrito) {
         modeloTablaDetalle.setRowCount(0);
         carritoSeleccionado = null;
@@ -160,7 +160,7 @@ public class CarritoEliminarView extends JInternalFrame {
         return respuesta == JOptionPane.YES_OPTION;
     }
 
-    // Getters
+
     public JButton getBtnEliminar() {
         return btnEliminar;
     }

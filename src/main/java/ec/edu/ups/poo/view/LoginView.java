@@ -10,7 +10,7 @@ public class LoginView extends JFrame{
     private JTextField txtUsername;
     private JPasswordField txtPassword;
     private JButton btnIniciarSesion;
-    private JButton btnRegistrarse;// NUEVO
+    private JButton btnRegistrarse;
     private JLabel lblUsuario;
     private JLabel lblContrasena;
     private JButton btnOlvide;
@@ -36,7 +36,7 @@ public class LoginView extends JFrame{
     }
     private void crearMenu() {
         menuBar = new JMenuBar();
-        menuIdiomas = new JMenu(); // El texto se establece en actualizarTextos
+        menuIdiomas = new JMenu();
         menuItemEspañol = new JMenuItem();
         menuItemIngles = new JMenuItem();
         menuItemFrances = new JMenuItem();
@@ -55,7 +55,7 @@ public class LoginView extends JFrame{
         btnRegistrarse.setText(Idioma.get("login.btn.registrar"));
         btnOlvide.setText(Idioma.get("login.btn.olvide"));
 
-        // Actualizar menú
+
         menuIdiomas.setText(Idioma.get("menu.idiomas"));
         menuItemEspañol.setText(Idioma.get("menu.idiomas.español"));
         menuItemIngles.setText(Idioma.get("menu.idiomas.ingles"));

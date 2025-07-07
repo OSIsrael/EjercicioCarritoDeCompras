@@ -20,17 +20,17 @@ public class CarritoModificarView extends JInternalFrame {
     private JButton btnBuscar;
     private JLabel lblCodigo;
 
-    private DefaultTableModel modeloTablaCarritos; // Para tblModificar
-    private DefaultTableModel modeloTablaDetalle;  // Para tblDetalleCarrito
+    private DefaultTableModel modeloTablaCarritos;
+    private DefaultTableModel modeloTablaDetalle;
 
     private List<Carrito> ultimoListado;
 
     public CarritoModificarView() {
-        super("", true, true, true, true); // Título internacionalizado
+        super("", true, true, true, true);
 
         panelPrincipal = new JPanel(new BorderLayout());
 
-        // Panel superior para búsqueda
+
         JPanel panelSuperior = new JPanel();
         lblCodigo = new JLabel();
         panelSuperior.add(lblCodigo);
@@ -42,34 +42,34 @@ public class CarritoModificarView extends JInternalFrame {
 
         panelPrincipal.add(panelSuperior, BorderLayout.NORTH);
 
-        // Modelo para la tabla de carritos
+
         modeloTablaCarritos = new DefaultTableModel(
-                new Object[]{"", "", "", "", ""}, 0 // Columnas internacionalizadas abajo
+                new Object[]{"", "", "", "", ""}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                // Solo la columna de cantidad total es editable (col 3)
+
                 return column == 3;
             }
         };
         tblModificar = new JTable(modeloTablaCarritos);
 
-        // Modelo para la tabla de detalles
+
         modeloTablaDetalle = new DefaultTableModel(
-                new Object[]{"", "", "", ""}, 0 // Columnas internacionalizadas abajo
+                new Object[]{"", "", "", ""}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) { return false; }
         };
         tblDetalleCarrito = new JTable(modeloTablaDetalle);
 
-        // Panel central con las dos tablas
+
         JPanel panelTablas = new JPanel(new GridLayout(2, 1));
         panelTablas.add(new JScrollPane(tblModificar));
         panelTablas.add(new JScrollPane(tblDetalleCarrito));
         panelPrincipal.add(panelTablas, BorderLayout.CENTER);
 
-        // Panel inferior con el botón modificar
+
         JPanel panelInferior = new JPanel();
         btnModificar = new JButton();
         btnModificar.setIcon(new ImageIcon(getClass().getResource("/icons/editar.png")));
@@ -79,7 +79,7 @@ public class CarritoModificarView extends JInternalFrame {
         setContentPane(panelPrincipal);
         setSize(800, 550);
 
-        // Listener: al seleccionar un carrito, muestra detalles
+
         tblModificar.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && tblModificar.getSelectedRow() != -1 && ultimoListado != null) {
                 int fila = tblModificar.getSelectedRow();
@@ -108,7 +108,7 @@ public class CarritoModificarView extends JInternalFrame {
                 Idioma.get("carrito.modificar.tbl.usuario")
         });
 
-        // Columnas tabla detalles
+
         modeloTablaDetalle.setColumnIdentifiers(new Object[]{
                 Idioma.get("carrito.modificar.tbl.codigoProd"),
                 Idioma.get("carrito.modificar.tbl.nombreProd"),
@@ -120,7 +120,7 @@ public class CarritoModificarView extends JInternalFrame {
         tblDetalleCarrito.setToolTipText(Idioma.get("carrito.modificar.tbldetalle.tooltip"));
     }
 
-    // Cargar todos los carritos
+
     public void cargarCarritosUsuario(List<Carrito> carritos) {
         modeloTablaCarritos.setRowCount(0);
         ultimoListado = carritos;
@@ -142,7 +142,7 @@ public class CarritoModificarView extends JInternalFrame {
         modeloTablaDetalle.setRowCount(0);
     }
 
-    // Cargar solo un carrito filtrado (por código)
+
     public void cargarCarrito(Carrito carrito) {
         modeloTablaCarritos.setRowCount(0);
         ultimoListado = null;
@@ -164,7 +164,7 @@ public class CarritoModificarView extends JInternalFrame {
         }
     }
 
-    // Muestra los detalles del carrito seleccionado
+
     public void cargarDetalleCarrito(Carrito carrito) {
         modeloTablaDetalle.setRowCount(0);
         if (carrito != null) {
@@ -176,7 +176,7 @@ public class CarritoModificarView extends JInternalFrame {
                         String.format("%.2f", item.getSubtotal())
                 });
             }
-            // Fila vacía
+
             modeloTablaDetalle.addRow(new Object[]{"", "", "", ""});
             modeloTablaDetalle.addRow(new Object[]{"", Idioma.get("carrito.modificar.lbl.subtotal"), "", String.format("%.2f", carrito.calcularSubtotal())});
             modeloTablaDetalle.addRow(new Object[]{"", Idioma.get("carrito.modificar.lbl.iva"), "", String.format("%.2f", carrito.calcularIva())});
@@ -198,7 +198,7 @@ public class CarritoModificarView extends JInternalFrame {
         JOptionPane.showMessageDialog(this, Idioma.get(mensajeKey), Idioma.get("carrito.modificar.msj.error"), JOptionPane.ERROR_MESSAGE);
     }
 
-    // Getters para el controlador
+
     public JTextField getTxtCodigo() { return txtCodigo; }
     public JButton getBtnModificar() { return btnModificar; }
     public JTable getTblModificar() { return tblModificar; }

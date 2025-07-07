@@ -24,10 +24,10 @@ public class ProductoEditar extends JInternalFrame {
         setResizable(true);
         setMaximizable(true);
         setSize(600, 500);
-        //setVisible(true);
+
 
         modelo = new DefaultTableModel();
-        Object[] columnas = {"", "", ""}; // Internacionalizadas abajo
+        Object[] columnas = {"", "", ""};
         modelo.setColumnIdentifiers(columnas);
         tblEditarProducto.setModel(modelo);
 

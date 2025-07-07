@@ -72,7 +72,7 @@ public class Carrito {
 
     public void actualizarCantidad(int codigoProducto, int nuevaCantidad) {
         if (nuevaCantidad <= 0) {
-            eliminarProducto(codigoProducto); // Si la cantidad es 0 o menos, se elimina
+            eliminarProducto(codigoProducto);
             return;
         }
         for (ItemCarrito item : items) {
@@ -92,7 +92,7 @@ public class Carrito {
     }
 
     public double calcularIva() {
-        return calcularSubtotal() * 0.12; // Asumiendo IVA del 12%
+        return calcularSubtotal() * 0.12;
     }
 
     public double calcularTotal() {

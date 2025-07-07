@@ -48,13 +48,11 @@ public class OlvideContrasenaView extends JDialog {
     public void actualizarTextos() {
         setTitle(Idioma.get("olvide.titulo"));
         lblUsuario.setText(Idioma.get("olvide.lbl.usuario"));
-        // lblPregunta se actualiza dinámicamente, pero podemos poner un placeholder
-        // lblPregunta.setText(Idioma.get("olvide.lbl.pregunta"));
+
         lblNuevaContrasena.setText(Idioma.get("olvide.lbl.nuevacontra"));
         btnValidar.setText(Idioma.get("olvide.btn.validar"));
         btnCambiar.setText(Idioma.get("olvide.btn.cambiar"));
 
-        // Actualizar menú
         menuIdiomas.setText(Idioma.get("menu.idiomas"));
         menuItemEspañol.setText(Idioma.get("menu.idiomas.español"));
         menuItemIngles.setText(Idioma.get("menu.idiomas.ingles"));

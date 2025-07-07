@@ -22,7 +22,6 @@ public class UsuarioBuscarView extends JInternalFrame {
     public UsuarioBuscarView()  {
         super("", true, true, true, true);
 
-        // Inicialización manual de componentes
         panelPrincipal = new JPanel(new BorderLayout());
         JPanel panelSuperior = new JPanel();
 
@@ -36,7 +35,7 @@ public class UsuarioBuscarView extends JInternalFrame {
         panelSuperior.add(btnListar);
 
         modeloTablaUsuarios = new DefaultTableModel(
-                new Object[]{"", ""}, 0 // Internacionalizadas abajo
+                new Object[]{"", ""}, 0
         ) {
             public boolean isCellEditable(int row, int col) { return false; }
         };
@@ -65,7 +64,7 @@ public class UsuarioBuscarView extends JInternalFrame {
         tblUsuarios.setToolTipText(Idioma.get("usuario.buscar.tbl.tooltip"));
     }
 
-    // Mostrar todos los usuarios
+
     public void cargarUsuarios(List<Usuario> usuarios) {
         modeloTablaUsuarios.setRowCount(0);
         ultimoListadoUsuarios = usuarios;
@@ -76,7 +75,7 @@ public class UsuarioBuscarView extends JInternalFrame {
         }
     }
 
-    // Mostrar solo un usuario encontrado
+
     public void mostrarUsuario(Usuario usuario) {
         modeloTablaUsuarios.setRowCount(0);
         if (usuario != null) {
@@ -96,7 +95,7 @@ public class UsuarioBuscarView extends JInternalFrame {
         JOptionPane.showMessageDialog(this, mensaje, Idioma.get("usuario.buscar.msj.info"), JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // Getters
+
     public JTextField getTxtUsername() { return txtUsername; }
     public JButton getBtnBuscar() { return btnBuscar; }
     public JButton getBtnListar() { return btnListar; }

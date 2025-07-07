@@ -39,7 +39,7 @@ public class CarritoAnadirView extends JInternalFrame {
         cargarDatos();
         configurarTabla();
         configurarComponentes();
-        actualizarTextos(); // Textos internacionalizados
+        actualizarTextos();
     }
 
     public void actualizarTextos() {
@@ -91,11 +91,10 @@ public class CarritoAnadirView extends JInternalFrame {
         DefaultTableModel model = new DefaultTableModel() {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Hacer que la tabla no sea editable
+                return false;
             }
         };
 
-        // Columnas iniciales, pero serán sobreescritas por actualizarTextos()
         Object[] columnas = new Object[]{
                 Idioma.get("carrito.tbl.codigo"),
                 Idioma.get("carrito.tbl.nombre"),
@@ -106,12 +105,12 @@ public class CarritoAnadirView extends JInternalFrame {
         model.setColumnIdentifiers(columnas);
         tblMostrar.setModel(model);
 
-        // Configurar el ancho de las columnas
-        tblMostrar.getColumnModel().getColumn(0).setPreferredWidth(80);  // Código
-        tblMostrar.getColumnModel().getColumn(1).setPreferredWidth(200); // Nombre
-        tblMostrar.getColumnModel().getColumn(2).setPreferredWidth(80);  // Precio
-        tblMostrar.getColumnModel().getColumn(3).setPreferredWidth(80);  // Cantidad
-        tblMostrar.getColumnModel().getColumn(4).setPreferredWidth(100); // Subtotal
+
+        tblMostrar.getColumnModel().getColumn(0).setPreferredWidth(80);
+        tblMostrar.getColumnModel().getColumn(1).setPreferredWidth(200);
+        tblMostrar.getColumnModel().getColumn(2).setPreferredWidth(80);
+        tblMostrar.getColumnModel().getColumn(3).setPreferredWidth(80);
+        tblMostrar.getColumnModel().getColumn(4).setPreferredWidth(100);
 
         tblMostrar.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblMostrar.setRowSelectionAllowed(true);
@@ -155,7 +154,7 @@ public class CarritoAnadirView extends JInternalFrame {
         txtTotal.setText("0.00");
     }
 
-    // Métodos getter y setter (sin cambios)
+
     public JPanel getPanelPrincipal() { return panelPrincipal; }
     public void setPanelPrincipal(JPanel panelPrincipal) { this.panelPrincipal = panelPrincipal; }
     public JTextField getTxtCodigo() { return txtCodigo; }
@@ -183,7 +182,7 @@ public class CarritoAnadirView extends JInternalFrame {
     public JComboBox<String> getCbxCanridad() { return cbxCanridad; }
     public void setCbxCanridad(JComboBox<String> cbxCanridad) { this.cbxCanridad = cbxCanridad; }
 
-    // Métodos de mensajes internacionalizados
+
     public void mostrarMensaje(String clave) {
         JOptionPane.showMessageDialog(this, Idioma.get(clave), Idioma.get("carrito.info"), JOptionPane.INFORMATION_MESSAGE);
     }

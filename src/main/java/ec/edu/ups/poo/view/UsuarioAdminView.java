@@ -43,12 +43,12 @@ public class UsuarioAdminView extends JInternalFrame {
         modeloTabla = new DefaultTableModel() {
             @Override
             public boolean isCellEditable(int row, int column) {
-                // SOLO el username es editable (columna 0)
+
                 return column == 0;
             }
         };
-        modeloTabla.addColumn(""); // username
-        modeloTabla.addColumn(""); // rol
+        modeloTabla.addColumn("");
+        modeloTabla.addColumn("");
 
         tblUsuarios = new JTable(modeloTabla);
         tblUsuarios.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

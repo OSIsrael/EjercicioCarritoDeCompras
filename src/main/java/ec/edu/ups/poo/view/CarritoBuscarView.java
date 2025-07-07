@@ -24,17 +24,17 @@ public class CarritoBuscarView extends JInternalFrame {
     private DefaultTableModel modeloTablaCarritos;
     private DefaultTableModel modeloTablaDetalle;
 
-    private List<Carrito> ultimoListadoCarritos; // Para referencia rápida en selección
+    private List<Carrito> ultimoListadoCarritos;
     private DateFormat dateFormat;
     private NumberFormat currencyFormat;
     public CarritoBuscarView() {
-        super("", true, true, true, true); // Título será internacionalizado
+        super("", true, true, true, true);
 
-        // Inicialización de componentes
+
         panelPrincipal = new JPanel(new BorderLayout());
 
         JPanel panelBusqueda = new JPanel();
-        lblCodigo = new JLabel(); // Internacionalizado después
+        lblCodigo = new JLabel();
         panelBusqueda.add(lblCodigo);
         txtBuscarCarrito = new JTextField(8);
         btnBuscarCarrito = new JButton();
@@ -47,14 +47,14 @@ public class CarritoBuscarView extends JInternalFrame {
         panelBusqueda.add(btnListar);
 
         modeloTablaCarritos = new DefaultTableModel(
-                new Object[]{"", "", "", ""}, 0 // Columnas internacionalizadas después
+                new Object[]{"", "", "", ""}, 0
         ) {
             public boolean isCellEditable(int r, int c) { return false; }
         };
         tblBuscarCarrito = new JTable(modeloTablaCarritos);
 
         modeloTablaDetalle = new DefaultTableModel(
-                new Object[]{"", "", "", ""}, 0 // Columnas internacionalizadas después
+                new Object[]{"", "", "", ""}, 0
         ) {
             public boolean isCellEditable(int r, int c) { return false; }
         };
@@ -70,7 +70,6 @@ public class CarritoBuscarView extends JInternalFrame {
         setContentPane(panelPrincipal);
         setSize(700, 500);
 
-        // Listener para seleccionar carrito y mostrar detalles
         tblBuscarCarrito.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && tblBuscarCarrito.getSelectedRow() != -1 && ultimoListadoCarritos != null) {
                 int fila = tblBuscarCarrito.getSelectedRow();
@@ -97,7 +96,6 @@ public class CarritoBuscarView extends JInternalFrame {
         btnBuscarCarrito.setText(Idioma.get("carrito.buscar.btn.buscar"));
         btnListar.setText(Idioma.get("carrito.buscar.btn.listar"));
 
-        // Columnas tabla carritos
         modeloTablaCarritos.setColumnIdentifiers(new Object[]{
                 Idioma.get("carrito.buscar.tbl.codigo"),
                 Idioma.get("carrito.buscar.tbl.usuario"),
@@ -105,7 +103,6 @@ public class CarritoBuscarView extends JInternalFrame {
                 Idioma.get("carrito.buscar.tbl.total")
         });
 
-        // Columnas tabla detalle
         modeloTablaDetalle.setColumnIdentifiers(new Object[]{
                 Idioma.get("carrito.buscar.tbl.codigoProd"),
                 Idioma.get("carrito.buscar.tbl.nombreProd"),
@@ -121,7 +118,7 @@ public class CarritoBuscarView extends JInternalFrame {
 
     }
 
-    // Muestra todos los carritos en la tabla principal
+
     public void cargarCarritosUsuario(List<Carrito> carritos) {
         modeloTablaCarritos.setRowCount(0);
         modeloTablaDetalle.setRowCount(0);
@@ -137,7 +134,7 @@ public class CarritoBuscarView extends JInternalFrame {
         }
     }
 
-    // Muestra solo un carrito (por código)
+
     public void mostrarCarrito(Carrito carrito) {
         modeloTablaCarritos.setRowCount(0);
         modeloTablaDetalle.setRowCount(0);
@@ -151,14 +148,14 @@ public class CarritoBuscarView extends JInternalFrame {
                     currencyFormat.format(carrito.calcularTotal())
             });
             mostrarDetalleCarrito(carrito);
-            ultimoListadoCarritos = List.of(carrito); // Para permitir click en tabla única
+            ultimoListadoCarritos = List.of(carrito);
         } else {
             mostrarMensaje(Idioma.get("carrito.buscar.msj.noencontrado"));
             ultimoListadoCarritos = null;
         }
     }
 
-    // Muestra los ítems de un carrito en la tabla de detalles
+
     public void mostrarDetalleCarrito(Carrito carrito) {
         modeloTablaDetalle.setRowCount(0);
         if (carrito != null) {
@@ -184,7 +181,7 @@ public class CarritoBuscarView extends JInternalFrame {
        JOptionPane.showMessageDialog(this, mensaje, "carrito.buscar.msj.info", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // Getters para el controlador
+
     public JTextField getTxtBuscarCarrito() { return txtBuscarCarrito; }
     public JButton getBtnBuscarCarrito() { return btnBuscarCarrito; }
     public JButton getBtnListar() { return btnListar; }

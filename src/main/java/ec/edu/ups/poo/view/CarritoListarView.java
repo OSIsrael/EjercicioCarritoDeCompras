@@ -28,13 +28,13 @@ public class CarritoListarView extends JInternalFrame {
     private NumberFormat currencyFormat;
 
     public CarritoListarView() {
-        super("", true, true, true, true); // Título internacionalizado
+        super("", true, true, true, true);
 
         panelPrincipal = new JPanel(new BorderLayout());
 
         // Modelo de la tabla de carritos
         modeloTablaCarritos = new DefaultTableModel(
-                new Object[]{"", "", "", "", ""}, 0 // Columnas internacionalizadas abajo
+                new Object[]{"", "", "", "", ""}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -43,9 +43,9 @@ public class CarritoListarView extends JInternalFrame {
         };
         tblCarritos = new JTable(modeloTablaCarritos);
 
-        // Modelo de la tabla de detalles
+
         modeloDetallesCarrito = new DefaultTableModel(
-                new Object[]{"", "", "", ""}, 0 // Columnas internacionalizadas abajo
+                new Object[]{"", "", "", ""}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -68,7 +68,7 @@ public class CarritoListarView extends JInternalFrame {
         setContentPane(panelPrincipal);
         this.setSize(800, 500);
 
-        // Listener de selección
+
         tblCarritos.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
@@ -118,10 +118,7 @@ public class CarritoListarView extends JInternalFrame {
         }
     }
 
-    /**
-     * Carga la lista de carritos en la tabla principal.
-     * @param carritos Carritos a mostrar (solo del usuario autenticado)
-     */
+
     public void cargarCarritos(List<Carrito> carritos) {
         modeloTablaCarritos.setRowCount(0);
         ultimoListado = carritos;
@@ -139,13 +136,10 @@ public class CarritoListarView extends JInternalFrame {
                 });
             }
         }
-        modeloDetallesCarrito.setRowCount(0); // limpia detalles
+        modeloDetallesCarrito.setRowCount(0);
     }
 
-    /**
-     * Muestra los detalles del carrito seleccionado en la tabla inferior,
-     * incluyendo productos y al final, subtotal, iva y total.
-     */
+
     public void mostrarDetallesCarrito(Carrito carrito) {
         modeloDetallesCarrito.setRowCount(0);
         if (carrito != null) {
@@ -157,16 +151,16 @@ public class CarritoListarView extends JInternalFrame {
                         String.format("%.2f", item.getSubtotal())
                 });
             }
-            // Fila vacía
+
             modeloDetallesCarrito.addRow(new Object[]{"", "", "", ""});
-            // Subtotal, IVA y Total (internacionalizados)
+
             modeloDetallesCarrito.addRow(new Object[]{"", Idioma.get("carrito.listar.lbl.subtotal"), "", String.format("%.2f", carrito.calcularSubtotal())});
             modeloDetallesCarrito.addRow(new Object[]{"", Idioma.get("carrito.listar.lbl.iva"), "", String.format("%.2f", carrito.calcularIva())});
             modeloDetallesCarrito.addRow(new Object[]{"", Idioma.get("carrito.listar.lbl.total"), "", String.format("%.2f", carrito.calcularTotal())});
         }
     }
 
-    // Getters
+
     public JButton getBtnListar() { return btnListar; }
     public JTable getTblCarritos() { return tblCarritos; }
     public JTable getTblDetallesCarrito() { return tblDetallesCarrito; }

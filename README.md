@@ -1,6 +1,8 @@
 # Sistema de Gestión de Carrito de Compras
 ## Nombre:Israel Orellana
 ![Sistema de Gestión de Carrito de Compras Logo](https://raw.githubusercontent.com/your-username/your-repo-name/main/docs/logo.png) Un robusto sistema de gestión de carrito de compras desarrollado en Java Swing, diseñado con una arquitectura MVC y el patrón DAO para una gestión eficiente de productos, usuarios y transacciones de compra. El sistema soporta múltiples roles de usuario (administrador y usuario regular) y cuenta con funcionalidad de internacionalización.
+## LINK DEL VIDEO 📽️
+https://youtu.be/XsI37nwdyaY
 
 ## 🚀 Características Principales
 
@@ -66,21 +68,6 @@ El código base se adhiere a los principios SOLID para promover un diseño de so
 * **Framework de GUI:** Java Swing
 * **Gestión de Proyectos:** Maven (Recomendado, aunque no se mostró directamente el `pom.xml`, es una práctica estándar para proyectos Java).
 
-## 🚀 Cómo Ejecutar el Proyecto
 
-1.  **Clonar el Repositorio:**
-    ```bash
-    git clone [https://github.com/your-username/your-repo-name.git](https://github.com/your-username/your-repo-name.git)
-    cd your-repo-name
-    ```
-    *(Asegúrate de reemplazar `your-username` y `your-repo-name` con los valores reales de tu repositorio).*
-
-2.  **Abrir con un IDE:**
-    * Importa el proyecto en tu IDE favorito (IntelliJ IDEA, Eclipse, NetBeans).
-    * Asegúrate de que las dependencias de Maven (si aplicables) se resuelvan automáticamente.
-
-3.  **Ejecutar la Aplicación:**
-    * Localiza la clase principal (ej. `ec.edu.ups.poo.main.MainApp` o similar, si tienes una).
-    * Ejecuta el método `main`.
 
 

@@ -3,6 +3,7 @@ package ec.edu.ups.poo.controlador;
 import ec.edu.ups.poo.dao.PreguntaDAO;
 import ec.edu.ups.poo.modelo.Pregunta;
 
+import java.io.IOException;
 import java.util.List;
 
 public class PreguntaController {
@@ -12,15 +13,15 @@ public class PreguntaController {
         this.preguntaDAO = preguntaDAO;
     }
 
-    public void agregarPregunta(Pregunta pregunta) {
+    public void agregarPregunta(Pregunta pregunta) throws IOException {
         preguntaDAO.crear(pregunta);
     }
 
-    public List<Pregunta> obtenerTodasLasPreguntas() {
+    public List<Pregunta> obtenerTodasLasPreguntas() throws IOException {
         return preguntaDAO.listarTodas();
     }
 
-    public Pregunta buscarPorId(int id) {
+    public Pregunta buscarPorId(int id) throws IOException {
         return preguntaDAO.buscarPorId(id);
     }
 }

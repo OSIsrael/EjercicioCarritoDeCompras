@@ -4,21 +4,22 @@ import ec.edu.ups.poo.dao.CarritoDAO;
 import ec.edu.ups.poo.modelo.Carrito;
 import ec.edu.ups.poo.modelo.Usuario;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class CarritoDAOMemoria implements CarritoDAO {
     private List<Carrito> carritos;
-    private int nextCodigo = 1; // Para asignar códigos automáticamente
+    private int nextCodigo = 1;
 
     public CarritoDAOMemoria() {
         carritos = new ArrayList<>();
     }
 
     @Override
-    public void crear(Carrito carrito) {
-        // Asignar un código si no tiene uno (para nuevos carritos)
+    public void crear(Carrito carrito) throws IOException {
+
         if (carrito.getCodigo() == 0) {
             carrito.setCodigo(nextCodigo++);
         }
@@ -26,7 +27,7 @@ public class CarritoDAOMemoria implements CarritoDAO {
     }
 
     @Override
-    public void eliminar(int codigo) {
+    public void eliminar(int codigo) throws IOException {
         Iterator<Carrito> iterator = carritos.iterator();
         while (iterator.hasNext()) {
             Carrito carrito = iterator.next();
@@ -38,17 +39,17 @@ public class CarritoDAOMemoria implements CarritoDAO {
     }
 
     @Override
-    public void actualizar(Carrito carrito) {
+    public void actualizar(Carrito carrito) throws IOException {
         for (int i = 0; i < carritos.size(); i++) {
             if (carritos.get(i).getCodigo() == carrito.getCodigo()) {
                 carritos.set(i, carrito);
-                return; // Se encontró y actualizó, salir
+                return;
             }
         }
     }
 
     @Override
-    public Carrito buscar(int codigo) {
+    public Carrito buscar(int codigo) throws IOException {
         for (Carrito carrito : carritos) {
             if (carrito.getCodigo() == codigo) {
                 return carrito;
@@ -58,12 +59,12 @@ public class CarritoDAOMemoria implements CarritoDAO {
     }
 
     @Override
-    public List<Carrito> listarTodos() {
-        return new ArrayList<>(carritos); // Devolver una copia para evitar modificaciones externas
+    public List<Carrito> listarTodos() throws IOException {
+        return new ArrayList<>(carritos);
     }
 
     @Override
-    public List<Carrito> listarPorUsuario(Usuario usuario) {
+    public List<Carrito> listarPorUsuario(Usuario usuario) throws IOException {
         List<Carrito> resultado = new ArrayList<>();
         for (Carrito c : carritos) {
             if (c.getUsuario() != null && c.getUsuario().equals(usuario)) {

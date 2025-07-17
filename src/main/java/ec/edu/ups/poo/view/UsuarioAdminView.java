@@ -12,102 +12,48 @@ import java.util.List;
 public class UsuarioAdminView extends JInternalFrame {
     private JTable tblUsuarios;
     private DefaultTableModel modeloTabla;
+    private JPanel panelPrincipal;
     private JComboBox<Rol> cbxRol;
     private JButton btnActualizar;
-    private JButton btnEliminar;
     private JButton btnRefrescar;
-    private JPanel panelPrincipal;
-    private JTable table1;
-    private JComboBox comboBox1;
-    private JButton actualizarButton;
-    private JButton refrescarListaButton;
-    private JButton eliminarUsuarioButton;
+    private JButton btnEliminar;
     private JLabel lblRol;
     private JLabel lblUsuarioSeleccionado;
 
     public UsuarioAdminView() {
         super("", true, true, true, true);
-        inicializarComponentes();
-        configurarLayout();
-        configurarEventos();
-        this.setSize(700, 500);
-        this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        setContentPane(panelPrincipal);
 
-        actualizarTextos();
-
-    }
-
-    private void inicializarComponentes() {
-        panelPrincipal = new JPanel(new BorderLayout());
-
+        // Inicializar el modelo de la tabla
         modeloTabla = new DefaultTableModel() {
             @Override
             public boolean isCellEditable(int row, int column) {
-
-                return column == 0;
+                // Se deshabilita la edición en la tabla para prevenir inconsistencias y simplificar la lógica.
+                return false;
             }
         };
-        modeloTabla.addColumn("");
-        modeloTabla.addColumn("");
+        tblUsuarios.setModel(modeloTabla);
 
-        tblUsuarios = new JTable(modeloTabla);
-        tblUsuarios.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tblUsuarios.getTableHeader().setReorderingAllowed(false);
-
-        cbxRol = new JComboBox<>();
+        // Poblar el ComboBox de Rol
         cbxRol.addItem(Rol.ADMINISTRADOR);
         cbxRol.addItem(Rol.USUARIO);
 
-        btnActualizar = new JButton();
-        btnEliminar = new JButton();
-        btnRefrescar = new JButton();
+        // Configurar iconos de botones
         btnRefrescar.setIcon(new ImageIcon(getClass().getResource("/icons/actualizar.png")));
         btnActualizar.setIcon(new ImageIcon(getClass().getResource("/icons/actualizar.png")));
         btnEliminar.setIcon(new ImageIcon(getClass().getResource("/icons/eliminar.png")));
 
+        // Configurar selección de la tabla y estado inicial de botones
+        configurarSeleccionTabla();
 
-
-        lblRol = new JLabel();
-        lblUsuarioSeleccionado = new JLabel();
-        lblUsuarioSeleccionado.setFont(new Font("Arial", Font.ITALIC, 12));
-        lblUsuarioSeleccionado.setForeground(Color.GRAY);
+        this.setSize(700, 500);
+        this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        actualizarTextos();
     }
 
-    private void configurarLayout() {
-        JPanel panelInfo = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panelInfo.add(new JLabel(Idioma.get("usuario.admin.titulo")));
-        panelInfo.setBorder(BorderFactory.createEtchedBorder());
-
-        JScrollPane scrollPane = new JScrollPane(tblUsuarios);
-        scrollPane.setBorder(BorderFactory.createTitledBorder(Idioma.get("usuario.admin.tbl.titulo")));
-
-        JPanel panelControles = new JPanel(new BorderLayout());
-
-        JPanel panelSeleccion = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panelSeleccion.add(lblUsuarioSeleccionado);
-
-        JPanel panelRol = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panelRol.add(lblRol);
-        panelRol.add(cbxRol);
-        panelRol.add(btnActualizar);
-
-        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        panelBotones.add(btnRefrescar);
-        panelBotones.add(btnEliminar);
-
-        panelControles.add(panelSeleccion, BorderLayout.NORTH);
-        panelControles.add(panelRol, BorderLayout.CENTER);
-        panelControles.add(panelBotones, BorderLayout.SOUTH);
-        panelControles.setBorder(BorderFactory.createTitledBorder(Idioma.get("usuario.admin.acciones")));
-
-        panelPrincipal.add(panelInfo, BorderLayout.NORTH);
-        panelPrincipal.add(scrollPane, BorderLayout.CENTER);
-        panelPrincipal.add(panelControles, BorderLayout.SOUTH);
-
-        this.setContentPane(panelPrincipal);
-    }
-
-    private void configurarEventos() {
+    private void configurarSeleccionTabla() {
+        tblUsuarios.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tblUsuarios.getTableHeader().setReorderingAllowed(false);
         tblUsuarios.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && tblUsuarios.getSelectedRow() != -1) {
                 int selectedRow = tblUsuarios.getSelectedRow();

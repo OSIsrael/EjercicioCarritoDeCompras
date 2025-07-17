@@ -142,7 +142,13 @@ public class ProductoAnadirView extends JInternalFrame {
         this.btnEliminar = btnEliminar;
     }
 
-    public void mostrarMensaje(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje);
+    // --- MÉTODO CORREGIDO Y AÑADIDO ---
+    public void mostrarMensaje(String mensajeKey) {
+        // Se corrige para que use el sistema de idiomas, como en las otras vistas.
+        JOptionPane.showMessageDialog(this, Idioma.get(mensajeKey), Idioma.get("usuario.admin.msj.info"), JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public void mostrarError(String mensajeCompleto) {
+        JOptionPane.showMessageDialog(this, mensajeCompleto, Idioma.get("usuario.admin.msj.error"), JOptionPane.ERROR_MESSAGE);
     }
 }

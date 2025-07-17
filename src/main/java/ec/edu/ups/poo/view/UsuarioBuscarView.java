@@ -21,30 +21,16 @@ public class UsuarioBuscarView extends JInternalFrame {
 
     public UsuarioBuscarView()  {
         super("", true, true, true, true);
-
-        panelPrincipal = new JPanel(new BorderLayout());
-        JPanel panelSuperior = new JPanel();
-
-        lblUsuario = new JLabel();
-        panelSuperior.add(lblUsuario);
-        txtUsername = new JTextField(12);
-        btnBuscar = new JButton();
-        btnListar = new JButton();
-        panelSuperior.add(txtUsername);
-        panelSuperior.add(btnBuscar);
-        panelSuperior.add(btnListar);
+        setContentPane(panelPrincipal);
 
         modeloTablaUsuarios = new DefaultTableModel(
                 new Object[]{"", ""}, 0
         ) {
             public boolean isCellEditable(int row, int col) { return false; }
         };
-        tblUsuarios = new JTable(modeloTablaUsuarios);
-
-        panelPrincipal.add(panelSuperior, BorderLayout.NORTH);
-        panelPrincipal.add(new JScrollPane(tblUsuarios), BorderLayout.CENTER);
-
-        setContentPane(panelPrincipal);
+        // Asignar el modelo a la tabla ya creada por el diseñador
+        tblUsuarios.setModel(modeloTablaUsuarios);
+        
         setSize(700, 500);
         btnBuscar.setIcon(new ImageIcon(getClass().getResource("/icons/buscar.png")));
         btnListar.setIcon(new ImageIcon(getClass().getResource("/icons/listar.png")));

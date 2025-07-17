@@ -1,23 +1,26 @@
 package ec.edu.ups.poo.controlador;
 
+import ec.edu.ups.poo.dao.DAOFactory;
 import ec.edu.ups.poo.dao.PreguntaDAO;
 import ec.edu.ups.poo.dao.UsuarioDAO;
 import ec.edu.ups.poo.modelo.Pregunta;
 import ec.edu.ups.poo.modelo.Rol;
 import ec.edu.ups.poo.modelo.Usuario;
 import ec.edu.ups.poo.util.Idioma;
+import ec.edu.ups.poo.util.ValidacionException;
 import ec.edu.ups.poo.view.*;
 import ec.edu.ups.poo.modelo.Genero;
+import ec.edu.ups.poo.util.*;
 
 import javax.swing.*;
+import java.io.IOException;
 import java.awt.event.ActionListener;
-import java.text.MessageFormat;
 import java.util.*;
+
 
 public class UsuarioController {
     private UsuarioDAO usuarioDAO;
     private PreguntaDAO preguntaDAO;
-    private LoginView loginView;
     private RegistrarUsuario registrarUsuarioView;
     private UsuarioAdminView usuarioAdminView;
     private Usuario usuarioAutenticado;
@@ -30,14 +33,13 @@ public class UsuarioController {
     private Usuario usuarioRecuperacion;
     private Integer idPreguntaRecuperacion;
 
-    public UsuarioController(UsuarioDAO usuarioDAO,PreguntaDAO preguntaDAO,LoginView loginView,
+    public UsuarioController(UsuarioDAO usuarioDAO,PreguntaDAO preguntaDAO, Usuario usuarioAutenticado,
                              RegistrarUsuario registrarUsuarioView, UsuarioAdminView usuarioAdminView,
                              UsuarioBuscarView usuarioBuscarView, UsuarioCrearView usuarioCrearView,
-                             UsuarioModificarDatosView usuarioModificarDatosView
-                             ) {
+                             UsuarioModificarDatosView usuarioModificarDatosView) {
         this.usuarioDAO = usuarioDAO;
         this.preguntaDAO = preguntaDAO;
-        this.loginView = loginView;
+        this.usuarioAutenticado = usuarioAutenticado;
         this.registrarUsuarioView = registrarUsuarioView;
         this.usuarioAdminView = usuarioAdminView;
         this.usuarioBuscarView = usuarioBuscarView;
@@ -47,6 +49,7 @@ public class UsuarioController {
         configurarEventosIdioma();
         configurarEventos();
     }
+
     private void configurarEventosIdioma() {
 
         ActionListener cambiarIdiomaListener = e -> {
@@ -64,44 +67,57 @@ public class UsuarioController {
             Idioma.setIdioma(lang, country);
 
 
-            loginView.actualizarTextos();
-            registrarUsuarioView.actualizarTextos();
-            olvideContrasenaView.actualizarTextos();
+            if (registrarUsuarioView != null) registrarUsuarioView.actualizarTextos();
+            if (olvideContrasenaView != null) olvideContrasenaView.actualizarTextos();
         };
 
 
-        loginView.getMenuItemEspañol().addActionListener(cambiarIdiomaListener);
-        loginView.getMenuItemIngles().addActionListener(cambiarIdiomaListener);
-        loginView.getMenuItemFrances().addActionListener(cambiarIdiomaListener);
-
-
-        registrarUsuarioView.getMenuItemEspañol().addActionListener(cambiarIdiomaListener);
-        registrarUsuarioView.getMenuItemIngles().addActionListener(cambiarIdiomaListener);
-        registrarUsuarioView.getMenuItemFrances().addActionListener(cambiarIdiomaListener);
-
-
-        olvideContrasenaView.getMenuItemEspañol().addActionListener(cambiarIdiomaListener);
-        olvideContrasenaView.getMenuItemIngles().addActionListener(cambiarIdiomaListener);
-        olvideContrasenaView.getMenuItemFrances().addActionListener(cambiarIdiomaListener);
+        if (registrarUsuarioView != null) {
+            registrarUsuarioView.getMenuItemEspañol().addActionListener(cambiarIdiomaListener);
+            registrarUsuarioView.getMenuItemIngles().addActionListener(cambiarIdiomaListener);
+            registrarUsuarioView.getMenuItemFrances().addActionListener(cambiarIdiomaListener);
+        }
+        if (olvideContrasenaView != null) {
+            olvideContrasenaView.getMenuItemEspañol().addActionListener(cambiarIdiomaListener);
+            olvideContrasenaView.getMenuItemIngles().addActionListener(cambiarIdiomaListener);
+            olvideContrasenaView.getMenuItemFrances().addActionListener(cambiarIdiomaListener);
+        }
     }
 
 
     private void configurarEventos() {
+        if (registrarUsuarioView != null) {
+            this.registrarUsuarioView.getBtnRegistrarse().addActionListener(e -> registrarUsuario());
+        }
 
-        this.loginView.getBtnIniciarSesion().addActionListener(e -> login());
-        this.loginView.getBtnOlvide().addActionListener(e ->  abrirOlvideContrasena());
-        this.loginView.getBtnRegistrarse().addActionListener(e -> abrirVentanaRegistro());
-
-
-        this.registrarUsuarioView.getBtnRegistrarse().addActionListener(e -> registrarUsuario());
-
-
-        olvideContrasenaView.getBtnValidar().addActionListener(e -> validarUsuarioYMostrarPregunta());
+        olvideContrasenaView.getBtnValidar().addActionListener(e -> {
+            try {
+                validarUsuarioYMostrarPregunta();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         olvideContrasenaView.getBtnCambiar().addActionListener(e -> cambiarContrasena());
 
-        this.usuarioAdminView.getBtnActualizar().addActionListener(e -> actualizarUsuario());
-        this.usuarioAdminView.getBtnEliminar().addActionListener(e -> eliminarUsuario());
-        this.usuarioAdminView.getBtnRefrescar().addActionListener(e -> listarUsuarios());
+        if (usuarioAdminView != null) {
+            this.usuarioAdminView.getBtnActualizar().addActionListener(e -> {
+                try {
+                    actualizarUsuario();
+                } catch (IOException ex) {
+
+                    JOptionPane.showMessageDialog(usuarioAdminView, Idioma.get("usuario.controller.msj.error.archivo") + ": " + ex.getMessage(), "Error de Archivo", JOptionPane.ERROR_MESSAGE);
+                }
+            });
+            this.usuarioAdminView.getBtnEliminar().addActionListener(e -> {
+                try {
+                    eliminarUsuario();
+                } catch (IOException ex) {
+
+                    JOptionPane.showMessageDialog(usuarioAdminView, Idioma.get("usuario.controller.msj.error.archivo") + ": " + ex.getMessage(), "Error de Archivo", JOptionPane.ERROR_MESSAGE);
+                }
+            });
+            this.usuarioAdminView.getBtnRefrescar().addActionListener(e -> listarUsuarios());
+        }
 
         if (usuarioBuscarView != null) {
             usuarioBuscarView.getBtnBuscar().addActionListener(e -> buscarUsuarioAction());
@@ -109,15 +125,17 @@ public class UsuarioController {
         }
         if (usuarioCrearView != null) {
             usuarioCrearView.getBtnCrear().addActionListener(e -> crearUsuarioDesdeCrearView());
-            usuarioCrearView.getBtnBorrar().addActionListener(e -> usuarioCrearView.getTxtUsuario().setText(""));
-            usuarioCrearView.getBtnBorrar().addActionListener(e -> usuarioCrearView.getTxtContrasena().setText(""));
+            usuarioCrearView.getBtnBorrar().addActionListener(e -> {
+                usuarioCrearView.getTxtUsuario().setText("");
+                usuarioCrearView.getTxtContrasena().setText("");
+            });
         }
         if (usuarioModificarDatosView != null) {
             usuarioModificarDatosView.getBtnModificar().addActionListener(e -> modificarDatosUsuario());
             usuarioModificarDatosView.getBtnBorrar().addActionListener(e -> usuarioModificarDatosView.limpiarCampos());
         }
     }
-    private void abrirOlvideContrasena() {
+    public void abrirOlvideContrasena() {
         olvideContrasenaView.getTxtUsername().setText("");
         olvideContrasenaView.getLblPregunta().setText("");
         olvideContrasenaView.getTxtRespuesta().setText("");
@@ -126,15 +144,21 @@ public class UsuarioController {
         olvideContrasenaView.getBtnCambiar().setVisible(false);
         olvideContrasenaView.setVisible(true);
     }
-    private void validarUsuarioYMostrarPregunta() {
-        String username = olvideContrasenaView.getTxtUsername().getText().trim();
-        Usuario usuario = usuarioDAO.buscarPorUsername(username);
-        if (usuario == null) {
-            JOptionPane.showMessageDialog(olvideContrasenaView, Idioma.get("usuario.controller.msj.noecontrado"));
+
+    private void validarUsuarioYMostrarPregunta() throws IOException {
+        try {
+            String username = olvideContrasenaView.getTxtUsername().getText().trim();
+            Usuario usuario = usuarioDAO.buscarPorUsername(username);
+            if (usuario == null) {
+                JOptionPane.showMessageDialog(olvideContrasenaView, Idioma.get("usuario.controller.msj.noecontrado"));
+                return;
+            }
+            usuarioRecuperacion = usuario;
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(olvideContrasenaView, Idioma.get("usuario.controller.msj.error.archivo") + ": " + e.getMessage(), "Error de Archivo", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        usuarioRecuperacion = usuario;
-        List<Integer> idsPreguntas = new ArrayList<>(usuario.getPreguntasSeguridad().keySet());
+        List<Integer> idsPreguntas = new ArrayList<>(usuarioRecuperacion.getPreguntasSeguridad().keySet());
         if (idsPreguntas.isEmpty()) {
             JOptionPane.showMessageDialog(olvideContrasenaView, Idioma.get("usuario.controller.nopreguntas"));
             return;
@@ -153,170 +177,183 @@ public class UsuarioController {
         olvideContrasenaView.getBtnCambiar().setVisible(true);
     }
     private void cambiarContrasena() {
-        String respuesta = olvideContrasenaView.getTxtRespuesta().getText().trim();
-        String respuestaCorrecta = usuarioRecuperacion.getPreguntasSeguridad().get(idPreguntaRecuperacion);
-        if (!respuesta.equals(respuestaCorrecta)) {
-            JOptionPane.showMessageDialog(olvideContrasenaView, Idioma.get("usuario.controller.incorrecta"));
-            return;
-        }
-        String nuevaContra = new String(olvideContrasenaView.getTxtNuevaContrasena().getPassword());
-        if (nuevaContra.isEmpty()) {
-            JOptionPane.showMessageDialog(olvideContrasenaView, Idioma.get("usuario.controller.nuevacontra"));
-            return;
-        }
-        usuarioRecuperacion.setPassword(nuevaContra);
-        usuarioDAO.actualizar(usuarioRecuperacion);
-        JOptionPane.showMessageDialog(olvideContrasenaView, Idioma.get("usuario.controller.msj.cambiado"));
-        olvideContrasenaView.dispose();
-    }
-    private void login() {
-        String username = loginView.getTxtUsername().getText().trim();
-        String password = new String(loginView.getTxtPassword().getPassword());
+        try {
+            String respuesta = olvideContrasenaView.getTxtRespuesta().getText().trim();
+            String respuestaCorrecta = usuarioRecuperacion.getPreguntasSeguridad().get(idPreguntaRecuperacion);
+            if (!respuesta.equals(respuestaCorrecta)) {
+                JOptionPane.showMessageDialog(olvideContrasenaView, Idioma.get("usuario.controller.incorrecta"));
+                return;
+            }
+            String nuevaContra = new String(olvideContrasenaView.getTxtNuevaContrasena().getPassword());
+            if (nuevaContra.isEmpty()) {
+                JOptionPane.showMessageDialog(olvideContrasenaView, Idioma.get("usuario.controller.nuevacontra"));
+                return;
+            }
+            usuarioRecuperacion.setPassword(nuevaContra);
+            usuarioDAO.actualizar(usuarioRecuperacion.getUsername(), usuarioRecuperacion);
+            JOptionPane.showMessageDialog(olvideContrasenaView, Idioma.get("usuario.controller.msj.cambiado"));
+            olvideContrasenaView.dispose();
+        }catch (PasswordInvalidaException e){
+            JOptionPane.showMessageDialog(olvideContrasenaView, e.getMessage(),"Error", JOptionPane.WARNING_MESSAGE);
+        } catch (IOException e) { 
 
-        if (username.isEmpty() || password.isEmpty()) {
-            loginView.mostrar("usuario.controller.msj.porfavor");
-            return;
+            JOptionPane.showMessageDialog(olvideContrasenaView, Idioma.get("usuario.controller.msj.error.archivo") + ": " + e.getMessage(), "Error de Archivo", JOptionPane.ERROR_MESSAGE);
         }
-
-        Usuario usuario = usuarioDAO.buscarPorUsername(username);
-        if (usuario == null) {
-            loginView.mostrar("usuario.controller.msj.noecontrado");
-            return;
-        }
-        if (!usuario.getPassword().equals(password)) {
-            loginView.mostrar("usuario.controller.msj.contrasena");
-            return;
-        }
-        this.usuarioAutenticado = usuario;
-        loginView.dispose();
     }
 
-    public Usuario getUsuarioAutenticado() {
-        return usuarioAutenticado;
-    }
+    public void abrirVentanaRegistro() throws IOException {
 
-    private void abrirVentanaRegistro() {
+        if (registrarUsuarioView == null) {
+            System.err.println("Error: Se intentó abrir la ventana de registro, pero no se proporcionó una al controlador.");
+            return;
+        }
         List<Pregunta> preguntas = preguntaDAO.listarTodas();
         registrarUsuarioView.setPreguntasDisponibles(preguntas);
         registrarUsuarioView.limpiarCampos();
         registrarUsuarioView.setVisible(true);
     }
 
+
+
     private void registrarUsuario() {
-        String username = registrarUsuarioView.getTxtUsuarioRe().getText().trim();
-        String password = new String(registrarUsuarioView.getTxtContraRe().getPassword());
-        String nombre = registrarUsuarioView.getTxtNombre().getText().trim();
-        String apellido = registrarUsuarioView.getTxtApellido().getText().trim();
-        String telefono = registrarUsuarioView.getTxtTelefono().getText().trim();
-        String edadStr = registrarUsuarioView.getTxtEdad().getText().trim();
-
-        Genero genero = null;
-        Object itemGenero = registrarUsuarioView.getCbxGenero().getSelectedItem();
-        if (itemGenero instanceof Genero) {
-            genero = (Genero) itemGenero;
-        } else if (itemGenero != null) {
-            try {
-                genero = Genero.valueOf(itemGenero.toString().toUpperCase());
-            } catch (Exception ignore) {
-                genero = Genero.OTROS;
-            }
-        } else {
-            genero = Genero.OTROS;
-        }
-
-
-        if (username.isEmpty() || password.isEmpty() || nombre.isEmpty() || apellido.isEmpty() ||
-                telefono.isEmpty() || edadStr.isEmpty()) {
-            registrarUsuarioView.mostrarMensaje("registro.msj.camposprincipales.vacios");
-            return;
-        }
-        if (usuarioDAO.buscarPorUsername(username) != null) {
-            registrarUsuarioView.mostrarMensaje("registro.msj.yaextite");
-            return;
-        }
-        int edad;
         try {
-            edad = Integer.parseInt(edadStr);
-            if (edad < 0) throw new NumberFormatException();
-        } catch (NumberFormatException ex) {
-            registrarUsuarioView.mostrarMensaje("registro.msj.edadinvalida");
-            return;
+
+            String username = registrarUsuarioView.getTxtUsuarioRe().getText().trim();
+            String password = new String(registrarUsuarioView.getTxtContraRe().getPassword());
+            String nombre = registrarUsuarioView.getTxtNombre().getText().trim();
+            String apellido = registrarUsuarioView.getTxtApellido().getText().trim();
+            String telefono = registrarUsuarioView.getTxtTelefono().getText().trim();
+            String edadStr = registrarUsuarioView.getTxtEdad().getText().trim();
+            Genero genero = (Genero) registrarUsuarioView.getCbxGenero().getSelectedItem();
+            Map<Pregunta, String> preguntasRespondidas = registrarUsuarioView.getPreguntasYRespuestas();
+
+            String tipoStorage = (String) registrarUsuarioView.getCbxTipoGuardar().getSelectedItem();
+            String ruta = registrarUsuarioView.getTxtRuta().getText().trim();
+
+
+            if (username.isEmpty() || password.isEmpty() || nombre.isEmpty() || apellido.isEmpty() ||
+                    telefono.isEmpty() || edadStr.isEmpty()) {
+                throw new ValidacionException(Idioma.get("registro.msj.camposprincipales.vacios"));
+            }
+            
+            if (("TEXTO".equals(tipoStorage) || "BINARIO".equals(tipoStorage)) && ruta.isEmpty()) {
+                throw new ValidacionException(Idioma.get("registro.msj.rutavacia"));
+            }
+
+
+            DAOFactory factoryParaRegistrar = new DAOFactory(tipoStorage, ruta);
+            UsuarioDAO daoParaRegistrar = factoryParaRegistrar.getUsuarioDAO();
+            
+
+            if (daoParaRegistrar.buscarPorUsername(username) != null) {
+                throw new ValidacionException(Idioma.get("registro.msj.yaextite"));
+            }
+
+            int edad;
+            try {
+                edad = Integer.parseInt(edadStr);
+                if (edad <= 0 || edad > 120) {
+                    throw new NumberFormatException();
+                }
+            } catch (NumberFormatException ex) {
+                throw new ValidacionException(Idioma.get("registro.msj.edadinvalida"));
+            }
+
+            if (preguntasRespondidas.size() < 3) {
+                throw new ValidacionException(Idioma.get("registro.msj.minpreguntas"));
+            }
+
+
+            Usuario nuevo = new Usuario(username, password, Rol.USUARIO, genero, nombre, apellido, telefono, edad, tipoStorage);
+
+            Map<Integer, String> preguntasParaGuardar = new HashMap<>();
+            for (Map.Entry<Pregunta, String> entry : preguntasRespondidas.entrySet()) {
+                preguntasParaGuardar.put(entry.getKey().getId(), entry.getValue());
+            }
+            nuevo.setPreguntasSeguridad(preguntasParaGuardar);
+            
+
+            daoParaRegistrar.crear(nuevo);
+
+
+            registrarUsuarioView.mostrarMensaje("registro.msj.registrado");
+            registrarUsuarioView.limpiarCampos();
+            registrarUsuarioView.dispose();
+
+        } catch (CedulaInvalidaException | PasswordInvalidaException e) {
+
+            JOptionPane.showMessageDialog(registrarUsuarioView, e.getMessage(), "Error de Datos", JOptionPane.WARNING_MESSAGE);
+        } catch (ValidacionException e) {
+
+            JOptionPane.showMessageDialog(registrarUsuarioView, e.getMessage(), "Error de Validación", JOptionPane.WARNING_MESSAGE);
+        } catch (IOException e) {
+
+            JOptionPane.showMessageDialog(registrarUsuarioView, Idioma.get("registro.msj.error.archivo") + ": " + e.getMessage(), "Error de Archivo", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+                    JOptionPane.showMessageDialog(registrarUsuarioView, "Ocurrió un error inesperado: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
-
-
-        Map<Pregunta, String> preguntasRespondidas = registrarUsuarioView.getPreguntasYRespuestas();
-        if (preguntasRespondidas.size() < 3) {
-            registrarUsuarioView.mostrarMensaje("registro.msj.minpreguntas");
-            return;
-        }
-
-
-        Usuario nuevo = new Usuario(username, password, Rol.USUARIO, genero, nombre, apellido, telefono, edad);
-        Map<Integer, String> preguntasParaGuardar = new HashMap<>();
-        for (Map.Entry<Pregunta, String> entry : preguntasRespondidas.entrySet()) {
-            preguntasParaGuardar.put(entry.getKey().getId(), entry.getValue());
-        }
-        nuevo.setPreguntasSeguridad(preguntasParaGuardar);
-
-        usuarioDAO.crear(nuevo);
-        registrarUsuarioView.mostrarMensaje("registro.msj.registrado");
-        registrarUsuarioView.limpiarCampos();
-        registrarUsuarioView.dispose();
     }
+
+
     public void listarUsuarios() {
-        List<Usuario> todosLosUsuarios = usuarioDAO.listarTodos();
-        usuarioAdminView.cargarUsuarios(todosLosUsuarios);
+        try {
+            List<Usuario> todosLosUsuarios = usuarioDAO.listarTodos();
+            usuarioAdminView.cargarUsuarios(todosLosUsuarios);
+        } catch (IOException e) {
+            usuarioAdminView.mostrarError(Idioma.get("usuario.controller.msj.error.archivo") + ": " + e.getMessage());
+        }
     }
 
     public void listarUsuariosPorRol(Rol rol) {
-        List<Usuario> usuariosFiltrados = usuarioDAO.listarPorRol(rol);
-        usuarioAdminView.cargarUsuarios(usuariosFiltrados);
+        try {
+            List<Usuario> usuariosFiltrados = usuarioDAO.listarPorRol(rol);
+            usuarioAdminView.cargarUsuarios(usuariosFiltrados);
+        } catch (IOException e) {
+            usuarioAdminView.mostrarError(Idioma.get("usuario.controller.msj.error.archivo") + ": " + e.getMessage());
+        }
     }
 
-    private void actualizarUsuario() {
+    private void actualizarUsuario() throws IOException {
         int fila = usuarioAdminView.getTblUsuarios().getSelectedRow();
-
         if (fila < 0) {
             usuarioAdminView.mostrarError(Idioma.get("usuario.controller.msj.seletable"));
             return;
         }
 
-        String nuevoUsername = (String) usuarioAdminView.getModeloTabla().getValueAt(fila, 0);
-        Rol rolActual = (Rol) usuarioAdminView.getTblUsuarios().getValueAt(fila, 1);
+
+        String username = (String) usuarioAdminView.getTblUsuarios().getValueAt(fila, 0);
         Rol nuevoRol = (Rol) usuarioAdminView.getCbxRol().getSelectedItem();
-
-
-        if (rolActual == nuevoRol && nuevoUsername.equals(usuarioDAO.buscarPorUsername(nuevoUsername).getUsername())) {
-            usuarioAdminView.mostrarMensaje("usuario.controller.msj.sincambios");
+        Usuario usuario;
+        try {
+            usuario = usuarioDAO.buscarPorUsername(username);
+        } catch (IOException e) {
+            usuarioAdminView.mostrarError(Idioma.get("usuario.controller.msj.error.archivo") + ": " + e.getMessage());
             return;
         }
 
-        Usuario usuarioBuscado = usuarioDAO.buscarPorUsername(nuevoUsername);
-        if (usuarioBuscado != null && !usuarioAdminView.getTblUsuarios().getValueAt(fila, 0).equals(usuarioBuscado.getUsername())) {
-            usuarioAdminView.mostrarError("usuario.controller.msj.uso");
-            return;
-        }
-
-        Usuario usuario = usuarioDAO.buscarPorUsername((String) usuarioAdminView.getTblUsuarios().getValueAt(fila, 0));
         if (usuario == null) {
-            usuarioAdminView.mostrarError("usuario.controller.msj.encontrado");
+            usuarioAdminView.mostrarError("usuario.controller.msj.noecontrado");
             return;
         }
 
-
-        if (!usuarioAdminView.confirmarAccion("usuario.controller.msj.seguro", nuevoUsername, nuevoRol)) {
+        if (usuario.getRol() == nuevoRol) {
             return;
         }
 
-        usuario.setUsername(nuevoUsername);
+        if (!usuarioAdminView.confirmarAccion("usuario.controller.msj.seguro", username, nuevoRol)) {
+            return;
+        }
         usuario.setRol(nuevoRol);
-        usuarioDAO.actualizar(usuario);
+        usuarioDAO.actualizar(username, usuario);
 
         listarUsuarios();
         usuarioAdminView.mostrarMensaje("usuario.controller.msj.actualizado");
     }
 
-    private void eliminarUsuario() {
+
+
+    private void eliminarUsuario() throws IOException {
         int fila = usuarioAdminView.getTblUsuarios().getSelectedRow();
 
         if (fila < 0) {
@@ -326,22 +363,15 @@ public class UsuarioController {
 
         String username = (String) usuarioAdminView.getTblUsuarios().getValueAt(fila, 0);
 
+
+        if (username.equals(usuarioAutenticado.getUsername())) {
+            usuarioAdminView.mostrarError("usuario.controller.msj.noauteliminar");
+            return;
+        }
+
         if (!usuarioAdminView.confirmarAccion("usuario.controller.msj.seguroelimar", username)) {
             return;
         }
-
-        Usuario usuario = usuarioDAO.buscarPorUsername(username);
-        if (usuario == null) {
-            usuarioAdminView.mostrarError("usuario.controller.msj.encontrado");
-            return;
-        }
-
-        String mensaje = MessageFormat.format(
-                Idioma.get("usuario.controller.msj.seguroelimar"),
-                username
-        );
-
-
 
         usuarioDAO.eliminar(username);
 
@@ -355,88 +385,108 @@ public class UsuarioController {
     }
 
     private void buscarUsuarioAction() {
-        String username = usuarioBuscarView.getTxtUsername().getText().trim();
-        if (username.isEmpty()) {
-            usuarioBuscarView.mostrarMensaje(Idioma.get("usuario.controller.msj.ingreseusuario"));
-            return;
+        try {
+            String username = usuarioBuscarView.getTxtUsername().getText().trim();
+            if (username.isEmpty()) {
+                usuarioBuscarView.mostrarMensaje(Idioma.get("usuario.controller.msj.ingreseusuario"));
+                return;
+            }
+            Usuario usuario = usuarioDAO.buscarPorUsername(username);
+            usuarioBuscarView.mostrarUsuario(usuario);
+        } catch (IOException e) {
+            usuarioBuscarView.mostrarMensaje(Idioma.get("usuario.controller.msj.error.archivo") + ": " + e.getMessage());
         }
-        Usuario usuario = usuarioDAO.buscarPorUsername(username);
-        usuarioBuscarView.mostrarUsuario(usuario);
     }
 
     public void listarTodosAction() {
-        List<Usuario> usuarios = usuarioDAO.listarTodos();
-        usuarioBuscarView.cargarUsuarios(usuarios);
+        try {
+            List<Usuario> usuarios = usuarioDAO.listarTodos();
+            usuarioBuscarView.cargarUsuarios(usuarios);
+        } catch (IOException e) {
+            usuarioBuscarView.mostrarMensaje(Idioma.get("usuario.controller.msj.error.archivo") + ": " + e.getMessage());
+        }
     }
 
     private void crearUsuarioDesdeCrearView() {
-        String username = usuarioCrearView.getTxtUsuario().getText().trim();
-        String password = new String(usuarioCrearView.getTxtContrasena().getPassword());
+        try {
+            String username = usuarioCrearView.getTxtUsuario().getText().trim();
+            String password = new String(usuarioCrearView.getTxtContrasena().getPassword());
 
-        if (username.isEmpty()) {
-            usuarioCrearView.mostrarMensaje("usuario.controller.msj.nousuario");
-            return;
+            if (username.isEmpty() || password.isEmpty()) {
+                throw new ValidacionException(Idioma.get("usuario.controller.msj.nousuariopass"));
+            }
+            if (usuarioDAO.buscarPorUsername(username) != null) {
+                throw new ValidacionException(Idioma.get("usuario.controller.extiste"));
+            }
+
+            String tipoStorageSesion = usuarioAutenticado.getTipoAlmacenamiento();
+            Usuario nuevo = new Usuario(username, password, Rol.USUARIO, Genero.OTROS, "N/A", "N/A", "N/A", 0, tipoStorageSesion);
+
+            usuarioDAO.crear(nuevo);
+
+            usuarioCrearView.mostrarMensaje("usuario.controller.msj.creado");
+            usuarioCrearView.getTxtUsuario().setText("");
+            usuarioCrearView.getTxtContrasena().setText("");
+            if (usuarioAdminView != null) listarUsuarios();
+            if (usuarioBuscarView != null) listarTodosAction();
+
+        } catch (CedulaInvalidaException | PasswordInvalidaException | ValidacionException e) {
+            JOptionPane.showMessageDialog(usuarioCrearView, e.getMessage(), "Error de Validación", JOptionPane.WARNING_MESSAGE);
+        } catch (IOException e) { 
+
+            JOptionPane.showMessageDialog(usuarioCrearView, Idioma.get("usuario.controller.msj.error.archivo") + ": " + e.getMessage(), "Error de Archivo", JOptionPane.ERROR_MESSAGE);
         }
-        if (password.isEmpty()) {
-            usuarioCrearView.mostrarMensaje("usuario.controller.msj.nopass");
-            return;
-        }
-        if (usuarioDAO.buscarPorUsername(username) != null) {
-            usuarioCrearView.mostrarMensaje("usuario.controller.extiste");
-            return;
-        }
-        Usuario nuevo = new Usuario(username, password, Rol.USUARIO, Genero.OTROS, "", "", "", 0);
-        usuarioDAO.crear(nuevo);
-        usuarioCrearView.mostrarMensaje("usuario.controller.msj.creado");
-        usuarioCrearView.getTxtUsuario().setText("");
-        usuarioCrearView.getTxtContrasena().setText("");
-        if (usuarioAdminView != null) listarUsuarios();
-        if (usuarioBuscarView != null) listarTodosAction();
     }
 
     private void modificarDatosUsuario() {
-        String nuevoUsername = usuarioModificarDatosView.getTxtUsuario().getText().trim();
-        String nuevaContra = new String(usuarioModificarDatosView.getTxtContra().getPassword());
-        String nuevoNombre = usuarioModificarDatosView.getTxtNombre().getText().trim();
-        String nuevoApellido = usuarioModificarDatosView.getTxtApellido().getText().trim();
-        String nuevoTelefono = usuarioModificarDatosView.getTxtTelefono().getText().trim();
-        String edadTexto = usuarioModificarDatosView.getTxtEdad().getText().trim();
-        int nuevaEdad = 0;
         try {
-            nuevaEdad = Integer.parseInt(edadTexto);
-        } catch (Exception ex) {
-            mostrarMensaje("La edad debe ser un número válido");
-            return;
+            String originalUsername = usuarioAutenticado.getUsername();
+            String nuevoUsername = usuarioModificarDatosView.getTxtUsuario().getText().trim();
+            String nuevaContra = new String(usuarioModificarDatosView.getTxtContra().getPassword());
+            String nuevoNombre = usuarioModificarDatosView.getTxtNombre().getText().trim();
+            String nuevoApellido = usuarioModificarDatosView.getTxtApellido().getText().trim();
+            String nuevoTelefono = usuarioModificarDatosView.getTxtTelefono().getText().trim();
+            String edadTexto = usuarioModificarDatosView.getTxtEdad().getText().trim();
+            int nuevaEdad;
+            try {
+                nuevaEdad = Integer.parseInt(edadTexto);
+            } catch (Exception ex) {
+                throw new ValidacionException(Idioma.get("registro.msj.edadinvalida"));
+            }
+            Genero nuevoGenero = (Genero) usuarioModificarDatosView.getCbxGenero().getSelectedItem();
+
+            if (nuevoUsername.isEmpty() || nuevaContra.isEmpty()) {
+                throw new ValidacionException(Idioma.get("usuario.controller.msj.nousuariopass"));
+            }
+            if (!nuevoUsername.equals(usuarioAutenticado.getUsername()) && usuarioDAO.buscarPorUsername(nuevoUsername) != null) {
+                throw new ValidacionException(Idioma.get("usuario.controller.msj.usoyaenuso"));
+            }
+
+
+            usuarioAutenticado.setUsername(nuevoUsername);
+            usuarioAutenticado.setPassword(nuevaContra);
+            usuarioAutenticado.setNombre(nuevoNombre);
+            usuarioAutenticado.setApellido(nuevoApellido);
+            usuarioAutenticado.setTelefono(nuevoTelefono);
+            usuarioAutenticado.setEdad(nuevaEdad);
+            usuarioAutenticado.setGenero(nuevoGenero);
+            usuarioDAO.actualizar(originalUsername, usuarioAutenticado);
+
+            mostrarMensaje(Idioma.get("usuario.controller.msj.actualizadodatos"));
+            usuarioModificarDatosView.mostrarDatosUsuario(usuarioAutenticado);
+
+            if (usuarioAdminView != null) listarUsuarios();
+            if (usuarioBuscarView != null) listarTodosAction();
+
+        } catch (CedulaInvalidaException | PasswordInvalidaException | ValidacionException e) {
+            mostrarMensaje(e.getMessage());
+        } catch (IOException e) { 
+
+            mostrarMensaje(Idioma.get("usuario.controller.msj.error.archivo") + ": " + e.getMessage());
         }
-        Genero nuevoGenero = (Genero) usuarioModificarDatosView.getCbxGenero().getSelectedItem();
-
-        if (nuevoUsername.isEmpty() || nuevaContra.isEmpty()) {
-            mostrarMensaje(Idioma.get("usuario.controller.msj.nousuariopass"));
-            return;
-        }
-        if (!nuevoUsername.equals(usuarioAutenticado.getUsername()) && usuarioDAO.buscarPorUsername(nuevoUsername) != null) {
-            mostrarMensaje(Idioma.get("usuario.controller.msj.usoyaenuso"));
-            return;
-        }
-
-        usuarioAutenticado.setUsername(nuevoUsername);
-        usuarioAutenticado.setPassword(nuevaContra);
-        usuarioAutenticado.setNombre(nuevoNombre);
-        usuarioAutenticado.setApellido(nuevoApellido);
-        usuarioAutenticado.setTelefono(nuevoTelefono);
-        usuarioAutenticado.setEdad(nuevaEdad);
-        usuarioAutenticado.setGenero(nuevoGenero);
-
-        usuarioDAO.actualizar(usuarioAutenticado);
-
-        mostrarMensaje(Idioma.get("usuario.controller.msj.actualizadodatos"));
-        usuarioModificarDatosView.mostrarDatosUsuario(usuarioAutenticado);
-
-        if (usuarioAdminView != null) listarUsuarios();
-        if (usuarioBuscarView != null) listarTodosAction();
     }
 
-    private void mostrarMensaje(String mensaje) {
+            private void mostrarMensaje(String mensaje) {
         if (usuarioModificarDatosView != null) {
             JOptionPane.showMessageDialog(usuarioModificarDatosView, mensaje);
         }

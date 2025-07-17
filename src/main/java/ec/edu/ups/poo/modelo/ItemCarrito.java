@@ -1,11 +1,12 @@
 package ec.edu.ups.poo.modelo;
 
-public class ItemCarrito {
+import java.io.Serializable;
+import java.util.Objects;
+
+public class ItemCarrito implements Serializable {
+    private static final long serialVersionUID = 1L;
     private Producto producto;
     private int cantidad;
-
-    public ItemCarrito() {
-    }
 
     public ItemCarrito(Producto producto, int cantidad) {
         this.producto = producto;
@@ -33,8 +34,17 @@ public class ItemCarrito {
     }
 
     @Override
-    public String toString() {
-        return producto.toString() + " x " + cantidad + " = $" + getSubtotal();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ItemCarrito that = (ItemCarrito) o;
+
+        return Objects.equals(producto, that.producto);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(producto);
     }
 
 }

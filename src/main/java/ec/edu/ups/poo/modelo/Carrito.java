@@ -1,11 +1,14 @@
 package ec.edu.ups.poo.modelo;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
-public class Carrito {
+public class Carrito implements Serializable {
+    private static final long serialVersionUID = 1L;
     private int codigo;
     private GregorianCalendar fechaCreacion;
     private List<ItemCarrito> items;
@@ -16,7 +19,7 @@ public class Carrito {
         fechaCreacion = new GregorianCalendar();
     }
 
-    // --- GETTERS Y SETTERS ---
+
     public int getCodigo() {
         return codigo;
     }
@@ -35,7 +38,7 @@ public class Carrito {
 
     public List<ItemCarrito> getItems() {
 
-        return new ArrayList<>(items);
+        return items;
     }
 
     public void setItems(List<ItemCarrito> items) {
@@ -50,19 +53,18 @@ public class Carrito {
         this.usuario = usuario;
     }
 
-    // --- LÓGICA DE NEGOCIO ---
+
     public void agregarProducto(Producto producto, int cantidad) {
         if (producto == null || cantidad <= 0) {
-            return; // No agregar si los datos son inválidos
+            return;
         }
-        // Si el ítem ya existe, actualiza la cantidad
         for (ItemCarrito item : items) {
             if (item.getProducto().getCodigo() == producto.getCodigo()) {
                 item.setCantidad(item.getCantidad() + cantidad);
                 return;
             }
         }
-        // Si es nuevo, lo añade a la lista
+
         items.add(new ItemCarrito(producto, cantidad));
     }
 
@@ -105,5 +107,20 @@ public class Carrito {
 
     public boolean estaVacio() {
         return items.isEmpty();
+    }
+
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Carrito carrito = (Carrito) o;
+        return codigo == carrito.codigo;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(codigo);
     }
 }

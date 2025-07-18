@@ -25,7 +25,6 @@ import java.io.IOException;
 public class Main {
 
     public static void main(String[] args) {
-        // --- CAMBIO: Crear archivos y directorios al inicio ---
         crearArchivosPorDefectoSiNoExisten();
         SwingUtilities.invokeLater(Main::mostrarLogin);
     }
@@ -39,37 +38,29 @@ public class Main {
     }
 
     private static void mostrarLogin() {
-        // 1. Crear la vista de Login
         LoginView loginView = new LoginView();
 
-        // Crear las vistas necesarias para el pre-login
         RegistrarUsuario registrarUsuarioView = new RegistrarUsuario();
 
-        // --- ACCIÓN PARA INICIAR SESIÓN ---
         loginView.getBtnIniciarSesion().addActionListener(e -> {
             try {
-                // Obtener la elección de almacenamiento y ruta desde la VISTA DE LOGIN
                 String tipoStorage = (String) loginView.getCbxTipoStorage().getSelectedItem();
                 String ruta = loginView.getTxtRuta().getText().trim();
 
-                // Validar que la ruta no esté vacía si se elige almacenamiento en archivo
                 if (("TEXTO".equals(tipoStorage) || "BINARIO".equals(tipoStorage)) && ruta.isEmpty()) {
-                    loginView.mostrar("login.msj.rutavacia"); // Añadir esta clave a los archivos de idioma
+                    loginView.mostrar("login.msj.rutavacia");
                     return;
                 }
 
-                // Crear la DAOFactory para toda la sesión con la elección del usuario.
+
                 DAOFactory factory = new DAOFactory(tipoStorage, ruta);
                 UsuarioDAO usuarioDAO = factory.getUsuarioDAO();
                 ProductoDAO productoDAO = factory.getProductoDAO();
-                // Se obtiene el DAO de la factory para que respete la elección del usuario.
                 PreguntaDAO preguntaDAO = factory.getPreguntaDAO();
 
-                // Cargar datos por defecto. Esto es seguro porque el método previene duplicados.
-                // Esencial para que los usuarios por defecto existan en cualquier tipo de almacenamiento.
                 cargarDatosPorDefecto(usuarioDAO, productoDAO, preguntaDAO);
 
-                // Autenticar al usuario usando el DAO recién creado
+
                 String username = loginView.getTxtUsername().getText().trim();
                 String password = new String(loginView.getTxtPassword().getPassword());
                 Usuario usuarioAutenticado = usuarioDAO.autenticar(username, password);
@@ -82,58 +73,45 @@ public class Main {
                 }
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(loginView, "Error de archivo al iniciar sesión: " + ex.getMessage(), "Error de E/S", JOptionPane.ERROR_MESSAGE);
-            } catch (Exception ex) { // Captura genérica para otros errores
+            } catch (Exception ex) {
                 JOptionPane.showMessageDialog(loginView, "Error al iniciar sesión: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();
             }
         });
 
-        // --- ACCIONES PARA "REGISTRARSE" Y "OLVIDÉ CONTRASEÑA" ---
         ActionListener preLoginActionListener = e -> {
-            // Estas acciones también dependen de la selección actual en la pantalla de login.
             String tipoStorage = (String) loginView.getCbxTipoStorage().getSelectedItem();
             String ruta = loginView.getTxtRuta().getText().trim();
 
-            // --- MEJORA DE ROBUSTEZ: Añadir la misma validación de ruta que en el login ---
             if (("TEXTO".equals(tipoStorage) || "BINARIO".equals(tipoStorage)) && ruta.isEmpty()) {
                 loginView.mostrar("login.msj.rutavacia");
                 return;
             }
 
-            // La lógica de registro ya crea su propio DAO, pero la de "Olvidé Contraseña" necesita uno.
-            // Para consistencia, creamos uno aquí para ambas acciones pre-login.
-
-            // Crear una factory y DAOs temporales solo para esta acción
             DAOFactory tempFactory = new DAOFactory(tipoStorage, ruta);
             UsuarioDAO tempUsuarioDAO = tempFactory.getUsuarioDAO();
             ProductoDAO tempProductoDAO = tempFactory.getProductoDAO();
-            // Se obtiene el DAO de la factory para que las preguntas se carguen desde el archivo correcto.
             PreguntaDAO tempPreguntaDAO = tempFactory.getPreguntaDAO();
 
-            // Cargar siempre los datos por defecto para que las preguntas y usuarios base estén disponibles.
             try {
                 cargarDatosPorDefecto(tempUsuarioDAO, tempProductoDAO, tempPreguntaDAO);
-            } catch (IOException ex) { // MEJORA: Notificar al usuario en lugar de cerrar la aplicación.
+            } catch (IOException ex) {
                 JOptionPane.showMessageDialog(loginView, "Error de archivo al preparar el registro: " + ex.getMessage(), "Error de E/S", JOptionPane.ERROR_MESSAGE);
-                return; // Detener la acción si no se pueden cargar los datos
+                return;
             }
 
-            // Crear un controlador temporal con los DAOs correctos
             UsuarioController tempController = new UsuarioController(
                     tempUsuarioDAO, tempPreguntaDAO, null,
                     registrarUsuarioView, null, null, null, null
             );
 
-            // --- LÓGICA CORREGIDA ---
-            // Se usa el controlador para abrir la ventana de registro.
-            // Esto asegura que la ventana está correctamente conectada, que se cargan las preguntas y que el botón de registrar funciona.
             if (e.getSource() == loginView.getBtnRegistrarse()) {
                 try {
                     tempController.abrirVentanaRegistro();
-                } catch (IOException ex) { // MEJORA: Notificar al usuario.
+                } catch (IOException ex) {
                     JOptionPane.showMessageDialog(loginView, "Error de archivo al abrir el registro: " + ex.getMessage(), "Error de E/S", JOptionPane.ERROR_MESSAGE);
                 }
-            } else if (e.getSource() == loginView.getBtnOlvide()) { // Olvidé contraseña sí depende del contexto
+            } else if (e.getSource() == loginView.getBtnOlvide()) {
                 tempController.abrirOlvideContrasena();
             }
 
@@ -343,7 +321,6 @@ public class Main {
             });
         }
 
-        // Solo usuarios normales pueden modificar sus datos
         if (usuarioAutenticado.getRol() == Rol.USUARIO) {
             principalView.getMenuItemUser().addActionListener(e -> {
                 usuarioModificarDatosView.mostrarDatosUsuario(usuarioAutenticado);

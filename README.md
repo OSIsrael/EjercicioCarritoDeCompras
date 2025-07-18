@@ -1,4 +1,5 @@
 # Sistema de Gestión de Carrito de Compras
+
 ## Nombre:Israel Orellana
 ![Sistema de Gestión de Carrito de Compras Logo](https://raw.githubusercontent.com/your-username/your-repo-name/main/docs/logo.png) Un robusto sistema de gestión de carrito de compras desarrollado en Java Swing, diseñado con una arquitectura MVC y el patrón DAO para una gestión eficiente de productos, usuarios y transacciones de compra. El sistema soporta múltiples roles de usuario (administrador y usuario regular) y cuenta con funcionalidad de internacionalización.
 

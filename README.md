@@ -1,5 +1,20 @@
 # Sistema de Gestión de Carrito de Compras
 
+INSTRUCCIONES DE USO - SISTEMA DE CARRITO DE COMPRAS
+
+Gracias por revisar mi proyecto.
+
+1. PARA EJECUTAR LA APLICACIÓN:
+  - Asegúrate de tener Java 8 o superior instalado.
+  - Haz doble clic en el archivo "EjercicioCarritoDeCompras.jar".
+  - Si el doble clic no funciona, abre una terminal en esta carpeta y ejecuta el comando: java -jar EjercicioCarritoDeCompras.jar
+
+2. PARA VER LA DOCUMENTACIÓN TÉCNICA:
+  - Abre la carpeta "docs".
+  - Haz doble clic en el archivo "index.html". Se abrirá en tu navegador web.
+
+Atentamente,
+Israel Orellana
 ## Nombre:Israel Orellana
 ![Sistema de Gestión de Carrito de Compras Logo](https://raw.githubusercontent.com/your-username/your-repo-name/main/docs/logo.png) Un robusto sistema de gestión de carrito de compras desarrollado en Java Swing, diseñado con una arquitectura MVC y el patrón DAO para una gestión eficiente de productos, usuarios y transacciones de compra. El sistema soporta múltiples roles de usuario (administrador y usuario regular) y cuenta con funcionalidad de internacionalización.
 

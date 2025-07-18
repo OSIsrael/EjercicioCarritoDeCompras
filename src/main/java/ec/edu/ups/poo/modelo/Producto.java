@@ -1,12 +1,14 @@
 package ec.edu.ups.poo.modelo;
 
-public class Producto {
+import java.io.Serializable;
+import java.util.Objects;
+
+public class Producto implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private int codigo;
     private String nombre;
     private double precio;
-
-    public Producto() {
-    }
 
     public Producto(int codigo, String nombre, double precio) {
         this.codigo = codigo;
@@ -40,7 +42,20 @@ public class Producto {
 
     @Override
     public String toString() {
-        return nombre + " - $" + precio;
+        return nombre + " - $" + String.format("%.2f", precio);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Producto producto = (Producto) o;
+        return codigo == producto.codigo;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(codigo);
     }
 
 }

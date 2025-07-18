@@ -3,101 +3,133 @@ package ec.edu.ups.poo.view;
 import ec.edu.ups.poo.controlador.CarritoController;
 import ec.edu.ups.poo.controlador.ProductoController;
 import ec.edu.ups.poo.controlador.UsuarioController;
+import ec.edu.ups.poo.dao.DAOFactory;
 import ec.edu.ups.poo.dao.CarritoDAO;
 import ec.edu.ups.poo.dao.ProductoDAO;
 import ec.edu.ups.poo.dao.UsuarioDAO;
-import ec.edu.ups.poo.dao.impl.CarritoDAOMemoria;
-import ec.edu.ups.poo.dao.impl.ProductoDAOMemoria;
-import ec.edu.ups.poo.dao.impl.UsuarioDAOMemoria;
 import ec.edu.ups.poo.modelo.Pregunta;
 import ec.edu.ups.poo.modelo.Producto;
 import ec.edu.ups.poo.modelo.Rol;
 import ec.edu.ups.poo.modelo.Usuario;
 import ec.edu.ups.poo.dao.PreguntaDAO;
-import ec.edu.ups.poo.dao.impl.PreguntaDAOMemoria;
+import ec.edu.ups.poo.util.CedulaInvalidaException;
 import ec.edu.ups.poo.util.Idioma;
 import ec.edu.ups.poo.modelo.Genero;
+import ec.edu.ups.poo.util.PasswordInvalidaException;
+
 import javax.swing.*;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
 
 public class Main {
 
-    private static UsuarioDAO usuarioDAO;
-    private static ProductoDAO productoDAO;
-    private static CarritoDAO carritoDAO;
-    private static PreguntaDAO preguntaDAO;
-
     public static void main(String[] args) {
-
-        // Inicializar DAOs una sola vez
-        usuarioDAO = new UsuarioDAOMemoria();
-        productoDAO = new ProductoDAOMemoria();
-        carritoDAO = new CarritoDAOMemoria();
-        preguntaDAO = new PreguntaDAOMemoria();
-        preguntaDAO.crear(new Pregunta(1, "¿Nombre de tu primera mascota?"));
-        preguntaDAO.crear(new Pregunta(2, "¿Ciudad de nacimiento?"));
-        preguntaDAO.crear(new Pregunta(3, "¿Comida favorita?"));
-        preguntaDAO.crear(new Pregunta(4, "¿Animal favorito?"));
-        preguntaDAO.crear(new Pregunta(5, "¿Nombre de tu mejor amigo de la infancia?"));
-        preguntaDAO.crear(new Pregunta(6, "¿Comó se llama tu escuela primaria?"));
-        preguntaDAO.crear(new Pregunta(7,"¿Cuál es el segundo nombre de tu padre?"));
-        preguntaDAO.crear(new Pregunta(8,"¿Cuál fue tu primer empleo?"));
-        preguntaDAO.crear(new Pregunta(9,"¿Cómo se llama tu película favorita?"));
-        preguntaDAO.crear(new Pregunta(10,"¿Cuál es el nombre de tu primer profeso(a)? "));
-
-
-        // Cargar datos iniciales si no existen
-        if (usuarioDAO.buscarPorUsername("admin") == null) {
-            usuarioDAO.crear(new Usuario("admin", "admin", Rol.ADMINISTRADOR, Genero.MASCULINO, "Admin", "Principal", "000000000", 30));
-        }
-        if (usuarioDAO.buscarPorUsername("user") == null) {
-            usuarioDAO.crear(new Usuario("user", "user", Rol.USUARIO, Genero.OTROS, "User", "Demo", "111111111", 18));
-        }
-        productoDAO.crear(new Producto(1, "Laptop Gamer", 1200.00));
-        productoDAO.crear(new Producto(2, "Teclado Mecánico", 85.50));
-        productoDAO.crear(new Producto(3, "Mouse Inalámbrico", 30.00));
-        productoDAO.crear(new Producto(4, "Monitor 27 pulgadas", 350.00));
-
+        crearArchivosPorDefectoSiNoExisten();
         SwingUtilities.invokeLater(Main::mostrarLogin);
+    }
+
+    private static void mostrarVentana(PrincipalView principal, JInternalFrame ventana) {
+        if (!ventana.isVisible()) {
+            principal.getjDesktopPane().add(ventana);
+            ventana.setVisible(true);
+        }
+        ventana.moveToFront();
     }
 
     private static void mostrarLogin() {
         LoginView loginView = new LoginView();
+
         RegistrarUsuario registrarUsuarioView = new RegistrarUsuario();
-        UsuarioAdminView usuarioAdminView = new UsuarioAdminView();
-        UsuarioBuscarView usuarioBuscarView = new UsuarioBuscarView();
-        UsuarioCrearView usuarioCrearView = new UsuarioCrearView();
-        UsuarioModificarDatosView usuarioModificarDatosView = new UsuarioModificarDatosView();
-        for (Pregunta pregunta: preguntaDAO.listarTodas()) {
-            registrarUsuarioView.getCbxPregunta1().addItem(pregunta);
-        }
 
-        UsuarioController usuarioController = new UsuarioController(
-                usuarioDAO,preguntaDAO, loginView, registrarUsuarioView, usuarioAdminView,
-                usuarioBuscarView, usuarioCrearView, usuarioModificarDatosView);
+        loginView.getBtnIniciarSesion().addActionListener(e -> {
+            try {
+                String tipoStorage = (String) loginView.getCbxTipoStorage().getSelectedItem();
+                String ruta = loginView.getTxtRuta().getText().trim();
 
-        loginView.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosed(WindowEvent e) {
-                Usuario usuarioAutenticado = usuarioController.getUsuarioAutenticado();
-                if (usuarioAutenticado != null) {
-                    iniciarAplicacionPrincipal(usuarioAutenticado, usuarioController, usuarioAdminView, usuarioBuscarView, usuarioCrearView, usuarioModificarDatosView);
-                } else {
-                    System.exit(0);
+                if (("TEXTO".equals(tipoStorage) || "BINARIO".equals(tipoStorage)) && ruta.isEmpty()) {
+                    loginView.mostrar("login.msj.rutavacia");
+                    return;
                 }
+
+
+                DAOFactory factory = new DAOFactory(tipoStorage, ruta);
+                UsuarioDAO usuarioDAO = factory.getUsuarioDAO();
+                ProductoDAO productoDAO = factory.getProductoDAO();
+                PreguntaDAO preguntaDAO = factory.getPreguntaDAO();
+
+                cargarDatosPorDefecto(usuarioDAO, productoDAO, preguntaDAO);
+
+
+                String username = loginView.getTxtUsername().getText().trim();
+                String password = new String(loginView.getTxtPassword().getPassword());
+                Usuario usuarioAutenticado = usuarioDAO.autenticar(username, password);
+
+                if (usuarioAutenticado != null) {
+                    loginView.dispose();
+                    iniciarAplicacionPrincipal(usuarioAutenticado, factory);
+                } else {
+                    loginView.mostrar("usuario.controller.msj.credenciales.invalidas");
+                }
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(loginView, "Error de archivo al iniciar sesión: " + ex.getMessage(), "Error de E/S", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(loginView, "Error al iniciar sesión: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
             }
         });
+
+        ActionListener preLoginActionListener = e -> {
+            String tipoStorage = (String) loginView.getCbxTipoStorage().getSelectedItem();
+            String ruta = loginView.getTxtRuta().getText().trim();
+
+            if (("TEXTO".equals(tipoStorage) || "BINARIO".equals(tipoStorage)) && ruta.isEmpty()) {
+                loginView.mostrar("login.msj.rutavacia");
+                return;
+            }
+
+            DAOFactory tempFactory = new DAOFactory(tipoStorage, ruta);
+            UsuarioDAO tempUsuarioDAO = tempFactory.getUsuarioDAO();
+            ProductoDAO tempProductoDAO = tempFactory.getProductoDAO();
+            PreguntaDAO tempPreguntaDAO = tempFactory.getPreguntaDAO();
+
+            try {
+                cargarDatosPorDefecto(tempUsuarioDAO, tempProductoDAO, tempPreguntaDAO);
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(loginView, "Error de archivo al preparar el registro: " + ex.getMessage(), "Error de E/S", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            UsuarioController tempController = new UsuarioController(
+                    tempUsuarioDAO, tempPreguntaDAO, null,
+                    registrarUsuarioView, null, null, null, null
+            );
+
+            if (e.getSource() == loginView.getBtnRegistrarse()) {
+                try {
+                    tempController.abrirVentanaRegistro();
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(loginView, "Error de archivo al abrir el registro: " + ex.getMessage(), "Error de E/S", JOptionPane.ERROR_MESSAGE);
+                }
+            } else if (e.getSource() == loginView.getBtnOlvide()) {
+                tempController.abrirOlvideContrasena();
+            }
+
+        };
+
+        loginView.getBtnRegistrarse().addActionListener(preLoginActionListener);
+        loginView.getBtnOlvide().addActionListener(preLoginActionListener);
+
         loginView.setVisible(true);
     }
 
-    private static void iniciarAplicacionPrincipal(Usuario usuarioAutenticado,
-                                                   UsuarioController usuarioController,
-                                                   UsuarioAdminView usuarioAdminView,
-                                                   UsuarioBuscarView usuarioBuscarView,
-                                                   UsuarioCrearView usuarioCrearView,
-                                                   UsuarioModificarDatosView usuarioModificarDatosView) {
+    private static void iniciarAplicacionPrincipal(Usuario usuarioAutenticado, DAOFactory factory) {
+
+        // Obtenemos los DAOs de la factory
+        UsuarioDAO usuarioDAO = factory.getUsuarioDAO();
+        ProductoDAO productoDAO = factory.getProductoDAO();
+        CarritoDAO carritoDAO = factory.getCarritoDAO();
+        PreguntaDAO preguntaDAO = factory.getPreguntaDAO();
 
         // Instanciar vistas
         PrincipalView principalView = new PrincipalView();
@@ -112,7 +144,19 @@ public class Main {
         CarritoModificarView carritoModificarView = new CarritoModificarView();
         CarritoEliminarView carritoEliminarView = new CarritoEliminarView();
 
-        // Instanciar controladores
+        // Vistas de Usuario
+        UsuarioAdminView usuarioAdminView = new UsuarioAdminView();
+        UsuarioBuscarView usuarioBuscarView = new UsuarioBuscarView();
+        UsuarioCrearView usuarioCrearView = new UsuarioCrearView();
+        UsuarioModificarDatosView usuarioModificarDatosView = new UsuarioModificarDatosView();
+        RegistrarUsuario registrarUsuarioView = new RegistrarUsuario();
+
+        // Instanciar controladores, inyectando los DAOs
+        UsuarioController usuarioController = new UsuarioController(
+                usuarioDAO, preguntaDAO, usuarioAutenticado, registrarUsuarioView, usuarioAdminView,
+                usuarioBuscarView, usuarioCrearView, usuarioModificarDatosView
+        );
+        
         ProductoController productoController = new ProductoController(
                 productoDAO, productoAnadirView, productoListaView,
                 productoEditar, productoEliminar, carritoAnadirView);
@@ -142,6 +186,68 @@ public class Main {
         principalView.setVisible(true);
     }
 
+    private static void crearArchivosPorDefectoSiNoExisten() {
+        String basePath = "data";
+        String[] subDirs = {"text", "binary"};
+        String[] fileNames = {"usuarios", "productos", "carritos", "preguntas"};
+
+        for (int i = 0; i < subDirs.length; i++) {
+            String dirPath = basePath + File.separator + subDirs[i];
+            File directory = new File(dirPath);
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+
+            boolean isBinaryMode = "binary".equals(subDirs[i]);
+            String extension = isBinaryMode ? ".dat" : ".txt";
+
+            for (String fileName : fileNames) {
+                File file = new File(dirPath + File.separator + fileName + extension);
+                if (!file.exists()) {
+                    try {
+                        file.createNewFile();
+                    } catch (IOException e) {
+                        System.err.println("No se pudo crear el archivo por defecto: " + file.getAbsolutePath());
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    private static void cargarDatosPorDefecto(UsuarioDAO usuarioDAO, ProductoDAO productoDAO, PreguntaDAO preguntaDAO) throws IOException {
+        // Cargar Preguntas
+        preguntaDAO.crear(new Pregunta(1, "¿Nombre de tu primera mascota?"));
+        preguntaDAO.crear(new Pregunta(2, "¿Ciudad de nacimiento?"));
+        preguntaDAO.crear(new Pregunta(3, "¿Comida favorita?"));
+        preguntaDAO.crear(new Pregunta(4, "¿Animal favorito?"));
+        preguntaDAO.crear(new Pregunta(5, "¿Nombre de tu mejor amigo de la infancia?"));
+        preguntaDAO.crear(new Pregunta(6, "¿Comó se llama tu escuela primaria?"));
+        preguntaDAO.crear(new Pregunta(7,"¿Cuál es el segundo nombre de tu padre?"));
+        preguntaDAO.crear(new Pregunta(8,"¿Cuál fue tu primer empleo?"));
+        preguntaDAO.crear(new Pregunta(9,"¿Cómo se llama tu película favorita?"));
+        preguntaDAO.crear(new Pregunta(10,"¿Cuál es el nombre de tu primer profeso(a)? "));
+
+        // Cargar Usuarios
+        try {
+            if (usuarioDAO.buscarPorUsername("1712345675") == null) {
+                usuarioDAO.crear(new Usuario("1712345675", "Admin_123", Rol.ADMINISTRADOR, Genero.MASCULINO, "Admin", "Principal", "000000000", 30, "MEMORIA"));
+            }
+            if (usuarioDAO.buscarPorUsername("0987654324") == null) {
+                usuarioDAO.crear(new Usuario("0987654324", "User-456", Rol.USUARIO, Genero.OTROS, "User", "Demo", "111111111", 18, "MEMORIA"));
+            }
+            // Cargar Productos (se comprueba si ya existen para no duplicar)
+            if(productoDAO.buscarPorCodigo(1) == null) productoDAO.crear(new Producto(1, "Laptop Gamer", 1200.00));
+            if(productoDAO.buscarPorCodigo(2) == null) productoDAO.crear(new Producto(2, "Teclado Mecánico", 85.50));
+            if(productoDAO.buscarPorCodigo(3) == null) productoDAO.crear(new Producto(3, "Mouse Inalámbrico", 30.00));
+            if(productoDAO.buscarPorCodigo(4) == null) productoDAO.crear(new Producto(4, "Monitor 27 pulgadas", 350.00));
+        } catch (CedulaInvalidaException | PasswordInvalidaException e) {
+            System.err.println("Error al inicializar datos por defecto (datos inválidos): " + e.getMessage());
+        } catch (IOException e) { // MEJORA: Manejar el error de E/S en lugar de lanzar una excepción que detenga la app.
+            JOptionPane.showMessageDialog(null, "No se pudieron cargar los datos por defecto. Verifique los permisos de la carpeta.\nError: " + e.getMessage(), "Error de Archivo", JOptionPane.ERROR_MESSAGE);
+        } // El try-catch ahora envuelve también a los productos
+    }
+
     private static void configurarEventosProductos(PrincipalView principalView, ProductoAnadirView productoAnadirView, ProductoListaView productoListaView, ProductoEditar productoEditar, ProductoEliminar productoEliminar) {
         principalView.getMenuItemCrearProducto().addActionListener(e -> mostrarVentana(principalView, productoAnadirView));
         principalView.getMenuItemBuscarProducto().addActionListener(e -> mostrarVentana(principalView, productoListaView));
@@ -164,10 +270,12 @@ public class Main {
 
         // Listar: Admins ven todos, usuarios solo los suyos
         principalView.getMenuItemCarritoListar().addActionListener(e -> {
-            if (usuarioAutenticado.getRol() == Rol.ADMINISTRADOR) {
+            // La lógica de quién ve qué ya está en el controller, aquí solo se invoca.
+            try {
                 carritoController.listarCarritosDelUsuario();
-            } else {
-                carritoController.listarCarritosDelUsuario();
+            } catch (IOException ex) {
+                // MEJORA DE ROBUSTEZ: Mostrar error sin crashear.
+                JOptionPane.showMessageDialog(principalView, Idioma.get("carrito.controller.msj.error.archivo") + ": " + ex.getMessage(), "Error de Archivo", JOptionPane.ERROR_MESSAGE);
             }
             mostrarVentana(principalView, carritoListarView);
         });
@@ -213,7 +321,6 @@ public class Main {
             });
         }
 
-        // Solo usuarios normales pueden modificar sus datos
         if (usuarioAutenticado.getRol() == Rol.USUARIO) {
             principalView.getMenuItemUser().addActionListener(e -> {
                 usuarioModificarDatosView.mostrarDatosUsuario(usuarioAutenticado);
@@ -274,13 +381,5 @@ public class Main {
         principalView.getMenuItemEspañol().addActionListener(cambiarIdiomaListener);
         principalView.getMenuItemFrances().addActionListener(cambiarIdiomaListener);
         principalView.getMenuItemIngles().addActionListener(cambiarIdiomaListener);
-    }
-
-    private static void mostrarVentana(PrincipalView principal, JInternalFrame ventana) {
-        if (!ventana.isVisible()) {
-            principal.getjDesktopPane().add(ventana);
-            ventana.setVisible(true);
-        }
-        ventana.moveToFront();
     }
 }

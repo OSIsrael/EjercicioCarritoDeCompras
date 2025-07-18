@@ -15,6 +15,7 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import java.io.IOException;
 import java.util.List;
 
 public class CarritoController {
@@ -68,12 +69,24 @@ public class CarritoController {
     }
 
     private void configurarEventosAnadir() {
-        carritoAnadirView.getBtnAnadir().addActionListener(e -> anadirProducto());
-        carritoAnadirView.getBtnGuardar().addActionListener(e -> guardarCarrito());
+        carritoAnadirView.getBtnAnadir().addActionListener(e -> {
+            try {
+                anadirProducto();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        carritoAnadirView.getBtnGuardar().addActionListener(e -> {
+            try {
+                guardarCarrito();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         carritoAnadirView.getBtnLimpiar().addActionListener(e -> limpiarCarritoActual());
     }
 
-    private void anadirProducto() {
+    private void anadirProducto() throws IOException {
         String codigoStr = carritoAnadirView.getTxtCodigo().getText();
 
         if (!esNumeroEntero(codigoStr)) {
@@ -100,7 +113,7 @@ public class CarritoController {
         limpiarCamposProductoAnadir();
     }
 
-    private void guardarCarrito() {
+    private void guardarCarrito() throws IOException {
         if (carritoActual.estaVacio()) {
             carritoAnadirView.mostrarMensaje("carrito.controller.msj.carvac");
             return;
@@ -138,10 +151,16 @@ public class CarritoController {
     }
 
     private void configurarEventosListar() {
-        carritoListarView.getBtnListar().addActionListener(e -> listarCarritosDelUsuario());
+        carritoListarView.getBtnListar().addActionListener(e -> {
+            try {
+                listarCarritosDelUsuario();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
     }
 
-    public void listarCarritosDelUsuario() {
+    public void listarCarritosDelUsuario() throws IOException {
         List<Carrito> carritos;
         if (usuarioAutenticado.getRol() == Rol.ADMINISTRADOR) {
             carritos = carritoDAO.listarTodos();
@@ -153,19 +172,31 @@ public class CarritoController {
     }
 
     private void configurarEventosBuscar() {
-        carritoBuscarView.getBtnBuscarCarrito().addActionListener(e -> buscarCarritoParaVer());
-        carritoBuscarView.getBtnListar().addActionListener(e -> listarCarritosBuscar());
+        carritoBuscarView.getBtnBuscarCarrito().addActionListener(e -> {
+            try {
+                buscarCarritoParaVer();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        carritoBuscarView.getBtnListar().addActionListener(e -> {
+            try {
+                listarCarritosBuscar();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
     }
 
 
-    public void mostrarCarritosUsuarioParaBuscar() {
+    public void mostrarCarritosUsuarioParaBuscar() throws IOException {
         List<Carrito> carritos = carritoDAO.listarPorUsuario(usuarioAutenticado);
         carritoBuscarView.cargarCarritosUsuario(carritos);
         this.carritosUltimosMostradosBuscar = carritos;
     }
 
 
-    private void buscarCarritoParaVer() {
+    private void buscarCarritoParaVer() throws IOException {
         String codigoStr = carritoBuscarView.getTxtBuscarCarrito().getText().trim();
         if (!esNumeroEntero(codigoStr)) {
             carritoBuscarView.mostrarMensaje(Idioma.get("carrito.controller.msj.numin"));
@@ -183,23 +214,35 @@ public class CarritoController {
     }
 
 
-    private void listarCarritosBuscar() {
+    private void listarCarritosBuscar() throws IOException {
         mostrarCarritosUsuarioParaBuscar();
     }
 
 
-    public void mostrarCarritosUsuarioParaEliminar() {
+    public void mostrarCarritosUsuarioParaEliminar() throws IOException {
         List<Carrito> carritos = carritoDAO.listarPorUsuario(usuarioAutenticado);
         carritoEliminarView.cargarCarritosUsuario(carritos);
     }
 
 
     private void configurarEventosEliminar() {
-        carritoEliminarView.getBtnEliminar().addActionListener(e -> eliminarCarritoConfirmado());
-        carritoEliminarView.getBtnListar().addActionListener(e -> mostrarCarritosUsuarioParaEliminar());
+        carritoEliminarView.getBtnEliminar().addActionListener(e -> {
+            try {
+                eliminarCarritoConfirmado();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        carritoEliminarView.getBtnListar().addActionListener(e -> {
+            try {
+                mostrarCarritosUsuarioParaEliminar();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
     }
 
-    private void eliminarCarritoConfirmado() {
+    private void eliminarCarritoConfirmado() throws IOException {
         Carrito carrito = carritoEliminarView.getCarritoSeleccionado();
         if (carrito == null) {
             carritoEliminarView.mostrarMensaje(Idioma.get("carrito.controller.msj.selecar"));
@@ -215,11 +258,23 @@ public class CarritoController {
 
 
     private void configurarEventosModificar() {
-        carritoModificarView.getBtnBuscar().addActionListener(e -> buscarCarritoParaModificar());
-        carritoModificarView.getBtnModificar().addActionListener(e -> guardarCambiosCarrito());
+        carritoModificarView.getBtnBuscar().addActionListener(e -> {
+            try {
+                buscarCarritoParaModificar();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        carritoModificarView.getBtnModificar().addActionListener(e -> {
+            try {
+                guardarCambiosCarrito();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
     }
 
-    private void buscarCarritoParaModificar() {
+    private void buscarCarritoParaModificar() throws IOException {
         String codigoStr = carritoModificarView.getTxtCodigo().getText().trim();
         if (!esNumeroEntero(codigoStr)) {
             carritoModificarView.mostrarError(Idioma.get("carrito.controller.msj.numin"));
@@ -236,7 +291,7 @@ public class CarritoController {
         carritoModificarView.cargarCarrito(carrito);
     }
 
-    private void guardarCambiosCarrito() {
+    private void guardarCambiosCarrito() throws IOException {
         int fila = carritoModificarView.getTblModificar().getSelectedRow();
         if (fila == -1) {
             carritoModificarView.mostrarError(Idioma.get("carrito.controller.msj.modificarno"));
@@ -309,7 +364,7 @@ public class CarritoController {
         }
         return carrito.getUsuario().equals(usuarioAutenticado);
     }
-    public void mostrarCarritosUsuarioParaModificar() {
+    public void mostrarCarritosUsuarioParaModificar() throws IOException {
         List<Carrito> carritos = carritoDAO.listarPorUsuario(usuarioAutenticado);
         carritoModificarView.cargarCarritosUsuario(carritos);
         this.carritosUltimosMostradosModificar = carritos;

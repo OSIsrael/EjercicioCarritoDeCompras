@@ -11,6 +11,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.List;
 
 public class ProductoController {
@@ -21,9 +22,6 @@ public class ProductoController {
     private ProductoEliminar productoEliminarView;
     private CarritoAnadirView carritoAnadirView;
     private ProductoDAO productoDAO;
-
-    private Carrito carrito = new Carrito();
-
     public ProductoController(ProductoDAO productoDAO, ProductoAnadirView productoAnadirView, ProductoListaView productoListaView, ProductoEditar productoEditarView, ProductoEliminar productoEliminarView, CarritoAnadirView carritoAnadirView) {
         this.productoDAO = productoDAO;
         this.productoAnadirView = productoAnadirView;
@@ -40,105 +38,141 @@ public class ProductoController {
     }
 
     private void configurarAnadirEventos() {
-        productoAnadirView.getBtnGuardar().addActionListener(e -> guardarProducto());
+        productoAnadirView.getBtnGuardar().addActionListener(e -> {
+            guardarProducto();
+        });
     }
 
     private void configurarLitsaEventos() {
-        productoListaView.getBtnBuscar().addActionListener(e -> buscarProducto());
-        productoListaView.getBtnListar().addActionListener(e -> listarProductos());
+        productoListaView.getBtnBuscar().addActionListener(e -> {
+            buscarProducto();
+        });
+        productoListaView.getBtnListar().addActionListener(e -> {
+            listarProductos();
+        });
     }
 
     private void configurarEditarEventos() {
-        productoEditarView.getBtnListar1().addActionListener(e -> listarProductosParaEditar());
-        productoEditarView.getBtnEditar().addActionListener(e -> editarProducto());
+        productoEditarView.getBtnListar1().addActionListener(e -> {
+            listarProductosParaEditar();
+        });
+        productoEditarView.getBtnEditar().addActionListener(e -> {
+            editarProducto();
+        });
     }
 
     private void configurarEliminarEventos() {
-        productoEliminarView.getBtnListar().addActionListener(e -> listarProductosParaEliminar());
-        productoEliminarView.getBtnEliminar().addActionListener(e -> eliminarProducto());
+        productoEliminarView.getBtnListar().addActionListener(e -> {
+            listarProductosParaEliminar();
+        });
+        productoEliminarView.getBtnEliminar().addActionListener(e -> {
+            eliminarProducto();
+        });
     }
 
     private void configurarCarritoEventos() {
-        carritoAnadirView.getBtnBuscar().addActionListener(e -> buscarProductoCarrito());
+        carritoAnadirView.getBtnBuscar().addActionListener(e -> {
+            buscarProductoCarrito();
+        });
     }
 
     private void buscarProductoCarrito() {
-            String codigo1=carritoAnadirView.getTxtCodigo().getText();
-            if (codigo1.equals("")) {
+        try {
+            String codigoStr = carritoAnadirView.getTxtCodigo().getText().trim();
+            if (codigoStr.isEmpty()) {
                 carritoAnadirView.mostrarMensaje("carrito.info.noproducto");
+                return;
             }
-            int codigo = Integer.parseInt(codigo1);
 
+            int codigo;
+            try {
+                codigo = Integer.parseInt(codigoStr);
+            } catch (NumberFormatException e) {
+                carritoAnadirView.mostrarMensaje("producto.controller.msj.codigoinvalido");
+                return;
+            }
+            
             Producto producto = productoDAO.buscarPorCodigo(codigo);
             if (producto == null) {
-                carritoAnadirView.mostrarMensaje("producto.controller.msj.encontrado");
+                carritoAnadirView.mostrarMensaje("producto.controller.msj.noencontrado");
                 carritoAnadirView.getTxtNombre().setText("");
                 carritoAnadirView.getTxtPrecio().setText("");
             } else {
                 carritoAnadirView.getTxtNombre().setText(producto.getNombre());
                 carritoAnadirView.getTxtPrecio().setText(String.valueOf(producto.getPrecio()));
             }
-    }
-
-    private void actualizarTablaCarrito() {
-        String[] columnas = {Idioma.get("carrito.tbl.codigo"), Idioma.get("carrito.tbl.nombre"), Idioma.get("carrito.tbl.precio"), Idioma.get("carrito.tbl.cantidad"), Idioma.get("carrito.tbl.subtotal")};
-        List<ItemCarrito> items = carrito.getItems();
-        Object[][] datos = new Object[items.size()][5];
-
-        int i = 0;
-        for (ItemCarrito item : items) {
-            datos[i][0] = item.getProducto().getCodigo();
-            datos[i][1] = item.getProducto().getNombre();
-            datos[i][2] = item.getProducto().getPrecio();
-            datos[i][3] = item.getCantidad();
-            datos[i][4] = item.getProducto().getPrecio() * item.getCantidad();
-            i++;
+        } catch (IOException e) {
+            carritoAnadirView.mostrarError(Idioma.get("producto.controller.msj.error.archivo") + ": " + e.getMessage());
         }
-
-        DefaultTableModel model = new DefaultTableModel(datos, columnas);
-        carritoAnadirView.getTblMostrar().setModel(model);
-    }
-
-    private void actualizarTotales() {
-        double subtotal = carrito.calcularTotal();
-        double iva = subtotal * 0.12;
-        double total = subtotal + iva;
-
-        carritoAnadirView.getTxtSubtotal().setText(String.format("%.2f", subtotal));
-        carritoAnadirView.getTxtIva().setText(String.format("%.2f", iva));
-        carritoAnadirView.getTxtTotal().setText(String.format("%.2f", total));
     }
 
     private void guardarProducto() {
-        String codigo1=carritoAnadirView.getTxtCodigo().getText();
-        if (codigo1.equals("")) {
-            carritoAnadirView.mostrarMensaje("producto.info.noproducto");
-        }
-        int codigo = Integer.parseInt(codigo1);
-        String nombre = productoAnadirView.getTxtNombre().getText();
-        double precio = Double.parseDouble(productoAnadirView.getTxtPrecio().getText());
+        try {
 
-        productoDAO.crear(new Producto(codigo, nombre, precio));
-        productoAnadirView.mostrarMensaje(Idioma.get("producto.controller.msj.guardado"));
-        productoAnadirView.limpiarCampos();
-        productoAnadirView.mostrarProductos(productoDAO.listarTodos());
+            String codigoStr = productoAnadirView.getTxtCodigo().getText().trim();
+            String nombre = productoAnadirView.getTxtNombre().getText().trim();
+            String precioStr = productoAnadirView.getTxtPrecio().getText().trim();
+
+            // --- MEJORA: Validación de campos ---
+            if (codigoStr.isEmpty() || nombre.isEmpty() || precioStr.isEmpty()) {
+                productoAnadirView.mostrarMensaje("producto.controller.msj.camposvacios");
+                return;
+            }
+
+            int codigo;
+            double precio;
+
+            try {
+                codigo = Integer.parseInt(codigoStr);
+                precio = Double.parseDouble(precioStr);
+            } catch (NumberFormatException e) {
+                productoAnadirView.mostrarMensaje("producto.controller.msj.valido");
+                return;
+            }
+
+            if (productoDAO.buscarPorCodigo(codigo) != null) {
+                productoAnadirView.mostrarMensaje("producto.controller.msj.codigoexiste");
+                return;
+            }
+
+            productoDAO.crear(new Producto(codigo, nombre, precio));
+            productoAnadirView.mostrarMensaje("producto.controller.msj.guardado");
+            productoAnadirView.limpiarCampos();
+
+        } catch (IOException e) {
+
+            productoAnadirView.mostrarError(Idioma.get("producto.controller.msj.error.archivo") + ": " + e.getMessage());
+        }
     }
 
     private void buscarProducto() {
-        String nombre = productoListaView.getTxtBuscar().getText();
-        List<Producto> productosEncontrados = productoDAO.buscarPorNombre(nombre);
-        productoListaView.cargarDatos(productosEncontrados);
+        try {
+            String nombre = productoListaView.getTxtBuscar().getText();
+            List<Producto> productosEncontrados = productoDAO.buscarPorNombre(nombre);
+            productoListaView.cargarDatos(productosEncontrados);
+        } catch (IOException e) {
+            productoListaView.mostrarError(Idioma.get("producto.controller.msj.error.archivo") + ": " + e.getMessage());
+        }
     }
 
     private void listarProductos() {
-        productoListaView.cargarDatos(productoDAO.listarTodos());
+        try {
+            productoListaView.cargarDatos(productoDAO.listarTodos());
+        } catch (IOException e) {
+            productoListaView.mostrarError(Idioma.get("producto.controller.msj.error.archivo") + ": " + e.getMessage());
+        }
     }
 
     private void listarProductosParaEditar() {
-        productoEditarView.cargarDatos(productoDAO.listarTodos());
+        try {
+            productoEditarView.cargarDatos(productoDAO.listarTodos());
+        } catch (IOException e) {
+            productoEditarView.mostrarMensaje(Idioma.get("producto.controller.msj.error.archivo") + ": " + e.getMessage());
+        }
     }
 
     private void editarProducto() {
+        try {
         int filaSeleccionada = productoEditarView.getTblEditarProducto().getSelectedRow();
         if (filaSeleccionada >= 0) {
             int codigo = (int) productoEditarView.getTblEditarProducto().getValueAt(filaSeleccionada, 0);
@@ -153,7 +187,7 @@ public class ProductoController {
                     productoEditarView.limpiarCampos();
                     listarProductosParaEditar();
                 } else {
-                    productoEditarView.mostrarMensaje(Idioma.get("producto.controller.msj.encontrado"));
+                    productoEditarView.mostrarMensaje(Idioma.get("producto.controller.msj.noencontrado"));
                 }
             } else {
                 productoEditarView.mostrarMensaje(Idioma.get("producto.controller.msj.valido"));
@@ -161,17 +195,23 @@ public class ProductoController {
         } else {
             productoEditarView.mostrarMensaje(Idioma.get("producto.controller.msj.selectable"));
         }
+
+        } catch (IOException e) {
+            productoEditarView.mostrarMensaje(Idioma.get("producto.controller.msj.error.archivo") + ": " + e.getMessage());
+        }
     }
 
     private void listarProductosParaEliminar() {
-        productoEliminarView.cargarDatos(productoDAO.listarTodos());
+        try {
+            productoEliminarView.cargarDatos(productoDAO.listarTodos());
+        } catch (IOException e) {
+            productoEliminarView.mostrarMensaje(Idioma.get("producto.controller.msj.error.archivo") + ": " + e.getMessage());
+        }
     }
 
 
     private void eliminarProducto() {
-
         int filaSeleccionada = productoEliminarView.getTblEliminarProducto().getSelectedRow();
-
         if (filaSeleccionada < 0) {
             productoEliminarView.mostrarMensaje("producto.controller.msj.please");
             return;
@@ -186,17 +226,14 @@ public class ProductoController {
         );
 
         if (confirmacion == JOptionPane.YES_OPTION) {
-
             int codigo = (int) productoEliminarView.getTblEliminarProducto().getValueAt(filaSeleccionada, 0);
-
-
-            productoDAO.eliminar(codigo);
-
-
-            productoEliminarView.mostrarMensaje(Idioma.get("producto.controller.msj.eliminado"));
-
-
-            listarProductosParaEliminar();
+            try {
+                productoDAO.eliminar(codigo);
+                productoEliminarView.mostrarMensaje(Idioma.get("producto.controller.msj.eliminado"));
+                listarProductosParaEliminar();
+            } catch (IOException e) {
+                productoEliminarView.mostrarMensaje(Idioma.get("producto.controller.msj.error.archivo") + ": " + e.getMessage());
+            }
         }
     }
 

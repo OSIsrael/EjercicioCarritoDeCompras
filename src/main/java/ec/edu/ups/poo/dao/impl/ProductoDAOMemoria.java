@@ -3,6 +3,7 @@ package ec.edu.ups.poo.dao.impl;
 import ec.edu.ups.poo.dao.ProductoDAO;
 import ec.edu.ups.poo.modelo.Producto;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -16,12 +17,12 @@ public class ProductoDAOMemoria implements ProductoDAO {
     }
 
     @Override
-    public void crear(Producto producto) {
+    public void crear(Producto producto) throws IOException {
         productos.add(producto);
     }
 
     @Override
-    public Producto buscarPorCodigo(int codigo) {
+    public Producto buscarPorCodigo(int codigo) throws IOException {
         for (Producto producto : productos) {
             if (producto.getCodigo() == codigo) {
                 return producto;
@@ -31,7 +32,7 @@ public class ProductoDAOMemoria implements ProductoDAO {
     }
 
     @Override
-    public List<Producto> buscarPorNombre(String nombre) {
+    public List<Producto> buscarPorNombre(String nombre) throws IOException {
         List<Producto> productosEncontrados = new ArrayList<>();
 
 
@@ -51,7 +52,7 @@ public class ProductoDAOMemoria implements ProductoDAO {
     }
 
     @Override
-    public void actualizar(Producto producto) {
+    public void actualizar(Producto producto) throws IOException {
         for (int i = 0; i < productos.size(); i++) {
             if (productos.get(i).getCodigo() == producto.getCodigo()) {
                 productos.set(i, producto);
@@ -61,7 +62,7 @@ public class ProductoDAOMemoria implements ProductoDAO {
     }
 
     @Override
-    public void eliminar(int codigo) {
+    public void eliminar(int codigo) throws IOException {
         Iterator<Producto> iterator = productos.iterator();
         while (iterator.hasNext()) {
             Producto producto = iterator.next();
@@ -73,7 +74,7 @@ public class ProductoDAOMemoria implements ProductoDAO {
     }
 
     @Override
-    public List<Producto> listarTodos() {
+    public List<Producto> listarTodos() throws IOException {
         return new ArrayList<>(productos);
     }
 }

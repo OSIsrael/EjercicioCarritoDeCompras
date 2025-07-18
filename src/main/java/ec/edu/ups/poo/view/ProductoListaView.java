@@ -89,4 +89,9 @@ public class ProductoListaView extends JInternalFrame {
             modelo.addRow(filaProducto);
         }
     }
+
+    // --- MÉTODO AÑADIDO PARA MANEJO DE ERRORES ---
+    public void mostrarError(String mensajeCompleto) {
+        JOptionPane.showMessageDialog(this, mensajeCompleto, Idioma.get("usuario.admin.msj.error"), JOptionPane.ERROR_MESSAGE);
+    }
 }

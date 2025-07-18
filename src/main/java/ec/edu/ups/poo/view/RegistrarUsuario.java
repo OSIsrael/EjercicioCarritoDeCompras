@@ -6,6 +6,7 @@ import ec.edu.ups.poo.modelo.Genero;
 import ec.edu.ups.poo.modelo.Pregunta;
 import ec.edu.ups.poo.util.Idioma;
 
+import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,7 +35,6 @@ public class RegistrarUsuario extends JFrame {
     private JLabel lblApellido;
     private JLabel lblTelefono;
     private JLabel lblEdad;
-    private JLabel lblGenero;
     private final Map<Pregunta, String> preguntasRespondidas;
     private List<Pregunta> todasLasPreguntas;
 
@@ -43,6 +43,13 @@ public class RegistrarUsuario extends JFrame {
     private JMenuItem menuItemEspañol;
     private JMenuItem menuItemIngles;
     private JMenuItem menuItemFrances;
+    private JLabel lblGenero;
+    private JLabel lblGuardarDatos;
+    private JLabel lblTipoAlmacenamiento;
+    private JComboBox<String> cbxTipoGuardar;
+    private JTextField txtRuta;
+    private JButton btnSeleccionarRuta;
+
 
 
 
@@ -63,12 +70,36 @@ public class RegistrarUsuario extends JFrame {
         cbxGenero.addItem(Genero.MASCULINO);
         cbxGenero.addItem(Genero.FEMININO);
         cbxGenero.addItem(Genero.OTROS);
+
+        // --- LÓGICA RESTAURADA ---
+        // Configurar el ComboBox para el tipo de almacenamiento
+        cbxTipoGuardar.setModel(new DefaultComboBoxModel<>(new String[] { "MEMORIA", "TEXTO", "BINARIO" }));
+        cbxTipoGuardar.addActionListener(e -> actualizarVisibilidadRuta());
+        btnSeleccionarRuta.addActionListener(e -> seleccionarRuta());
+
         btnRegistrarse.setIcon(new ImageIcon(getClass().getResource("/icons/entrar.png")));
         btnAgregarPregunta.setIcon(new ImageIcon(getClass().getResource("/icons/anadir.png")));
         crearMenu();
         actualizarTextos();
+        actualizarVisibilidadRuta(); // Llamada inicial para establecer la visibilidad correcta
         btnAgregarPregunta.addActionListener(e -> agregarPreguntaRespondida());
 
+    }
+    // --- LÓGICA RESTAURADA ---
+    private void actualizarVisibilidadRuta(){
+        String seleccion=(String) cbxTipoGuardar.getSelectedItem();
+        boolean visible="TEXTO".equals(seleccion) || "BINARIO".equals(seleccion);
+        txtRuta.setVisible(visible);
+        btnSeleccionarRuta.setVisible(visible);
+    }
+    private void seleccionarRuta(){
+        JFileChooser fileChooser=new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int resultado=fileChooser.showOpenDialog(this);
+        if (resultado==JFileChooser.APPROVE_OPTION) {
+            File directorioSeleccionado=fileChooser.getSelectedFile();
+            txtRuta.setText(directorioSeleccionado.getAbsolutePath());
+        }
     }
     private void crearMenu() {
         menuBar = new JMenuBar();
@@ -281,6 +312,45 @@ public class RegistrarUsuario extends JFrame {
         JOptionPane.showMessageDialog(this, Idioma.get(mensaje));
     }
 
+    public JButton getBtnSeleccionarRuta() {
+        return btnSeleccionarRuta;
+    }
+
+    public void setBtnSeleccionarRuta(JButton btnSeleccionarRuta) {
+        this.btnSeleccionarRuta = btnSeleccionarRuta;
+    }
+
+    public JLabel getLblGuardarDatos() {
+        return lblGuardarDatos;
+    }
+
+    public void setLblGuardarDatos(JLabel lblGuardarDatos) {
+        this.lblGuardarDatos = lblGuardarDatos;
+    }
+
+    public JLabel getLblTipoAlmacenamiento() {
+        return lblTipoAlmacenamiento;
+    }
+
+    public void setLblTipoAlmacenamiento(JLabel lblTipoAlmacenamiento) {
+        this.lblTipoAlmacenamiento = lblTipoAlmacenamiento;
+    }
+
+    public JTextField getTxtRuta() {
+        return txtRuta;
+    }
+
+    public void setTxtRuta(JTextField txtRuta) {
+        this.txtRuta = txtRuta;
+    }
+
+    public JComboBox<String> getCbxTipoGuardar() {
+        return cbxTipoGuardar;
+    }
+
+    public void setCbxTipoGuardar(JComboBox<String> cbxTipoGuardar) {
+        this.cbxTipoGuardar = cbxTipoGuardar;
+    }
 
     public void limpiarCampos() {
         txtUsuarioRe.setText("");
